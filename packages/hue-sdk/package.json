@@ -1,0 +1,48 @@
+{
+	"name": "hue-sdk",
+	"version": "0.1.0",
+	"description": "Typed, environment agnostic TypeScript SDK for the Philips Hue CLIP API v2",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md",
+		"CHANGELOG.md"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dawidjaniga/philips-hue-remote.git",
+		"directory": "packages/hue-sdk"
+	},
+	"keywords": [
+		"philips-hue",
+		"hue",
+		"clip-v2",
+		"smart-home",
+		"typescript"
+	],
+	"scripts": {
+		"build": "rm -rf dist && tsc -p tsconfig.build.json",
+		"check": "tsc --noEmit",
+		"test": "vitest run --typecheck",
+		"format": "prettier --write .",
+		"lint": "prettier --check ."
+	},
+	"devDependencies": {
+		"prettier": "^3.7.4",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.15"
+	}
+}
