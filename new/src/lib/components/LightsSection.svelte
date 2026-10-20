@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
 	import type { SvelteHueApp } from 'hue-app/svelte';
 	import { describeError } from '$lib/hue/bridge';
 	import LightGrid from './LightGrid.svelte';
@@ -20,15 +19,6 @@
 	const error = $derived(
 		commandError ?? (hue.status === 'error' ? describeError(hue.error) : null)
 	);
-
-	$effect(() => {
-		const app = hue;
-		untrack(() => {
-			app.initialize().catch(() => {});
-		});
-		return () => app.dispose();
-	});
-
 	async function run(command: Promise<void>) {
 		commandError = null;
 		try {

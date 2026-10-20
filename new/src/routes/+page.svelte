@@ -7,11 +7,21 @@
 	import { BridgeConnection } from '$lib/hue/connection.svelte';
 	import { createHueApp } from 'hue-app';
 	import { createSvelteHueApp } from 'hue-app/svelte';
+	import { untrack } from 'svelte';
 
 	const connection = new BridgeConnection();
 	const hue = $derived(
 		connection.client ? createSvelteHueApp(createHueApp({ client: connection.client })) : null
 	);
+
+	$effect(() => {
+		const app = hue;
+		if (!app) return;
+		untrack(() => {
+			app.initialize().catch(() => {});
+		});
+		return () => app.dispose();
+	});
 </script>
 
 <svelte:head>
