@@ -60,7 +60,6 @@ Requests use `keepalive: false` because Bun skips `checkServerIdentity` on reuse
 - Bridges with self-signed certificates (older firmware) are not supported and fail with a certificate error.
 - No live updates: changes made by other apps are not shown until restart.
 - Only the first discovered bridge is used; set the environment variables to choose another.
-- `src/dedupe-react.ts` redirects other copies of `react` to this package's copy. A `file:` install of `hue-app` brings its own development `react`, and two React copies break hooks.
 
 ## Scripts
 
