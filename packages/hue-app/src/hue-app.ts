@@ -2,7 +2,7 @@ import { batch, computed, signal, type ReadonlySignal } from '@preact/signals-co
 import type { HueClient } from 'hue-sdk';
 import { DimLight } from './dim-light.js';
 import { LightNotFoundError } from './errors.js';
-import type { HueGateway } from './gateway.js';
+import type { HueAppConnection, HueGateway } from './gateway.js';
 import { HueSdkGateway } from './hue-sdk-gateway.js';
 import { Light } from './light.js';
 import { LightCollection } from './light-collection.js';
@@ -15,9 +15,13 @@ export interface HueAppState {
 	readonly status: ReadonlySignal<HueAppStatus>;
 	/** Error from the last failed `initialize()`, cleared on the next attempt. */
 	readonly error: ReadonlySignal<unknown>;
+	readonly connection: ReadonlySignal<HueAppConnection>;
 }
 
-export type HueAppOptions = { client: HueClient } | { gateway: HueGateway };
+export type HueAppOptions = ({ client: HueClient } | { gateway: HueGateway }) & {
+	live?: boolean;
+	settleMs?: number;
+};
 
 export class HueApp {
 	readonly state: HueAppState;
@@ -26,6 +30,7 @@ export class HueApp {
 	readonly #lights = signal<ReadonlyMap<string, Light>>(new Map());
 	readonly #status = signal<HueAppStatus>('idle');
 	readonly #error = signal<unknown>(undefined);
+	readonly #connection = signal<HueAppConnection>('offline');
 	readonly #toggleLight: ToggleLight;
 	readonly #dimLight: DimLight;
 	#initialization: Promise<void> | undefined;
@@ -37,9 +42,12 @@ export class HueApp {
 		this.state = {
 			lights: new LightCollection(this.#lights),
 			status: computed(() => this.#status.value),
-			error: computed(() => this.#error.value)
+			error: computed(() => this.#error.value),
+			connection: computed(() => this.#connection.value)
 		};
 	}
+
+	dispose(): void {}
 
 	/** Loads lights from the bridge once. Concurrent calls share the load; calls after a failure retry. */
 	initialize(): Promise<void> {

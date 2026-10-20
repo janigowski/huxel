@@ -1,3 +1,4 @@
+import { createEventsApi, type EventsApi } from './events.js';
 import { createFetchHttpClient } from './fetch.js';
 import type { HttpClient } from './http.js';
 import { createHueProtocol } from './protocol.js';
@@ -34,6 +35,7 @@ export interface HueClient {
 	readonly devices: DevicesApi;
 	readonly bridges: BridgesApi;
 	readonly bridgeHomes: BridgeHomesApi;
+	readonly events: EventsApi;
 }
 
 export function createHueClient(options: HueClientOptions): HueClient {
@@ -54,6 +56,7 @@ export function createHueClient(options: HueClientOptions): HueClient {
 		smartScenes: createSmartScenesApi(protocol),
 		devices: createDevicesApi(protocol),
 		bridges: createBridgesApi(protocol),
-		bridgeHomes: createBridgeHomesApi(protocol)
+		bridgeHomes: createBridgeHomesApi(protocol),
+		events: createEventsApi({ baseUrl: options.baseUrl, appKey: options.appKey, httpClient })
 	};
 }

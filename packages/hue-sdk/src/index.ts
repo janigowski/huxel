@@ -2,7 +2,20 @@ export { createHueClient } from './client.js';
 export type { HueClient, HueClientOptions } from './client.js';
 export { createFetchHttpClient } from './fetch.js';
 export type { FetchHttpClientOptions } from './fetch.js';
-export type { HttpClient, HttpMethod, HttpRequest, HttpResponse } from './http.js';
+export type {
+	HttpClient,
+	HttpMethod,
+	HttpRequest,
+	HttpResponse,
+	HttpStreamResponse
+} from './http.js';
+export type {
+	EventsApi,
+	EventStreamObserver,
+	EventStreamOptions,
+	EventStreamState,
+	EventStreamSubscription
+} from './events.js';
 export type { RequestOptions } from './protocol.js';
 export * from './errors.js';
 export { discoverBridges } from './discovery.js';
@@ -23,6 +36,7 @@ export type * from './types/bridge-home.js';
 export type * from './types/bridge.js';
 export type * from './types/common.js';
 export type * from './types/device.js';
+export type * from './types/event.js';
 export type * from './types/grouped-light.js';
 export type * from './types/light.js';
 export type * from './types/resource.js';
