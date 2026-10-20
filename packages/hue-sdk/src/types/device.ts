@@ -144,7 +144,6 @@ export interface DeviceUsertestPut {
 }
 
 export interface DeviceModeGet {
-	/** @deprecated Deprecated. Use switch_mode in SwitchInputConfiguration. */
 	status: ConfigurationStatus;
 	/** Current mode (on read) or requested mode (on write) of the switch */
 	mode: SwitchModeType;
@@ -153,7 +152,7 @@ export interface DeviceModeGet {
 }
 
 export interface DeviceModePut {
-	/** @deprecated Deprecated. Use switch_mode in SwitchInputConfiguration. */
+	/** Current mode (on read) or requested mode (on write) of the switch */
 	mode: SwitchModeType;
 }
 

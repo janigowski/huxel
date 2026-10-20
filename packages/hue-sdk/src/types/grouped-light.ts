@@ -1,14 +1,12 @@
-import type { DeltaAction, EmptyObject, ResourceIdentifier } from './common.js';
+import type { DeltaAction, EmptyObject, ResourceIdentifier, XYColor } from './common.js';
 import type {
 	AlertPut,
-	ColorFeatureBasicGet,
 	ColorFeatureBasicPut,
 	ColorTemperatureDeltaPut,
 	ColorTemperaturePut,
 	DimmingDeltaPut,
 	DimmingPut,
 	LightAlertGet,
-	LightDynamicsPut,
 	OnFeature,
 	OnFeaturePut,
 	SignalingPut,
@@ -20,28 +18,36 @@ export interface GroupedLightDimmingGet {
 	brightness: number;
 }
 
+/** The schema declares no properties; fields are taken from the documented example. */
 export interface GroupedLightDimmingDeltaGet {
-	/** The delta action to apply */
 	action?: DeltaAction;
-	/** Brightness percentage of full-scale increase delta to current dimlevel. Clip at Max-level or Min-level. maximum: 100 */
 	brightness_delta?: number;
 }
 
+/** The schema declares no properties; fields are taken from the documented example. */
 export interface GroupedLightColorTemperatureGet {
-	/** color temperature in mirek. minimum: 50, maximum: 1000 */
 	mirek?: number;
 }
 
+/** The schema declares no properties; fields are taken from the documented example. */
 export interface GroupedLightColorTemperatureDeltaGet {
-	/** The delta action to apply */
 	action?: DeltaAction;
-	/** Mirek delta to current mirek. Clip at mirek_minimum and mirek_maximum of mirek_schema. maximum: 950 */
 	mirek_delta?: number;
+}
+
+/** The schema declares no properties; fields are taken from the documented example. */
+export interface GroupedLightColorGet {
+	xy?: XYColor;
 }
 
 export interface GroupedLightSignalingGet {
 	/** Signals that the light supports. */
 	signal_values: SignalType[];
+}
+
+export interface GroupedLightDynamicsPut {
+	/** Duration of a light transition in ms. */
+	duration?: number;
 }
 
 export interface GroupedLightGet {
@@ -61,7 +67,7 @@ export interface GroupedLightGet {
 	color_temperature?: GroupedLightColorTemperatureGet;
 	color_temperature_delta?: GroupedLightColorTemperatureDeltaGet;
 	/** Joined color control */
-	color?: ColorFeatureBasicGet;
+	color?: GroupedLightColorGet;
 	/** Joined alert control */
 	alert?: LightAlertGet;
 	/** Feature containing basic signaling properties. */
@@ -87,5 +93,5 @@ export interface GroupedLightPut {
 	alert?: AlertPut;
 	/** Feature containing basic signaling properties. */
 	signaling?: SignalingPut;
-	dynamics?: LightDynamicsPut;
+	dynamics?: GroupedLightDynamicsPut;
 }
