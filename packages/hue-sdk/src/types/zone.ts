@@ -1,46 +1,6 @@
-import type { ResourceIdentifier } from './common.js';
+import type { AreaArchetype, ResourceIdentifier } from './common.js';
 
-export type ZoneArchetype =
-	| 'living_room'
-	| 'kitchen'
-	| 'dining'
-	| 'bedroom'
-	| 'kids_bedroom'
-	| 'bathroom'
-	| 'nursery'
-	| 'recreation'
-	| 'office'
-	| 'gym'
-	| 'hallway'
-	| 'toilet'
-	| 'front_door'
-	| 'garage'
-	| 'terrace'
-	| 'garden'
-	| 'driveway'
-	| 'carport'
-	| 'home'
-	| 'downstairs'
-	| 'upstairs'
-	| 'top_floor'
-	| 'attic'
-	| 'guest_room'
-	| 'staircase'
-	| 'lounge'
-	| 'man_cave'
-	| 'computer'
-	| 'studio'
-	| 'music'
-	| 'tv'
-	| 'reading'
-	| 'closet'
-	| 'storage'
-	| 'laundry_room'
-	| 'balcony'
-	| 'porch'
-	| 'barbecue'
-	| 'pool'
-	| 'other';
+export type ZoneArchetype = AreaArchetype;
 
 export interface ZoneMetadataGet {
 	/** Human readable name of a resource. minLength: 1, maxLength: 32 */

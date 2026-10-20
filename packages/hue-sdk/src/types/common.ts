@@ -96,6 +96,73 @@ export interface Position3D {
 	z: number;
 }
 
+/** A quaternion representing rotation in 3D space. */
+export interface Quaternion {
+	/** minimum: -1, maximum: 1 */
+	x: number;
+	/** minimum: -1, maximum: 1 */
+	y: number;
+	/** minimum: -1, maximum: 1 */
+	z: number;
+	/** minimum: -1, maximum: 1 */
+	w: number;
+}
+
+export interface GeometryTransform {
+	/** A 3D coordinate in space in meters. */
+	position: Position3D;
+	/** A quaternion representing rotation in 3D space. */
+	rotation: Quaternion;
+}
+
+export interface GeometryObject {
+	reference: ResourceIdentifier;
+	transform: GeometryTransform;
+}
+
+/** Possible archetypes of a room or zone */
+export type AreaArchetype =
+	| 'living_room'
+	| 'kitchen'
+	| 'dining'
+	| 'bedroom'
+	| 'kids_bedroom'
+	| 'bathroom'
+	| 'nursery'
+	| 'recreation'
+	| 'office'
+	| 'gym'
+	| 'hallway'
+	| 'toilet'
+	| 'front_door'
+	| 'garage'
+	| 'terrace'
+	| 'garden'
+	| 'driveway'
+	| 'carport'
+	| 'home'
+	| 'downstairs'
+	| 'upstairs'
+	| 'top_floor'
+	| 'attic'
+	| 'guest_room'
+	| 'staircase'
+	| 'lounge'
+	| 'man_cave'
+	| 'computer'
+	| 'studio'
+	| 'music'
+	| 'tv'
+	| 'reading'
+	| 'closet'
+	| 'storage'
+	| 'laundry_room'
+	| 'balcony'
+	| 'porch'
+	| 'barbecue'
+	| 'pool'
+	| 'other';
+
 export type DeltaAction = 'up' | 'down' | 'stop';
 
 export type ConfigurationStatus = 'set' | 'changing';

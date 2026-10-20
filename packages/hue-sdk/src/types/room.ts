@@ -1,69 +1,6 @@
-import type { Position3D, ResourceIdentifier } from './common.js';
+import type { AreaArchetype, GeometryObject, ResourceIdentifier } from './common.js';
 
-export type RoomArchetype =
-	| 'living_room'
-	| 'kitchen'
-	| 'dining'
-	| 'bedroom'
-	| 'kids_bedroom'
-	| 'bathroom'
-	| 'nursery'
-	| 'recreation'
-	| 'office'
-	| 'gym'
-	| 'hallway'
-	| 'toilet'
-	| 'front_door'
-	| 'garage'
-	| 'terrace'
-	| 'garden'
-	| 'driveway'
-	| 'carport'
-	| 'home'
-	| 'downstairs'
-	| 'upstairs'
-	| 'top_floor'
-	| 'attic'
-	| 'guest_room'
-	| 'staircase'
-	| 'lounge'
-	| 'man_cave'
-	| 'computer'
-	| 'studio'
-	| 'music'
-	| 'tv'
-	| 'reading'
-	| 'closet'
-	| 'storage'
-	| 'laundry_room'
-	| 'balcony'
-	| 'porch'
-	| 'barbecue'
-	| 'pool'
-	| 'other';
-
-export interface RoomQuaternion {
-	/** minimum: -1, maximum: 1 */
-	x: number;
-	/** minimum: -1, maximum: 1 */
-	y: number;
-	/** minimum: -1, maximum: 1 */
-	z: number;
-	/** minimum: -1, maximum: 1 */
-	w: number;
-}
-
-export interface RoomGeometryTransform {
-	/** A 3D coordinate in space in meters. */
-	position: Position3D;
-	/** A quaternion representing rotation in 3D space. */
-	rotation: RoomQuaternion;
-}
-
-export interface RoomGeometryObject {
-	reference: ResourceIdentifier;
-	transform: RoomGeometryTransform;
-}
+export type RoomArchetype = AreaArchetype;
 
 export interface RoomMetadataGet {
 	/** Human readable name of a resource. minLength: 1, maxLength: 32 */
@@ -88,15 +25,15 @@ export interface RoomMetadataPost {
 
 export interface RoomGeometryGet {
 	/** Data describing geometry information of the room. Only positioning of device services is supported. */
-	objects?: RoomGeometryObject[];
+	objects?: GeometryObject[];
 }
 
 export interface RoomGeometryPut {
-	objects?: RoomGeometryObject[];
+	objects?: GeometryObject[];
 }
 
 export interface RoomGeometryPost {
-	objects: RoomGeometryObject[];
+	objects: GeometryObject[];
 }
 
 export interface RoomGet {

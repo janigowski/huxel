@@ -1,4 +1,9 @@
-import type { ConfigurationStatus, EmptyObject, Position3D, ResourceIdentifier } from './common.js';
+import type {
+	ConfigurationStatus,
+	EmptyObject,
+	GeometryObject,
+	ResourceIdentifier
+} from './common.js';
 import type { IdentifyPut } from './light.js';
 
 export type DeviceArchetype =
@@ -152,37 +157,14 @@ export interface DeviceModePut {
 	mode: SwitchModeType;
 }
 
-export interface DeviceQuaternion {
-	/** minimum: -1, maximum: 1 */
-	x: number;
-	/** minimum: -1, maximum: 1 */
-	y: number;
-	/** minimum: -1, maximum: 1 */
-	z: number;
-	/** minimum: -1, maximum: 1 */
-	w: number;
-}
-
-export interface DeviceGeometryTransform {
-	/** A 3D coordinate in space in meters. */
-	position: Position3D;
-	/** A quaternion representing rotation in 3D space. */
-	rotation: DeviceQuaternion;
-}
-
-export interface DeviceGeometryObject {
-	reference: ResourceIdentifier;
-	transform: DeviceGeometryTransform;
-}
-
 export interface DeviceGeometryGet {
 	/** Data describing geometry information of the device. Only positioning of lightservices is supported. */
-	objects?: DeviceGeometryObject[];
+	objects?: GeometryObject[];
 }
 
 export interface DeviceGeometryPut {
 	/** Data describing geometry information of the device. Only positioning of lightservices is supported. */
-	objects?: DeviceGeometryObject[];
+	objects?: GeometryObject[];
 }
 
 export interface DeviceGet {
