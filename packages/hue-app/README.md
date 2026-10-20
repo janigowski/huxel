@@ -13,11 +13,9 @@ bun add hue-app hue-sdk
 ## CLI / Node.js
 
 ```ts
-import { createHueClient } from 'hue-sdk';
 import { createHueApp } from 'hue-app';
 
-const client = createHueClient({ baseUrl: 'https://192.168.1.100', appKey, throttle: false });
-const app = createHueApp({ client });
+const app = createHueApp({ baseUrl: 'https://192.168.1.100', appKey });
 
 await app.initialize();
 
@@ -34,12 +32,13 @@ await app.dimLight(light.id, 50);
 unsubscribe();
 ```
 
-Create the `hue-sdk` client with `throttle: false`. The SDK's default write throttling can resolve a command with a different request's response and silently drop failures. `hue-app` already limits each light property to one request in flight.
+`createHueApp` creates the `hue-sdk` client itself with `throttle: false`. The SDK's default write throttling can resolve a command with a different request's response and silently drop failures. `hue-app` already limits each light property to one request in flight. Pass `httpClient` to customize the transport, for example to pin the bridge certificate.
 
 ## API
 
 ```ts
-createHueApp({ client: HueClient } | { gateway: HueGateway }): HueApp
+createHueApp({ baseUrl: string; appKey: string; httpClient?: HttpClient } | { gateway: HueGateway }): HueApp
+describeError(error: unknown): string
 
 app.initialize(): Promise<void>
 app.toggleLight(lightId: string): Promise<void>
@@ -61,6 +60,8 @@ State is read-only: signals are computed, light objects are frozen, and mutation
 
 The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness`), which is useful for tests.
 
+`describeError` turns an error into a user-facing message, appending each `cause` in parentheses and asking the user to press the link button for `HueLinkButtonNotPressedError`.
+
 ## Optimistic updates
 
 `toggleLight` and `dimLight` update state synchronously, then send the command. The returned promise resolves when the bridge accepts the command and rejects with the bridge error otherwise.
@@ -76,7 +77,7 @@ The `gateway` option accepts any `HueGateway` implementation (`listLights`, `set
 import { createHueApp } from 'hue-app';
 import { createSvelteHueApp } from 'hue-app/svelte';
 
-const hue = createSvelteHueApp(createHueApp({ client }));
+const hue = createSvelteHueApp(createHueApp({ baseUrl, appKey }));
 await hue.initialize();
 ```
 

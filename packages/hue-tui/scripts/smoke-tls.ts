@@ -1,5 +1,5 @@
+import { describeError } from 'hue-app';
 import { createBridgeHttpClient } from '../src/bridge/http-client';
-import { describeError } from '../src/describe-error';
 
 const ip = process.env.HUE_BRIDGE_IP ?? '192.168.1.10';
 const bridgeId = process.env.HUE_BRIDGE_ID ?? '001788fffe7d45eb';

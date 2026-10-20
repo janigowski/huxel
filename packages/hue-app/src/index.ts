@@ -1,7 +1,15 @@
 export { createHueApp } from './hue-app.js';
-export type { HueApp, HueAppOptions, HueAppState, HueAppStatus } from './hue-app.js';
+export type {
+	HueApp,
+	HueAppActions,
+	HueAppOptions,
+	HueAppState,
+	HueAppStatus,
+	HueBridgeOptions
+} from './hue-app.js';
+export { describeError } from './describe-error.js';
 export type { LightCollection } from './light-collection.js';
-export type { ReadonlyLight as Light } from './light.js';
+export type { ReadonlyLight as Light, LightSnapshot } from './light.js';
 export type {
 	BridgeLight,
 	HueAppConnection,

@@ -5,13 +5,10 @@
 	import LightsSection from '$lib/components/LightsSection.svelte';
 	import { bridge } from '$lib/hue/bridge';
 	import { BridgeConnection } from '$lib/hue/connection.svelte';
-	import { createHueApp } from 'hue-app';
 	import { createSvelteHueApp } from 'hue-app/svelte';
 
 	const connection = new BridgeConnection();
-	const hue = $derived(
-		connection.client ? createSvelteHueApp(createHueApp({ client: connection.client })) : null
-	);
+	const hue = $derived(connection.app ? createSvelteHueApp(connection.app) : null);
 </script>
 
 <svelte:head>

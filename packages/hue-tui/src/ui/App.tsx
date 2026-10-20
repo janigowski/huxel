@@ -1,10 +1,9 @@
 import { useKeyboard } from '@opentui/react';
-import type { HueApp } from 'hue-app';
+import { describeError, type HueApp } from 'hue-app';
 import { HueForbiddenError, HueUnauthorizedError } from 'hue-sdk';
 import { useEffect, useState } from 'react';
 import type { BridgeAddress } from '../config/config-store';
 import type { Connection } from '../connection';
-import { describeError } from '../describe-error';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { LightsScreen } from './LightsScreen';

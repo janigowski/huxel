@@ -1,8 +1,7 @@
 import { TextAttributes } from '@opentui/core';
 import { useKeyboard } from '@opentui/react';
-import { HueLinkButtonNotPressedError } from 'hue-sdk';
+import { describeError } from 'hue-app';
 import { useRef, useState } from 'react';
-import { describeError } from '../describe-error';
 import { Footer } from './Footer';
 import { Notice } from './Notice';
 import { colors } from './theme';
@@ -27,11 +26,7 @@ export function LinkScreen({ onLink, notice }: LinkScreenProps) {
 		try {
 			await onLink();
 		} catch (error) {
-			setError(
-				error instanceof HueLinkButtonNotPressedError
-					? 'Press the link button on the bridge, then connect again.'
-					: describeError(error)
-			);
+			setError(describeError(error));
 		} finally {
 			connectingRef.current = false;
 			setConnecting(false);

@@ -1,22 +1,14 @@
 import { computed, type ReadonlySignal } from '@preact/signals-core';
 import { useSyncExternalStore } from 'react';
-import type { HueApp, HueAppStatus } from '../hue-app.js';
-import type { ReadonlyLight } from '../light.js';
+import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app.js';
+import type { LightSnapshot, ReadonlyLight } from '../light.js';
 
-export interface ReactLight {
-	readonly id: string;
-	readonly name: string;
-	readonly isOn: boolean;
-	readonly brightness: number | null;
-}
+export type ReactLight = LightSnapshot;
 
-export interface ReactHueApp {
+export interface ReactHueApp extends HueAppActions {
 	readonly lights: readonly ReactLight[];
 	readonly status: HueAppStatus;
 	readonly error: unknown;
-	initialize(): Promise<void>;
-	toggleLight(lightId: string): Promise<void>;
-	dimLight(lightId: string, brightness: number): Promise<void>;
 }
 
 interface Store {
@@ -44,18 +36,14 @@ function lightSnapshot(light: ReadonlyLight): ReactLight {
 }
 
 function createStore(app: HueApp): Store {
-	const initialize = () => app.initialize();
-	const toggleLight = (lightId: string) => app.toggleLight(lightId);
-	const dimLight = (lightId: string, brightness: number) => app.dimLight(lightId, brightness);
+	const actions = bindActions(app);
 	const lights = computed(() => Object.freeze(app.state.lights.value.map(lightSnapshot)));
 	const snapshot = computed<ReactHueApp>(() =>
 		Object.freeze({
 			lights: lights.value,
 			status: app.state.status.value,
 			error: app.state.error.value,
-			initialize,
-			toggleLight,
-			dimLight
+			...actions
 		})
 	);
 

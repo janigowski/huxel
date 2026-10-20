@@ -1,21 +1,14 @@
 import { TextAttributes, type BoxRenderable, type KeyEvent } from '@opentui/core';
 import { useKeyboard } from '@opentui/react';
-import type { HueApp } from 'hue-app';
+import { describeError, type HueApp } from 'hue-app';
 import { useHueApp, type ReactLight } from 'hue-app/react';
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
-import { describeError } from '../describe-error';
 import { Footer } from './Footer';
 import { LightRow } from './LightRow';
 import { Notice } from './Notice';
 import { colors } from './theme';
 
 const DIM_STEP = 10;
-
-interface DimRequest {
-	lightId: string;
-	snapshot: number;
-	brightness: number;
-}
 
 interface LightsScreenProps {
 	app: HueApp;
@@ -28,7 +21,6 @@ export function LightsScreen({ app, onError }: LightsScreenProps) {
 	const [selectedId, setSelectedId] = useState<string | undefined>();
 	const [visibleRows, setVisibleRows] = useState(Number.POSITIVE_INFINITY);
 	const selectedIdRef = useRef<string | undefined>(undefined);
-	const dimRequestRef = useRef<DimRequest | null>(null);
 
 	const lights = useMemo(
 		() => [...hue.lights].sort((a, b) => a.name.localeCompare(b.name)),
@@ -73,17 +65,13 @@ export function LightsScreen({ app, onError }: LightsScreenProps) {
 	}
 
 	function dim(offset: number) {
-		const light = selected();
-		if (!light || !light.isOn || light.brightness === null) {
+		const selectedLight = selected();
+		const light = selectedLight && app.state.lights.get(selectedLight.id);
+		const current = light?.brightness.peek();
+		if (!light || !light.isOn.peek() || current == null) {
 			return;
 		}
-		const pending = dimRequestRef.current;
-		const current =
-			pending && pending.lightId === light.id && pending.snapshot === light.brightness
-				? pending.brightness
-				: Math.round(light.brightness);
-		const brightness = Math.min(100, Math.max(0, current + offset));
-		dimRequestRef.current = { lightId: light.id, snapshot: light.brightness, brightness };
+		const brightness = Math.min(100, Math.max(0, Math.round(current) + offset));
 		run(hue.dimLight(light.id, brightness));
 	}
 

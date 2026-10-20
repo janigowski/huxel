@@ -1,12 +1,10 @@
 import { batch, computed, signal, type ReadonlySignal } from '@preact/signals-core';
-import type { HueClient } from 'hue-sdk';
-import { DimLight } from './dim-light.js';
+import { createHueClient, type HttpClient } from 'hue-sdk';
 import { LightNotFoundError } from './errors.js';
 import type { HueAppConnection, HueGateway } from './gateway.js';
 import { HueSdkGateway } from './hue-sdk-gateway.js';
 import { Light } from './light.js';
 import { LightCollection } from './light-collection.js';
-import { ToggleLight } from './toggle-light.js';
 
 export type HueAppStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -18,12 +16,25 @@ export interface HueAppState {
 	readonly connection: ReadonlySignal<HueAppConnection>;
 }
 
-export type HueAppOptions = ({ client: HueClient } | { gateway: HueGateway }) & {
+export interface HueBridgeOptions {
+	/** Bridge origin, e.g. `https://192.168.1.100`. */
+	baseUrl: string;
+	appKey: string;
+	httpClient?: HttpClient;
+}
+
+export type HueAppOptions = (HueBridgeOptions | { gateway: HueGateway }) & {
 	live?: boolean;
 	settleMs?: number;
 };
 
-export class HueApp {
+export interface HueAppActions {
+	initialize(): Promise<void>;
+	toggleLight(lightId: string): Promise<void>;
+	dimLight(lightId: string, brightness: number): Promise<void>;
+}
+
+export class HueApp implements HueAppActions {
 	readonly state: HueAppState;
 
 	readonly #gateway: HueGateway;
@@ -31,14 +42,10 @@ export class HueApp {
 	readonly #status = signal<HueAppStatus>('idle');
 	readonly #error = signal<unknown>(undefined);
 	readonly #connection = signal<HueAppConnection>('offline');
-	readonly #toggleLight: ToggleLight;
-	readonly #dimLight: DimLight;
 	#initialization: Promise<void> | undefined;
 
 	constructor(gateway: HueGateway) {
 		this.#gateway = gateway;
-		this.#toggleLight = new ToggleLight(gateway);
-		this.#dimLight = new DimLight(gateway);
 		this.state = {
 			lights: new LightCollection(this.#lights),
 			status: computed(() => this.#status.value),
@@ -66,7 +73,9 @@ export class HueApp {
 		try {
 			const bridgeLights = await this.#gateway.listLights();
 			batch(() => {
-				this.#lights.value = new Map(bridgeLights.map((state) => [state.id, new Light(state)]));
+				this.#lights.value = new Map(
+					bridgeLights.map((state) => [state.id, new Light(state, this.#gateway)])
+				);
 				this.#status.value = 'ready';
 			});
 		} catch (error) {
@@ -80,12 +89,12 @@ export class HueApp {
 
 	/** Flips power optimistically; reverts and rejects if the bridge rejects the command. */
 	async toggleLight(lightId: string): Promise<void> {
-		return this.#toggleLight.execute(this.#find(lightId));
+		return this.#find(lightId).toggle();
 	}
 
 	/** Sets brightness (0–100) optimistically without changing power; reverts and rejects on failure. */
 	async dimLight(lightId: string, brightness: number): Promise<void> {
-		return this.#dimLight.execute(this.#find(lightId), brightness);
+		return this.#find(lightId).dim(brightness);
 	}
 
 	#find(lightId: string): Light {
@@ -98,5 +107,19 @@ export class HueApp {
 }
 
 export function createHueApp(options: HueAppOptions): HueApp {
-	return new HueApp('gateway' in options ? options.gateway : new HueSdkGateway(options.client));
+	if ('gateway' in options) {
+		return new HueApp(options.gateway);
+	}
+	const { baseUrl, appKey, httpClient } = options;
+	return new HueApp(
+		new HueSdkGateway(createHueClient({ baseUrl, appKey, httpClient, throttle: false }))
+	);
+}
+
+export function bindActions(app: HueApp): HueAppActions {
+	return {
+		initialize: () => app.initialize(),
+		toggleLight: (lightId) => app.toggleLight(lightId),
+		dimLight: (lightId, brightness) => app.dimLight(lightId, brightness)
+	};
 }
