@@ -1,2 +1,12 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@import '@fontsource-variable/inter';
+@import '../lib/styles/tokens.css';
+
+body {
+	background: var(--color-background);
+	color: var(--color-mint);
+	font-family: var(--font-sans);
+	font-size: var(--text-body);
+	-webkit-font-smoothing: antialiased;
+}
