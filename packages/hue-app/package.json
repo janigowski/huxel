@@ -1,0 +1,67 @@
+{
+	"name": "hue-app",
+	"version": "0.1.0",
+	"description": "Headless, framework agnostic application for controlling Philips Hue lights",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./svelte": {
+			"types": "./dist/svelte/index.d.ts",
+			"svelte": "./dist/svelte/index.js",
+			"import": "./dist/svelte/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dawidjaniga/philips-hue-remote.git",
+		"directory": "packages/hue-app"
+	},
+	"keywords": [
+		"philips-hue",
+		"hue",
+		"signals",
+		"headless",
+		"svelte"
+	],
+	"scripts": {
+		"build": "rm -rf dist && tsc -p tsconfig.build.json",
+		"check": "tsc --noEmit",
+		"test": "vitest run",
+		"check:universal": "sh scripts/check-universal.sh",
+		"format": "prettier --write .",
+		"lint": "prettier --check ."
+	},
+	"peerDependencies": {
+		"svelte": "^5.7.0"
+	},
+	"peerDependenciesMeta": {
+		"svelte": {
+			"optional": true
+		}
+	},
+	"dependencies": {
+		"@preact/signals-core": "^1.14.4",
+		"hue-sdk": "file:../hue-sdk"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^7",
+		"prettier": "^3.7.4",
+		"svelte": "^5.46.1",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.15"
+	}
+}
