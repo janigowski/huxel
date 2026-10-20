@@ -9,7 +9,9 @@ export class BridgeConnection {
 	error = $state<string | null>(null);
 
 	client = $derived(
-		this.appKey ? createHueClient({ baseUrl: bridgeBaseUrl(), appKey: this.appKey }) : null
+		this.appKey
+			? createHueClient({ baseUrl: bridgeBaseUrl(), appKey: this.appKey, throttle: false })
+			: null
 	);
 
 	async connect() {

@@ -1,28 +1,45 @@
 <script lang="ts">
-	import type { Light } from '$lib/hue/lights.svelte';
+	import type { SvelteLight } from 'hue-app/svelte';
 	import Label from './Label.svelte';
 	import PowerIcon from './icons/PowerIcon.svelte';
 
 	interface Props {
-		light: Light;
+		light: SvelteLight;
 		index: number;
 		ontoggle: () => void;
+		ondim: (brightness: number) => void;
 	}
 
-	let { light, index, ontoggle }: Props = $props();
+	let { light, index, ontoggle, ondim }: Props = $props();
 
 	const number = $derived(String(index + 1).padStart(2, '0'));
-	const level = $derived(light.on ? (light.brightness ?? 100) : 0);
+	const level = $derived(light.isOn ? Math.round(light.brightness ?? 100) : 0);
 </script>
 
-<button class="card" class:on={light.on} aria-pressed={light.on} onclick={ontoggle}>
-	<span class="top">
-		<span class="icon"><PowerIcon /></span>
-		<Label>{number}</Label>
-	</span>
-	<span class="metric">{level}<small>%</small></span>
-	<Label>{light.name}</Label>
-</button>
+<article class="card" class:on={light.isOn}>
+	<button class="toggle" aria-pressed={light.isOn} onclick={ontoggle}>
+		<span class="top">
+			<span class="icon"><PowerIcon /></span>
+			<Label>{number}</Label>
+		</span>
+		<span class="metric">{level}<small>%</small></span>
+		<Label>{light.name}</Label>
+	</button>
+
+	{#if light.brightness !== null}
+		<input
+			class="dimmer"
+			type="range"
+			min="0"
+			max="100"
+			step="1"
+			value={light.brightness}
+			disabled={!light.isOn}
+			aria-label="{light.name} brightness"
+			oninput={(event) => ondim(Number(event.currentTarget.value))}
+		/>
+	{/if}
+</article>
 
 <style>
 	.card {
@@ -39,13 +56,25 @@
 			transparent 1px 6px
 		);
 		color: var(--color-orange);
-		text-align: left;
-		cursor: pointer;
 	}
 
 	.card.on {
 		background: var(--color-orange);
 		color: var(--color-ink);
+	}
+
+	.toggle {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: var(--space-2);
+		padding: 0;
+		border: none;
+		background: none;
+		color: inherit;
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
 	}
 
 	.top {
@@ -73,5 +102,16 @@
 	.metric small {
 		font-size: var(--text-body);
 		font-weight: var(--font-weight-semibold);
+	}
+
+	.dimmer {
+		width: 100%;
+		accent-color: currentColor;
+		cursor: pointer;
+	}
+
+	.dimmer:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
 	}
 </style>

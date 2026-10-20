@@ -1,31 +1,57 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import type { Lights } from '$lib/hue/lights.svelte';
+	import type { SvelteHueApp } from 'hue-app/svelte';
+	import { describeError } from '$lib/hue/bridge';
 	import LightGrid from './LightGrid.svelte';
 	import Notice from './Notice.svelte';
 	import SectionHeader from './SectionHeader.svelte';
 
 	interface Props {
-		lights: Lights;
+		hue: SvelteHueApp;
 	}
 
-	let { lights }: Props = $props();
+	let { hue }: Props = $props();
 
-	onMount(() => {
-		lights.load();
+	let commandError = $state<string | null>(null);
+
+	const lights = $derived([...hue.lights.all].sort((a, b) => a.name.localeCompare(b.name)));
+	const onCount = $derived(lights.filter((light) => light.isOn).length);
+	const loading = $derived(hue.status === 'idle' || hue.status === 'loading');
+	const error = $derived(
+		commandError ?? (hue.status === 'error' ? describeError(hue.error) : null)
+	);
+
+	$effect(() => {
+		hue.initialize().catch(() => {});
 	});
+
+	async function run(command: Promise<void>) {
+		commandError = null;
+		try {
+			await command;
+		} catch (error) {
+			commandError = describeError(error);
+		}
+	}
+
+	function toggle(lightId: string) {
+		return run(hue.toggleLight(lightId));
+	}
+
+	function dim(lightId: string, brightness: number) {
+		return run(hue.dimLight(lightId, brightness));
+	}
 </script>
 
 <section>
-	<SectionHeader title="All lights" active={lights.onCount} total={lights.items.length} />
+	<SectionHeader title="All lights" active={onCount} total={lights.length} />
 
-	{#if lights.error}
-		<Notice>{lights.error}</Notice>
+	{#if error}
+		<Notice>{error}</Notice>
 	{/if}
 
-	{#if lights.loading && lights.items.length === 0}
+	{#if loading && lights.length === 0}
 		<Notice tone="muted">Loading lights…</Notice>
 	{:else}
-		<LightGrid {lights} />
+		<LightGrid {lights} ontoggle={toggle} ondim={dim} />
 	{/if}
 </section>

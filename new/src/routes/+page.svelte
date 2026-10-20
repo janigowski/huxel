@@ -5,10 +5,13 @@
 	import LightsSection from '$lib/components/LightsSection.svelte';
 	import { bridge } from '$lib/hue/bridge';
 	import { BridgeConnection } from '$lib/hue/connection.svelte';
-	import { Lights } from '$lib/hue/lights.svelte';
+	import { createHueApp } from 'hue-app';
+	import { createSvelteHueApp } from 'hue-app/svelte';
 
 	const connection = new BridgeConnection();
-	const lights = $derived(connection.client ? new Lights(connection.client) : null);
+	const hue = $derived(
+		connection.client ? createSvelteHueApp(createHueApp({ client: connection.client })) : null
+	);
 </script>
 
 <svelte:head>
@@ -19,8 +22,8 @@
 	<DashboardBar label="Hue control dashboard" date={new Date()} />
 	<Hero title="Home Lights" subtitle="Bridge {bridge.id}" />
 
-	{#if lights}
-		<LightsSection {lights} />
+	{#if hue}
+		<LightsSection {hue} />
 	{:else}
 		<ConnectPanel {connection} />
 	{/if}

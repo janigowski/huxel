@@ -1,18 +1,25 @@
 <script lang="ts">
-	import type { Lights } from '$lib/hue/lights.svelte';
+	import type { SvelteLight } from 'hue-app/svelte';
 	import LightCard from './LightCard.svelte';
 
 	interface Props {
-		lights: Lights;
+		lights: readonly SvelteLight[];
+		ontoggle: (lightId: string) => void;
+		ondim: (lightId: string, brightness: number) => void;
 	}
 
-	let { lights }: Props = $props();
+	let { lights, ontoggle, ondim }: Props = $props();
 </script>
 
 <ul class="grid">
-	{#each lights.items as light, index (light.id)}
+	{#each lights as light, index (light.id)}
 		<li>
-			<LightCard {light} {index} ontoggle={() => lights.toggle(light)} />
+			<LightCard
+				{light}
+				{index}
+				ontoggle={() => ontoggle(light.id)}
+				ondim={(brightness) => ondim(light.id, brightness)}
+			/>
 		</li>
 	{/each}
 </ul>
