@@ -25,7 +25,8 @@ export class CommandLane<T> {
 	readonly #settleMs: number;
 	#confirmed: T;
 	#pending: Pending<T> | undefined;
-	#remote: { value: T } | undefined;
+	#remote: { value: T; sequence: number } | undefined;
+	#received = 0;
 	#settle: TimerHandle | undefined;
 	#running = false;
 	#disposed = false;
@@ -68,7 +69,8 @@ export class CommandLane<T> {
 			return;
 		}
 		if (this.#isBusy()) {
-			this.#remote = { value: remote };
+			this.#received += 1;
+			this.#remote = { value: remote, sequence: this.#received };
 			return;
 		}
 		this.#remote = undefined;
@@ -91,10 +93,14 @@ export class CommandLane<T> {
 			while (this.#pending) {
 				const command = this.#pending;
 				this.#pending = undefined;
+				const sentAfter = this.#received;
 				try {
 					await this.#send(command.value);
 					this.#restartSettle();
 					this.#confirmed = command.value;
+					if (this.#remote && this.#remote.sequence <= sentAfter) {
+						this.#remote = undefined;
+					}
 					command.waiters.forEach((waiter) => waiter.resolve());
 				} catch (error) {
 					this.#restartSettle();

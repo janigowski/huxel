@@ -262,6 +262,52 @@ describe('reconciliation with command lanes', () => {
 		expect(light().brightness.value).toBe(55);
 	});
 
+	it('discards a remote value received before a newer command that succeeded (settleMs 0)', async () => {
+		const { app, gateway, light, update } = await setup({ settleMs: 0 });
+
+		const first = app.dimLight('desk', 80);
+		update({ brightness: 40 });
+		const latest = app.dimLight('desk', 60);
+		gateway.brightnessCalls[0]!.result.resolve();
+		await first;
+		gateway.brightnessCalls[1]!.result.resolve();
+		await latest;
+
+		expect(light().brightness.value).toBe(60);
+	});
+
+	it('discards a remote value received in the settle window before a newer command that succeeded', async () => {
+		const { app, gateway, light, update } = await setup();
+
+		const first = app.dimLight('desk', 80);
+		gateway.brightnessCalls[0]!.result.resolve();
+		await first;
+		update({ brightness: 40 });
+		const latest = app.dimLight('desk', 60);
+		gateway.brightnessCalls[1]!.result.resolve();
+		await latest;
+		await vi.advanceTimersByTimeAsync(SETTLE_MS);
+
+		expect(light().brightness.value).toBe(60);
+		expect(vi.getTimerCount()).toBe(0);
+	});
+
+	it('still reverts to a remote value received before a newer command that failed', async () => {
+		const { app, gateway, light, update } = await setup();
+		const error = new Error('60 failed');
+
+		const first = app.dimLight('desk', 80);
+		gateway.brightnessCalls[0]!.result.resolve();
+		await first;
+		update({ brightness: 40 });
+		const latest = app.dimLight('desk', 60);
+		const rejection = expect(latest).rejects.toBe(error);
+		gateway.brightnessCalls[1]!.result.reject(error);
+		await rejection;
+
+		expect(light().brightness.value).toBe(40);
+	});
+
 	it('keeps remote brightness and power independent', async () => {
 		const { app, gateway, light, update } = await setup();
 
@@ -697,6 +743,37 @@ describe('live sync lifecycle', () => {
 		await toggle;
 		app.dispose();
 		expect(vi.getTimerCount()).toBe(0);
+	});
+
+	it('shows connecting while watching even if the gateway never reports a state', async () => {
+		const gateway = new FakeGateway();
+		const app = createHueApp({ gateway });
+		const states: HueAppConnection[] = [];
+		const unsubscribe = app.state.connection.subscribe((state) => states.push(state));
+		const initialization = app.initialize();
+		gateway.listCalls[0]!.resolve([bridgeLight()]);
+		await initialization;
+
+		expect(states).toEqual(['offline', 'connecting']);
+		gateway.observer.onConnectionChange('live');
+		expect(app.state.connection.value).toBe('live');
+		unsubscribe();
+	});
+
+	it('goes back to offline when watch throws synchronously', async () => {
+		const gateway = new FakeGateway();
+		gateway.watch = () => {
+			throw new Error('no event stream');
+		};
+		const app = createHueApp({ gateway });
+		const states: HueAppConnection[] = [];
+		const unsubscribe = app.state.connection.subscribe((state) => states.push(state));
+		const initialization = app.initialize();
+		gateway.listCalls[0]!.resolve([bridgeLight()]);
+		await initialization;
+
+		expect(states).toEqual(['offline', 'connecting', 'offline']);
+		unsubscribe();
 	});
 
 	it('keeps the app usable when watch throws synchronously', async () => {

@@ -38,6 +38,7 @@ export class LiveSync {
 			return;
 		}
 		this.#started = true;
+		this.#target.connection.value = 'connecting';
 		let unwatch: () => void;
 		try {
 			unwatch = this.#gateway.watch({

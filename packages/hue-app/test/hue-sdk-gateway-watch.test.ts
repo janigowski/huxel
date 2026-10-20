@@ -9,6 +9,7 @@ import type {
 } from 'hue-sdk';
 import { describe, expect, it, vi } from 'vitest';
 import { HueSdkGateway } from '../src/hue-sdk-gateway.js';
+import { createHueApp } from '../src/index.js';
 import type { HueAppConnection, LightChange, LightChangeObserver } from '../src/index.js';
 import { deferred, flushMicrotasks, type Deferred } from './fakes.js';
 
@@ -16,6 +17,7 @@ function fakeClient() {
 	const observers: EventStreamObserver[] = [];
 	const closes: number[] = [];
 	const gets: Array<{ id: string; result: Deferred<ApiResponse<LightGet>> }> = [];
+	const lists: Deferred<ApiResponse<LightGet>>[] = [];
 	let state: EventStreamState = 'connecting';
 	const client = {
 		events: {
@@ -34,6 +36,11 @@ function fakeClient() {
 			}
 		},
 		lights: {
+			list() {
+				const result = deferred<ApiResponse<LightGet>>();
+				lists.push(result);
+				return result.promise;
+			},
 			get(id: string) {
 				const result = deferred<ApiResponse<LightGet>>();
 				gets.push({ id, result });
@@ -50,7 +57,7 @@ function fakeClient() {
 		return observer;
 	};
 
-	return { client, observers, closes, gets, stream };
+	return { client, observers, closes, gets, lists, stream };
 }
 
 function recorder() {
@@ -90,11 +97,11 @@ function lightGet(id: string, name: string, isOn: boolean, brightness?: number):
 }
 
 describe('HueSdkGateway.watch', () => {
-	it('subscribes to the event stream without invoking the observer', () => {
+	it('reports connecting from the subscription state even when the stream emits no initial state', () => {
 		const { observers, events } = setup();
 
 		expect(observers).toHaveLength(1);
-		expect(events).toEqual([]);
+		expect(events).toEqual(['connection:connecting']);
 	});
 
 	it('maps light updates to only the fields present', () => {
@@ -149,6 +156,84 @@ describe('HueSdkGateway.watch', () => {
 		]);
 	});
 
+	it('reports offline when the stream closes permanently on its own', () => {
+		const { stream, events } = setup();
+
+		stream().onStateChange?.('open');
+		stream().onError?.(new Error('unauthorized'));
+		stream().onStateChange?.('closed');
+
+		expect(events).toEqual([
+			'connection:connecting',
+			'connection:live',
+			'connected',
+			'connection:offline'
+		]);
+	});
+
+	it('builds added lights from complete add payloads in order within the batch', () => {
+		const { stream, changes, gets } = setup();
+
+		stream().onEvents([
+			event('update', [{ id: 'a', type: 'light', on: { on: false } }]),
+			event('add', [
+				lightGet('b', 'Lamp', true, 35) as HueEventResource,
+				lightGet('c', 'Plug', false) as HueEventResource
+			]),
+			event('update', [{ id: 'b', type: 'light', dimming: { brightness: 50 } }])
+		]);
+
+		expect(gets).toHaveLength(0);
+		expect(changes).toEqual([
+			[
+				{ kind: 'updated', id: 'a', isOn: false },
+				{ kind: 'added', light: { id: 'b', name: 'Lamp', isOn: true, brightness: 35 } },
+				{ kind: 'added', light: { id: 'c', name: 'Plug', isOn: false, brightness: null } },
+				{ kind: 'updated', id: 'b', brightness: 50 }
+			]
+		]);
+	});
+
+	it('buffers updates for a light whose incomplete add is still being fetched', async () => {
+		const { stream, changes, gets } = setup();
+
+		stream().onEvents([event('add', [{ id: 'a', type: 'light', on: { on: true } }])]);
+		stream().onEvents([
+			event('update', [
+				{ id: 'a', type: 'light', dimming: { brightness: 90 } },
+				{ id: 'other', type: 'light', on: { on: true } }
+			])
+		]);
+		stream().onEvents([event('update', [{ id: 'a', type: 'light', on: { on: false } }])]);
+		expect(changes).toEqual([[{ kind: 'updated', id: 'other', isOn: true }]]);
+
+		gets[0]!.result.resolve({ errors: [], data: [lightGet('a', 'Lamp', true, 10)] });
+		await flushMicrotasks();
+
+		expect(changes.at(-1)).toEqual([
+			{ kind: 'added', light: { id: 'a', name: 'Lamp', isOn: true, brightness: 10 } },
+			{ kind: 'updated', id: 'a', brightness: 90 },
+			{ kind: 'updated', id: 'a', isOn: false }
+		]);
+
+		stream().onEvents([event('update', [{ id: 'a', type: 'light', dimming: { brightness: 5 } }])]);
+		expect(changes.at(-1)).toEqual([{ kind: 'updated', id: 'a', brightness: 5 }]);
+	});
+
+	it('drops a pending fetch when a complete add for the same light arrives', async () => {
+		const { stream, changes, gets } = setup();
+
+		stream().onEvents([event('add', [{ id: 'a', type: 'light' }])]);
+		stream().onEvents([event('update', [{ id: 'a', type: 'light', on: { on: false } }])]);
+		stream().onEvents([event('add', [lightGet('a', 'Fresh', true, 60) as HueEventResource])]);
+		gets[0]!.result.resolve({ errors: [], data: [lightGet('a', 'Stale', false, 1)] });
+		await flushMicrotasks();
+
+		expect(changes).toEqual([
+			[{ kind: 'added', light: { id: 'a', name: 'Fresh', isOn: true, brightness: 60 } }]
+		]);
+	});
+
 	it('fetches added lights and emits them once loaded', async () => {
 		const { stream, changes, gets } = setup();
 
@@ -192,6 +277,7 @@ describe('HueSdkGateway.watch', () => {
 		const { stream, changes, gets } = setup();
 
 		stream().onEvents([event('add', [{ id: 'a', type: 'light' }])]);
+		stream().onEvents([event('update', [{ id: 'a', type: 'light', on: { on: true } }])]);
 		stream().onEvents([event('delete', [{ id: 'a', type: 'light' }])]);
 		gets[0]!.result.resolve({ errors: [], data: [lightGet('a', 'Lamp', true)] });
 		await flushMicrotasks();
@@ -228,7 +314,6 @@ describe('HueSdkGateway.watch', () => {
 	it('maps stream states and reports the connection before onConnected', () => {
 		const { stream, events } = setup();
 
-		stream().onStateChange?.('connecting');
 		stream().onStateChange?.('open');
 		stream().onStateChange?.('reconnecting');
 		stream().onStateChange?.('open');
@@ -249,7 +334,7 @@ describe('HueSdkGateway.watch', () => {
 		const { stream, events } = setup();
 
 		expect(() => stream().onError?.(new Error('boom'))).not.toThrow();
-		expect(events).toEqual([]);
+		expect(events).toEqual(['connection:connecting']);
 	});
 
 	it('closes the subscription once on unwatch and ignores later callbacks', () => {
@@ -261,7 +346,7 @@ describe('HueSdkGateway.watch', () => {
 		stream().onStateChange?.('open');
 
 		expect(closes).toEqual([1]);
-		expect(events).toEqual([]);
+		expect(events).toEqual(['connection:connecting']);
 	});
 
 	it('propagates a synchronous subscribe failure', () => {
@@ -273,5 +358,48 @@ describe('HueSdkGateway.watch', () => {
 		const gateway = new HueSdkGateway(fake.client);
 
 		expect(() => gateway.watch(recorder().observer)).toThrow(error);
+	});
+
+	describe('with HueApp', () => {
+		async function setupApp() {
+			const fake = fakeClient();
+			const app = createHueApp({ gateway: new HueSdkGateway(fake.client), settleMs: 0 });
+			const states: HueAppConnection[] = [];
+			const unsubscribe = app.state.connection.subscribe((state) => states.push(state));
+			const initialization = app.initialize();
+			fake.lists[0]!.resolve({ errors: [], data: [lightGet('desk', 'Desk', false, 30)] });
+			await initialization;
+			return { ...fake, app, states, unsubscribe };
+		}
+
+		it('shows connecting, live and offline with a stream that emits no initial state', async () => {
+			const { app, stream, states, unsubscribe } = await setupApp();
+			expect(states).toEqual(['offline', 'connecting']);
+
+			stream().onStateChange?.('open');
+			expect(states).toEqual(['offline', 'connecting', 'live']);
+
+			stream().onStateChange?.('closed');
+			expect(states).toEqual(['offline', 'connecting', 'live', 'offline']);
+			app.dispose();
+			unsubscribe();
+		});
+
+		it('keeps an update that arrives while an incomplete add is being fetched', async () => {
+			const { app, stream, gets, unsubscribe } = await setupApp();
+			stream().onStateChange?.('open');
+
+			stream().onEvents([event('add', [{ id: 'lamp', type: 'light' }])]);
+			stream().onEvents([event('update', [{ id: 'lamp', type: 'light', on: { on: true } }])]);
+			gets[0]!.result.resolve({ errors: [], data: [lightGet('lamp', 'Lamp', false, 20)] });
+			await flushMicrotasks();
+
+			const lamp = app.state.lights.get('lamp');
+			expect(lamp?.name.value).toBe('Lamp');
+			expect(lamp?.isOn.value).toBe(true);
+			expect(lamp?.brightness.value).toBe(20);
+			app.dispose();
+			unsubscribe();
+		});
 	});
 });

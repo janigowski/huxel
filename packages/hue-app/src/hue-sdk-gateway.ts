@@ -2,7 +2,6 @@ import { HueApiError } from 'hue-sdk';
 import type {
 	EventStreamState,
 	HueClient,
-	HueEvent,
 	LightEventResource,
 	LightGet,
 	LightPut,
@@ -17,6 +16,8 @@ import type {
 } from './gateway.js';
 
 const PARTIAL_SUCCESS_STATUS = 207;
+
+type LightUpdate = Extract<LightChange, { kind: 'updated' }>;
 
 const CONNECTION_STATES: Record<EventStreamState, HueAppConnection> = {
 	connecting: 'connecting',
@@ -51,23 +52,28 @@ export class HueSdkGateway implements HueGateway {
 
 	watch(observer: LightChangeObserver): () => void {
 		let active = true;
-		const additions = new Map<string, object>();
+		const additions = new Map<string, LightUpdate[]>();
 
-		const fetchAdded = async (id: string): Promise<void> => {
-			const token = {};
-			additions.set(id, token);
+		const fetchAdded = async (id: string, updates: LightUpdate[]): Promise<void> => {
+			let light: LightGet | undefined;
 			try {
-				const response = await this.#client.lights.get(id);
-				const [light] = response.data;
-				if (active && additions.get(id) === token && light) {
-					observer.onChanges([{ kind: 'added', light: toBridgeLight(light) }]);
-				}
+				[light] = (await this.#client.lights.get(id)).data;
 			} catch {
+				light = undefined;
+			}
+			if (!active || additions.get(id) !== updates) {
 				return;
-			} finally {
-				if (additions.get(id) === token) {
-					additions.delete(id);
-				}
+			}
+			additions.delete(id);
+			if (light) {
+				observer.onChanges([{ kind: 'added', light: toBridgeLight(light) }, ...updates]);
+			}
+		};
+
+		const reportState = (state: EventStreamState): void => {
+			observer.onConnectionChange(CONNECTION_STATES[state]);
+			if (state === 'open') {
+				observer.onConnected();
 			}
 		};
 
@@ -82,14 +88,27 @@ export class HueSdkGateway implements HueGateway {
 						if (resource.type !== 'light') {
 							continue;
 						}
-						const change = toLightChange(event.type, resource);
-						if (change) {
-							changes.push(change);
-						}
 						if (event.type === 'add') {
-							void fetchAdded(resource.id);
+							const light = fromEventResource(resource);
+							if (light) {
+								additions.delete(resource.id);
+								changes.push({ kind: 'added', light });
+							} else {
+								const updates: LightUpdate[] = [];
+								additions.set(resource.id, updates);
+								void fetchAdded(resource.id, updates);
+							}
 						} else if (event.type === 'delete') {
 							additions.delete(resource.id);
+							changes.push({ kind: 'removed', id: resource.id });
+						} else if (event.type === 'update') {
+							const update = toLightUpdate(resource);
+							const pending = additions.get(resource.id);
+							if (update && pending) {
+								pending.push(update);
+							} else if (update) {
+								changes.push(update);
+							}
 						}
 					}
 				}
@@ -98,16 +117,16 @@ export class HueSdkGateway implements HueGateway {
 				}
 			},
 			onStateChange: (state) => {
-				if (!active) {
-					return;
-				}
-				observer.onConnectionChange(CONNECTION_STATES[state]);
-				if (state === 'open') {
-					observer.onConnected();
+				if (active) {
+					reportState(state);
 				}
 			},
 			onError: () => {}
 		});
+
+		if (active) {
+			reportState(subscription.state);
+		}
 
 		return () => {
 			if (!active) {
@@ -125,17 +144,23 @@ export class HueSdkGateway implements HueGateway {
 	}
 }
 
-function toLightChange(
-	type: HueEvent['type'],
-	resource: LightEventResource
-): LightChange | undefined {
-	if (type === 'delete') {
-		return { kind: 'removed', id: resource.id };
-	}
-	if (type !== 'update') {
+function fromEventResource(resource: LightEventResource): BridgeLight | undefined {
+	const name = resource.metadata?.name;
+	const isOn = resource.on?.on;
+	if (typeof name !== 'string' || typeof isOn !== 'boolean') {
 		return undefined;
 	}
-	const change: Extract<LightChange, { kind: 'updated' }> = { kind: 'updated', id: resource.id };
+	const brightness = resource.dimming?.brightness;
+	return {
+		id: resource.id,
+		name,
+		isOn,
+		brightness: typeof brightness === 'number' ? brightness : null
+	};
+}
+
+function toLightUpdate(resource: LightEventResource): LightUpdate | undefined {
+	const change: LightUpdate = { kind: 'updated', id: resource.id };
 	const isOn = resource.on?.on;
 	const brightness = resource.dimming?.brightness;
 	const name = resource.metadata?.name;

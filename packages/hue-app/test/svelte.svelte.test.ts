@@ -346,14 +346,12 @@ describe('createSvelteHueApp', () => {
 		const { runs, cleanup } = watch(() => hue.connection);
 		const observer = at(gateway.observers, 0);
 
-		observer.onConnectionChange('connecting');
-		flushSync();
 		observer.onConnectionChange('live');
 		flushSync();
 		hue.dispose();
 		flushSync();
 
-		expect(runs).toEqual(['offline', 'connecting', 'live', 'offline']);
+		expect(runs).toEqual(['connecting', 'live', 'offline']);
 		expect(gateway.unwatchCalls).toBe(1);
 		await expect(hue.toggleLight('desk')).rejects.toThrow('disposed');
 		cleanup();
