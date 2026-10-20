@@ -12,15 +12,12 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"test:unit": "vitest",
-		"test": "bun run test:unit -- --run && bun run test:e2e",
-		"test:e2e": "playwright test"
+		"test": "vitest run"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.39.1",
 		"@inlang/paraglide-js": "^2.6.0",
-		"@playwright/test": "^1.57.0",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/kit": "^2.49.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",

@@ -1,38 +1,32 @@
-# sv
+# svelte-hue-app
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Web dashboard for Philips Hue lights: link to a bridge, list all lights, toggle and dim them with live updates. Built with SvelteKit on top of [`hue-app`](../../packages/hue-app) and [`hue-sdk`](../../packages/hue-sdk).
 
-## Creating a project
+## Setup
 
-If you're seeing this, you've probably already done this step. Congrats!
+`hue-app` and `hue-sdk` are workspace dependencies that resolve to their `dist/` builds, so build them first from the repository root:
 
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+```bash
+bun install
+bun run --filter hue-sdk --filter hue-app build
 ```
 
-## Developing
+## Run
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```bash
+bun run dev
 ```
 
-## Building
+In development, Vite proxies `/bridge` to the bridge at `https://192.168.1.10` (see `vite.config.ts`), and the bridge id is set in `src/lib/hue/bridge.ts`. Adjust both for your bridge.
 
-To create a production version of your app:
+On first run, press the link button on the bridge and then connect from the page. The application key is stored in `localStorage`.
 
-```sh
-npm run build
+## Scripts
+
+```bash
+bun run check
+bun run test
+bun run lint
+bun run format
+bun run build
 ```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
