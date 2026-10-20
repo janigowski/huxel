@@ -39,16 +39,13 @@
 		"test": "vitest run --typecheck",
 		"test:bun": "bunx --bun vitest run",
 		"test:browser": "vitest run --config vitest.browser.config.ts",
-		"check:universal": "sh scripts/check-universal.sh",
-		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"check:universal": "sh scripts/check-universal.sh"
 	},
 	"devDependencies": {
 		"@types/lodash-es": "^4.17.12",
 		"@types/node": "^22",
 		"@vitest/browser-playwright": "^4.1.12",
 		"playwright": "^1.64.1",
-		"prettier": "^3.7.4",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.15"
 	},

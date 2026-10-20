@@ -27,6 +27,5 @@ On first run, press the link button on the bridge and then connect from the page
 bun run check
 bun run test
 bun run lint
-bun run format
 bun run build
 ```
