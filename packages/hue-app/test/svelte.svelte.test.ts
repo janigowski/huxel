@@ -1,7 +1,13 @@
 import type { ReadonlySignal } from '@preact/signals-core';
 import { flushSync, tick } from 'svelte';
 import { describe, expect, test } from 'vitest';
-import { createHueApp, type BridgeLight, type HueApp, type HueGateway } from '../src/index.js';
+import {
+	createHueApp,
+	type BridgeLight,
+	type HueApp,
+	type HueGateway,
+	type LightChangeObserver
+} from '../src/index.js';
 import { createSvelteHueApp, type SvelteHueApp, type SvelteLight } from '../src/svelte/index.js';
 
 interface Deferred<T> {
@@ -23,6 +29,8 @@ function deferred<T>(): Deferred<T> {
 class FakeGateway implements HueGateway {
 	readonly listCalls: Deferred<BridgeLight[]>[] = [];
 	readonly commands: Deferred<void>[] = [];
+	readonly observers: LightChangeObserver[] = [];
+	unwatchCalls = 0;
 
 	listLights(): Promise<BridgeLight[]> {
 		const call = deferred<BridgeLight[]>();
@@ -36,6 +44,13 @@ class FakeGateway implements HueGateway {
 
 	setBrightness(): Promise<void> {
 		return this.#command();
+	}
+
+	watch(observer: LightChangeObserver): () => void {
+		this.observers.push(observer);
+		return () => {
+			this.unwatchCalls += 1;
+		};
 	}
 
 	#command(): Promise<void> {
@@ -310,6 +325,37 @@ describe('createSvelteHueApp', () => {
 		flushSync();
 
 		expect(runs).toHaveLength(1);
+		cleanup();
+	});
+
+	test('tracks remote name changes reactively', async () => {
+		const { gateway, hue } = await setup();
+		const light = hue.lights.get('desk') as SvelteLight;
+		const { runs, cleanup } = watch(() => light.name);
+
+		at(gateway.observers, 0).onChanges([{ kind: 'updated', id: 'desk', name: 'Office' }]);
+		flushSync();
+
+		expect(runs).toEqual(['Desk', 'Office']);
+		expect(light.name).toBe('Office');
+		cleanup();
+	});
+
+	test('tracks connection state and goes offline on dispose', async () => {
+		const { gateway, hue } = await setup();
+		const { runs, cleanup } = watch(() => hue.connection);
+		const observer = at(gateway.observers, 0);
+
+		observer.onConnectionChange('connecting');
+		flushSync();
+		observer.onConnectionChange('live');
+		flushSync();
+		hue.dispose();
+		flushSync();
+
+		expect(runs).toEqual(['offline', 'connecting', 'live', 'offline']);
+		expect(gateway.unwatchCalls).toBe(1);
+		await expect(hue.toggleLight('desk')).rejects.toThrow('disposed');
 		cleanup();
 	});
 });

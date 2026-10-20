@@ -3,22 +3,28 @@ import type { BridgeLight } from './gateway.js';
 
 export class Light {
 	readonly id: string;
-	readonly name: string;
+	readonly name: ReadonlySignal<string>;
 	readonly isOn: ReadonlySignal<boolean>;
 	/** Normalized 0–100, or `null` when the light cannot be dimmed. */
 	readonly brightness: ReadonlySignal<number | null>;
 
+	readonly #name: Signal<string>;
 	readonly #isOn: Signal<boolean>;
 	readonly #brightness: Signal<number | null>;
 
 	constructor(state: BridgeLight) {
 		this.id = state.id;
-		this.name = state.name;
+		this.#name = signal(state.name);
 		this.#isOn = signal(state.isOn);
 		this.#brightness = signal(state.brightness);
+		this.name = computed(() => this.#name.value);
 		this.isOn = computed(() => this.#isOn.value);
 		this.brightness = computed(() => this.#brightness.value);
 		Object.freeze(this);
+	}
+
+	setName(name: string): void {
+		this.#name.value = name;
 	}
 
 	setPower(isOn: boolean): void {

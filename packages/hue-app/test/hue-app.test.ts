@@ -5,77 +5,8 @@ import {
 	LightNotDimmableError,
 	LightNotFoundError
 } from '../src/index.js';
-import type { BridgeLight, HueGateway, Light } from '../src/index.js';
-
-interface Deferred<T> {
-	readonly promise: Promise<T>;
-	resolve(value: T): void;
-	reject(error: unknown): void;
-}
-
-function deferred<T>(): Deferred<T> {
-	let resolve!: (value: T) => void;
-	let reject!: (error: unknown) => void;
-	const promise = new Promise<T>((promiseResolve, promiseReject) => {
-		resolve = promiseResolve;
-		reject = promiseReject;
-	});
-	return { promise, resolve, reject };
-}
-
-interface PowerCall {
-	readonly lightId: string;
-	readonly isOn: boolean;
-	readonly result: Deferred<void>;
-}
-
-interface BrightnessCall {
-	readonly lightId: string;
-	readonly brightness: number;
-	readonly result: Deferred<void>;
-}
-
-class FakeGateway implements HueGateway {
-	readonly listCalls: Deferred<BridgeLight[]>[] = [];
-	readonly powerCalls: PowerCall[] = [];
-	readonly brightnessCalls: BrightnessCall[] = [];
-	readonly calls: Array<
-		| { readonly method: 'listLights' }
-		| { readonly method: 'setPower'; readonly lightId: string; readonly value: boolean }
-		| { readonly method: 'setBrightness'; readonly lightId: string; readonly value: number }
-	> = [];
-
-	listLights(): Promise<BridgeLight[]> {
-		const result = deferred<BridgeLight[]>();
-		this.listCalls.push(result);
-		this.calls.push({ method: 'listLights' });
-		return result.promise;
-	}
-
-	setPower(lightId: string, isOn: boolean): Promise<void> {
-		const result = deferred<void>();
-		this.powerCalls.push({ lightId, isOn, result });
-		this.calls.push({ method: 'setPower', lightId, value: isOn });
-		return result.promise;
-	}
-
-	setBrightness(lightId: string, brightness: number): Promise<void> {
-		const result = deferred<void>();
-		this.brightnessCalls.push({ lightId, brightness, result });
-		this.calls.push({ method: 'setBrightness', lightId, value: brightness });
-		return result.promise;
-	}
-}
-
-function bridgeLight(overrides: Partial<BridgeLight> = {}): BridgeLight {
-	return {
-		id: 'desk',
-		name: 'Desk',
-		isOn: false,
-		brightness: 30,
-		...overrides
-	};
-}
+import type { BridgeLight, Light } from '../src/index.js';
+import { bridgeLight, FakeGateway } from './fakes.js';
 
 async function setup(lights: BridgeLight[] = [bridgeLight()]) {
 	const gateway = new FakeGateway();
@@ -119,7 +50,7 @@ describe('HueApp initialization', () => {
 		expect(app.state.lights.value).toHaveLength(2);
 		expect(app.state.lights.peek()).toEqual(app.state.lights.value);
 		expect(app.state.lights.get('desk')).toMatchObject({ id: 'desk' });
-		expect(app.state.lights.get('desk')?.name).toBe('Desk');
+		expect(app.state.lights.get('desk')?.name.value).toBe('Desk');
 		expect(app.state.lights.get('desk')?.isOn.value).toBe(false);
 		expect(app.state.lights.get('desk')?.brightness.value).toBe(30);
 		expect(app.state.lights.get('plug')?.brightness.value).toBeNull();

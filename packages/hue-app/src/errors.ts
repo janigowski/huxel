@@ -2,6 +2,14 @@ export class HueAppError extends Error {
 	override name = 'HueAppError';
 }
 
+export class HueAppDisposedError extends HueAppError {
+	override name = 'HueAppDisposedError';
+
+	constructor() {
+		super('HueApp has been disposed');
+	}
+}
+
 export class LightNotFoundError extends HueAppError {
 	override name = 'LightNotFoundError';
 

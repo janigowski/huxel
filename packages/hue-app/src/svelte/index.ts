@@ -1,5 +1,6 @@
 import type { ReadonlySignal } from '@preact/signals-core';
 import { createSubscriber } from 'svelte/reactivity';
+import type { HueAppConnection } from '../gateway.js';
 import type { HueApp, HueAppStatus } from '../hue-app.js';
 import type { LightCollection } from '../light-collection.js';
 import type { ReadonlyLight } from '../light.js';
@@ -20,9 +21,11 @@ export interface SvelteHueApp {
 	readonly lights: SvelteLightCollection;
 	readonly status: HueAppStatus;
 	readonly error: unknown;
+	readonly connection: HueAppConnection;
 	initialize(): Promise<void>;
 	toggleLight(lightId: string): Promise<void>;
 	dimLight(lightId: string, brightness: number): Promise<void>;
+	dispose(): void;
 }
 
 type Subscribable = Pick<ReadonlySignal<unknown>, 'subscribe'>;
@@ -49,12 +52,15 @@ function reader<T>(source: ReadonlySignal<T>): () => T {
 }
 
 function createSvelteLight(light: ReadonlyLight): SvelteLight {
+	const name = reader(light.name);
 	const isOn = reader(light.isOn);
 	const brightness = reader(light.brightness);
 
 	return {
 		id: light.id,
-		name: light.name,
+		get name() {
+			return name();
+		},
 		get isOn() {
 			return isOn();
 		},
@@ -100,6 +106,7 @@ function createSvelteLightCollection(lights: LightCollection): SvelteLightCollec
 export function createSvelteHueApp(app: HueApp): SvelteHueApp {
 	const status = reader(app.state.status);
 	const error = reader(app.state.error);
+	const connection = reader(app.state.connection);
 
 	return {
 		lights: createSvelteLightCollection(app.state.lights),
@@ -109,8 +116,12 @@ export function createSvelteHueApp(app: HueApp): SvelteHueApp {
 		get error() {
 			return error();
 		},
+		get connection() {
+			return connection();
+		},
 		initialize: () => app.initialize(),
 		toggleLight: (lightId) => app.toggleLight(lightId),
-		dimLight: (lightId, brightness) => app.dimLight(lightId, brightness)
+		dimLight: (lightId, brightness) => app.dimLight(lightId, brightness),
+		dispose: () => app.dispose()
 	};
 }
