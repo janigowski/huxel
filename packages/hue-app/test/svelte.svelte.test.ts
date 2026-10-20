@@ -1,67 +1,9 @@
 import type { ReadonlySignal } from '@preact/signals-core';
 import { flushSync, tick } from 'svelte';
 import { describe, expect, test } from 'vitest';
-import {
-	createHueApp,
-	type BridgeLight,
-	type HueApp,
-	type HueGateway,
-	type LightChangeObserver
-} from '../src/index.js';
+import { createHueApp, type HueApp } from '../src/index.js';
 import { createSvelteHueApp, type SvelteHueApp, type SvelteLight } from '../src/svelte/index.js';
-
-interface Deferred<T> {
-	promise: Promise<T>;
-	resolve(value: T): void;
-	reject(error: unknown): void;
-}
-
-function deferred<T>(): Deferred<T> {
-	let resolve!: (value: T) => void;
-	let reject!: (error: unknown) => void;
-	const promise = new Promise<T>((res, rej) => {
-		resolve = res;
-		reject = rej;
-	});
-	return { promise, resolve, reject };
-}
-
-class FakeGateway implements HueGateway {
-	readonly listCalls: Deferred<BridgeLight[]>[] = [];
-	readonly commands: Deferred<void>[] = [];
-	readonly observers: LightChangeObserver[] = [];
-	unwatchCalls = 0;
-
-	listLights(): Promise<BridgeLight[]> {
-		const call = deferred<BridgeLight[]>();
-		this.listCalls.push(call);
-		return call.promise;
-	}
-
-	setPower(): Promise<void> {
-		return this.#command();
-	}
-
-	setBrightness(): Promise<void> {
-		return this.#command();
-	}
-
-	watch(observer: LightChangeObserver): () => void {
-		this.observers.push(observer);
-		return () => {
-			this.unwatchCalls += 1;
-		};
-	}
-
-	#command(): Promise<void> {
-		const call = deferred<void>();
-		this.commands.push(call);
-		return call.promise;
-	}
-}
-
-const desk: BridgeLight = { id: 'desk', name: 'Desk', isOn: false, brightness: 40 };
-const lamp: BridgeLight = { id: 'lamp', name: 'Lamp', isOn: true, brightness: null };
+import { at, desk, FakeGateway, lamp } from './fake-gateway.js';
 
 async function setup() {
 	const gateway = new FakeGateway();
@@ -71,14 +13,6 @@ async function setup() {
 	at(gateway.listCalls, 0).resolve([{ ...desk }, { ...lamp }]);
 	await ready;
 	return { gateway, app, hue };
-}
-
-function at<T>(items: readonly T[], index: number): T {
-	const item = items[index];
-	if (item === undefined) {
-		throw new Error(`No item at ${index}`);
-	}
-	return item;
 }
 
 function coreLight(app: HueApp, id: string) {

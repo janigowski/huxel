@@ -6,7 +6,3 @@ export const bridge = {
 export function bridgeBaseUrl(): string {
 	return `${location.origin}${bridge.proxyPath}`;
 }
-
-export function describeError(error: unknown): string {
-	return error instanceof Error ? error.message : String(error);
-}

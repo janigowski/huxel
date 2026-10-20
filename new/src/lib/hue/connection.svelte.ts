@@ -1,5 +1,6 @@
-import { createHueClient, HueLinkButtonNotPressedError, registerApplication } from 'hue-sdk';
-import { bridgeBaseUrl, describeError } from './bridge';
+import { createHueApp, describeError } from 'hue-app';
+import { registerApplication } from 'hue-sdk';
+import { bridgeBaseUrl } from './bridge';
 
 const APP_KEY_STORAGE_KEY = 'hue-app-key';
 
@@ -8,10 +9,8 @@ export class BridgeConnection {
 	connecting = $state(false);
 	error = $state<string | null>(null);
 
-	client = $derived(
-		this.appKey
-			? createHueClient({ baseUrl: bridgeBaseUrl(), appKey: this.appKey, throttle: false })
-			: null
+	app = $derived(
+		this.appKey ? createHueApp({ baseUrl: bridgeBaseUrl(), appKey: this.appKey }) : null
 	);
 
 	async connect() {
@@ -27,10 +26,7 @@ export class BridgeConnection {
 			localStorage.setItem(APP_KEY_STORAGE_KEY, credentials.username);
 			this.appKey = credentials.username;
 		} catch (error) {
-			this.error =
-				error instanceof HueLinkButtonNotPressedError
-					? 'Press the link button on the bridge, then connect again.'
-					: describeError(error);
+			this.error = describeError(error);
 		} finally {
 			this.connecting = false;
 		}

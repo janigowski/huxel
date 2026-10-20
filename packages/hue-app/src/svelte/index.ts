@@ -1,31 +1,22 @@
 import type { ReadonlySignal } from '@preact/signals-core';
 import { createSubscriber } from 'svelte/reactivity';
 import type { HueAppConnection } from '../gateway.js';
-import type { HueApp, HueAppStatus } from '../hue-app.js';
+import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app.js';
 import type { LightCollection } from '../light-collection.js';
-import type { ReadonlyLight } from '../light.js';
+import type { LightSnapshot, ReadonlyLight } from '../light.js';
 
-export interface SvelteLight {
-	readonly id: string;
-	readonly name: string;
-	readonly isOn: boolean;
-	readonly brightness: number | null;
-}
+export type SvelteLight = LightSnapshot;
 
 export interface SvelteLightCollection {
 	readonly all: readonly SvelteLight[];
 	get(id: string): SvelteLight | undefined;
 }
 
-export interface SvelteHueApp {
+export interface SvelteHueApp extends HueAppActions {
 	readonly lights: SvelteLightCollection;
 	readonly status: HueAppStatus;
 	readonly error: unknown;
 	readonly connection: HueAppConnection;
-	initialize(): Promise<void>;
-	toggleLight(lightId: string): Promise<void>;
-	dimLight(lightId: string, brightness: number): Promise<void>;
-	dispose(): void;
 }
 
 type Subscribable = Pick<ReadonlySignal<unknown>, 'subscribe'>;
@@ -119,9 +110,6 @@ export function createSvelteHueApp(app: HueApp): SvelteHueApp {
 		get connection() {
 			return connection();
 		},
-		initialize: () => app.initialize(),
-		toggleLight: (lightId) => app.toggleLight(lightId),
-		dimLight: (lightId, brightness) => app.dimLight(lightId, brightness),
-		dispose: () => app.dispose()
+		...bindActions(app)
 	};
 }

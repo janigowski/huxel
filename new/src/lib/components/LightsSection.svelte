@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { describeError } from 'hue-app';
 	import type { SvelteHueApp } from 'hue-app/svelte';
-	import { describeError } from '$lib/hue/bridge';
 	import LightGrid from './LightGrid.svelte';
 	import Notice from './Notice.svelte';
 	import SectionHeader from './SectionHeader.svelte';

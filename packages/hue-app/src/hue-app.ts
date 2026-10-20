@@ -1,5 +1,5 @@
 import { batch, computed, signal, type ReadonlySignal } from '@preact/signals-core';
-import type { HueClient } from 'hue-sdk';
+import { createHueClient, type HttpClient } from 'hue-sdk';
 import { DimLight } from './dim-light.js';
 import { HueAppDisposedError, LightNotFoundError } from './errors.js';
 import type { HueAppConnection, HueGateway } from './gateway.js';
@@ -20,14 +20,28 @@ export interface HueAppState {
 	readonly connection: ReadonlySignal<HueAppConnection>;
 }
 
-export type HueAppOptions = ({ client: HueClient } | { gateway: HueGateway }) & {
+export interface HueBridgeOptions {
+	/** Bridge origin, e.g. `https://192.168.1.100`. */
+	baseUrl: string;
+	appKey: string;
+	httpClient?: HttpClient;
+}
+
+export type HueAppOptions = (HueBridgeOptions | { gateway: HueGateway }) & {
 	live?: boolean;
 	settleMs?: number;
 };
 
+export interface HueAppActions {
+	initialize(): Promise<void>;
+	toggleLight(lightId: string): Promise<void>;
+	dimLight(lightId: string, brightness: number): Promise<void>;
+	dispose(): void;
+}
+
 const DEFAULT_SETTLE_MS = 1500;
 
-export class HueApp {
+export class HueApp implements HueAppActions {
 	readonly state: HueAppState;
 
 	readonly #gateway: HueGateway;
@@ -136,6 +150,27 @@ export class HueApp {
 }
 
 export function createHueApp(options: HueAppOptions): HueApp {
-	const gateway = 'gateway' in options ? options.gateway : new HueSdkGateway(options.client);
-	return new HueApp(gateway, { live: options.live, settleMs: options.settleMs });
+	const { live, settleMs } = options;
+	const gateway =
+		'gateway' in options
+			? options.gateway
+			: new HueSdkGateway(
+					createHueClient({
+						baseUrl: options.baseUrl,
+						appKey: options.appKey,
+						httpClient: options.httpClient,
+						throttle: false
+					})
+				);
+
+	return new HueApp(gateway, { live, settleMs });
+}
+
+export function bindActions(app: HueApp): HueAppActions {
+	return {
+		initialize: () => app.initialize(),
+		toggleLight: (lightId) => app.toggleLight(lightId),
+		dimLight: (lightId, brightness) => app.dimLight(lightId, brightness),
+		dispose: () => app.dispose()
+	};
 }

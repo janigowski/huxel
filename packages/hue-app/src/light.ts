@@ -38,3 +38,10 @@ export class Light {
 
 /** Read-only view of a light exposed to consumers. */
 export type ReadonlyLight = Pick<Light, 'id' | 'name' | 'isOn' | 'brightness'>;
+
+export interface LightSnapshot {
+	readonly id: string;
+	readonly name: string;
+	readonly isOn: boolean;
+	readonly brightness: number | null;
+}

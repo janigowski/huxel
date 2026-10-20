@@ -1,6 +1,6 @@
 # hue-app
 
-Headless, framework agnostic application for controlling Philips Hue lights, built on [`hue-sdk`](../hue-sdk) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes an optional Svelte 5 adapter.
+Headless, framework agnostic application for controlling Philips Hue lights, built on [`hue-sdk`](../hue-sdk) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes optional Svelte 5 and React adapters.
 
 Scope: load lights, read name, power and brightness, toggle power, change brightness, and follow changes made elsewhere (Hue app, switches, automations) in real time. No discovery, authentication, colors or rooms.
 
@@ -13,11 +13,9 @@ bun add hue-app hue-sdk
 ## CLI / Node.js
 
 ```ts
-import { createHueClient } from 'hue-sdk';
 import { createHueApp } from 'hue-app';
 
-const client = createHueClient({ baseUrl: 'https://192.168.1.100', appKey, throttle: false });
-const app = createHueApp({ client });
+const app = createHueApp({ baseUrl: 'https://192.168.1.100', appKey });
 
 await app.initialize();
 
@@ -35,17 +33,18 @@ unsubscribe();
 app.dispose();
 ```
 
-Create the `hue-sdk` client with `throttle: false`. The SDK's default write throttling can resolve a command with a different request's response and silently drop failures. `hue-app` already limits each light property to one request in flight.
+`createHueApp` creates the `hue-sdk` client itself with `throttle: false`. The SDK's default write throttling can resolve a command with a different request's response and silently drop failures. `hue-app` already limits each light property to one request in flight. Pass `httpClient` to customize the transport, for example to pin the bridge certificate.
 
 ## API
 
 ```ts
 createHueApp(
-	({ client: HueClient } | { gateway: HueGateway }) & {
+	({ baseUrl: string; appKey: string; httpClient?: HttpClient } | { gateway: HueGateway }) & {
 		live?: boolean;    // default true
 		settleMs?: number; // default 1500
 	}
 ): HueApp
+describeError(error: unknown): string
 
 app.initialize(): Promise<void>
 app.toggleLight(lightId: string): Promise<void>
@@ -68,6 +67,8 @@ light.brightness                // ReadonlySignal<number | null>, 0–100, null 
 State is read-only: signals are computed, light objects are frozen, and mutations only happen through `toggleLight`, `dimLight` and live sync. `initialize()` loads lights once; concurrent calls share the same load and a call after a failure retries.
 
 The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness` and the optional `watch`), which is useful for tests.
+
+`describeError` turns an error into a user-facing message, appending each `cause` in parentheses and asking the user to press the link button for `HueLinkButtonNotPressedError`.
 
 ## Optimistic updates
 
@@ -116,7 +117,7 @@ Stream errors themselves are not exposed; a permanent failure only shows up as `
 import { createHueApp } from 'hue-app';
 import { createSvelteHueApp } from 'hue-app/svelte';
 
-const hue = createSvelteHueApp(createHueApp({ client }));
+const hue = createSvelteHueApp(createHueApp({ baseUrl, appKey }));
 await hue.initialize();
 
 hue.connection; // 'offline' | 'connecting' | 'live' | 'reconnecting'
@@ -150,6 +151,40 @@ hue.dispose();
 ```
 
 The adapter holds no state. Its getters read the core signals and use `createSubscriber` to notify Svelte, subscribing only while a Svelte effect reads them and releasing the subscription when none does. `hue.lights.all` lists every light, `light.name`, `light.isOn` and `light.brightness` are plain reactive values, and `hue.status`, `hue.error` and `hue.connection` mirror the core state. `hue.dispose()` disposes the underlying app.
+
+## React
+
+```tsx
+import { memo } from 'react';
+import type { HueApp } from 'hue-app';
+import { useHueApp, type ReactLight } from 'hue-app/react';
+
+const LightRow = memo(function LightRow({
+	light,
+	onToggle
+}: {
+	light: ReactLight;
+	onToggle: (lightId: string) => Promise<void>;
+}) {
+	return (
+		<button onClick={() => onToggle(light.id)}>
+			{light.isOn ? 'Turn off' : 'Turn on'} {light.name}
+		</button>
+	);
+});
+
+export function Lights({ app }: { app: HueApp }) {
+	const hue = useHueApp(app);
+
+	if (hue.status === 'loading') return <p>Loading…</p>;
+
+	return hue.lights.map((light) => (
+		<LightRow key={light.id} light={light} onToggle={hue.toggleLight} />
+	));
+}
+```
+
+`useHueApp` subscribes with `useSyncExternalStore` and returns an immutable snapshot of the core state: `lights` in collection order, `status`, `error`, `connection`, and the `initialize`, `toggleLight`, `dimLight` and `dispose` actions. Snapshots are derived once per app and shared by every component using it. The `lights` array and each light object keep their identity until they change, so `memo` rows re-render only when their own light changes, and the actions are stable per app. Optimistic updates and rollbacks show up on the next render. Requires React 18 or newer.
 
 ## Scripts
 
