@@ -1,23 +1,13 @@
-import adapter from "sveltekit-adapter-chrome-extension";
+import adapter from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// Consult https://svelte.dev/docs/kit/integrations
-	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter({
-		  // default options are shown
-		  pages: "build",
-		  assets: "build",
-		  fallback: null,
-		  precompress: false,
-		  manifest: "manifest.json",
-		}),
-		appDir: "app",
-	  },
+		adapter: adapter()
+	}
 };
 
 export default config;
