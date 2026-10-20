@@ -57,3 +57,7 @@ https://{bridge}/clip/v2
 - [`/resource/speaker`](./speaker.md) — API to manage speaker services. These are offered by devices with speakers.
 - [`/resource/clip`](./clip.md) — API to reflect public clip services
 - [`/resource/wifi_connectivity`](./wifi_connectivity.md) — API to expose wifi_connectivity status
+
+## Outside CLIP v2
+
+- [Bridge discovery and application registration](./discovery-registration.md) — `GET https://discovery.meethue.com/` to find bridges and legacy V1 `POST /api` to obtain a `hue-application-key`
