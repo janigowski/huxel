@@ -35,12 +35,18 @@
 	],
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.build.json",
-		"check": "tsc --noEmit",
+		"check": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
 		"test": "vitest run --typecheck",
+		"test:bun": "bunx --bun vitest run",
+		"test:browser": "vitest run --config vitest.browser.config.ts",
+		"check:universal": "sh scripts/check-universal.sh",
 		"format": "prettier --write .",
 		"lint": "prettier --check ."
 	},
 	"devDependencies": {
+		"@types/node": "^22",
+		"@vitest/browser-playwright": "^4.1.12",
+		"playwright": "^1.64.1",
 		"prettier": "^3.7.4",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.15"
