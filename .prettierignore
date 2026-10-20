@@ -7,4 +7,4 @@ apps/svelte-hue-app/build
 apps/svelte-hue-app/static
 apps/svelte-hue-app/project.inlang
 apps/svelte-hue-app/src/lib/paraglide
-apps/svelte-hue-app/src/lib/BridgeClient/docs
+packages/hue-sdk/docs/clip-v2

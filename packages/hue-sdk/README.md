@@ -289,7 +289,7 @@ There is no runtime schema validation of request bodies or `data` items. The SDK
 
 ## Versioning
 
-This package uses [semantic versioning](https://semver.org/) independently of Hue’s API version. It targets **CLIP v2 only**.
+This package uses [semantic versioning](https://semver.org/) independently of Hue’s API version. It targets **CLIP v2 only**; the API reference it is built against lives in [`docs/clip-v2`](./docs/clip-v2/README.md).
 
 - **Minor**: new optional fields or endpoints.
 - **Patch**: internal fixes, no breaking change to the public SDK contract.
