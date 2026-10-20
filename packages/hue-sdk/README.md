@@ -64,18 +64,18 @@ Press the bridge link button before calling `registerApplication`. The SDK perfo
 createHueClient({ baseUrl, appKey, httpClient? }) => HueClient
 ```
 
-| Property | Methods |
-| --- | --- |
-| `lights` | `list`, `get`, `update`, `updateMany` |
-| `groupedLights` | `list`, `get`, `update` |
-| `rooms` | `list`, `get`, `create`, `update`, `delete` |
-| `zones` | `list`, `get`, `create`, `update`, `delete` |
-| `scenes` | `list`, `get`, `create`, `update`, `delete` |
-| `smartScenes` | `list`, `get`, `create`, `update`, `delete` |
-| `devices` | `list`, `get`, `update`, `delete` |
-| `bridges` | `list`, `get`, `update` |
-| `bridgeHomes` | `list`, `get` |
-| `resources` | `list({ type? })` — `GET /resource`, optional comma-joined `type` filter |
+| Property        | Methods                                                                  |
+| --------------- | ------------------------------------------------------------------------ |
+| `lights`        | `list`, `get`, `update`, `updateMany`                                    |
+| `groupedLights` | `list`, `get`, `update`                                                  |
+| `rooms`         | `list`, `get`, `create`, `update`, `delete`                              |
+| `zones`         | `list`, `get`, `create`, `update`, `delete`                              |
+| `scenes`        | `list`, `get`, `create`, `update`, `delete`                              |
+| `smartScenes`   | `list`, `get`, `create`, `update`, `delete`                              |
+| `devices`       | `list`, `get`, `update`, `delete`                                        |
+| `bridges`       | `list`, `get`, `update`                                                  |
+| `bridgeHomes`   | `list`, `get`                                                            |
+| `resources`     | `list({ type? })` — `GET /resource`, optional comma-joined `type` filter |
 
 - `baseUrl` is the bridge origin (e.g. `https://192.168.1.100`); `/clip/v2` is appended automatically.
 - Every method accepts an optional last argument `{ signal?: AbortSignal }`.
@@ -107,17 +107,17 @@ Uses V1 `POST /api` on the bridge origin (not `/clip/v2`). Catch `HueLinkButtonN
 
 All SDK errors extend `HueError`.
 
-| Class | When |
-| --- | --- |
-| `HueApiError` | Non-2xx HTTP (`status`, `errors`, optional `body`) |
-| `HueUnauthorizedError` | 401 |
-| `HueForbiddenError` | 403 |
-| `HueNotFoundError` | 404 |
-| `HueRateLimitError` | 429 |
-| `HueNetworkError` | Transport failure; original error on `cause` |
-| `HueResponseError` | 2xx but non-JSON or unexpected envelope (`status`, `body`) |
-| `HueRegistrationError` | V1 registration failed |
-| `HueLinkButtonNotPressedError` | V1 error type **101** (link button not pressed) |
+| Class                          | When                                                       |
+| ------------------------------ | ---------------------------------------------------------- |
+| `HueApiError`                  | Non-2xx HTTP (`status`, `errors`, optional `body`)         |
+| `HueUnauthorizedError`         | 401                                                        |
+| `HueForbiddenError`            | 403                                                        |
+| `HueNotFoundError`             | 404                                                        |
+| `HueRateLimitError`            | 429                                                        |
+| `HueNetworkError`              | Transport failure; original error on `cause`               |
+| `HueResponseError`             | 2xx but non-JSON or unexpected envelope (`status`, `body`) |
+| `HueRegistrationError`         | V1 registration failed                                     |
+| `HueLinkButtonNotPressedError` | V1 error type **101** (link button not pressed)            |
 
 `AbortError` from cancelled requests is rethrown unchanged.
 
@@ -139,7 +139,10 @@ try {
 ### Partial success
 
 ```ts
-const response = await hue.lights.updateMany([{ id: 'a', on: { on: true } }, { id: 'bad', on: { on: true } }]);
+const response = await hue.lights.updateMany([
+	{ id: 'a', on: { on: true } },
+	{ id: 'bad', on: { on: true } }
+]);
 if (response.errors.length > 0) {
 	console.warn('Some updates failed:', response.errors);
 }
@@ -207,11 +210,11 @@ In Node, you can pass a custom `fetch` (e.g. undici with a `dispatcher` that tru
 
 ## Resource coverage
 
-| Covered in this package | Not covered yet |
-| --- | --- |
+| Covered in this package                                                                                                 | Not covered yet                                                                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `light`, `grouped_light`, `room`, `zone`, `scene`, `smart_scene`, `device`, `bridge`, `bridge_home`, generic `resource` | `motion`, `temperature`, `light_level`, `button`, `relative_rotary`, `device_power`, `zigbee_connectivity`, `entertainment`, `entertainment_configuration`, `behavior_script`, `behavior_instance`, `geofence_client`, `geolocation`, `homekit`, `matter`, `service_group`, and other CLIP v2 resource types |
-| | `/eventstream` (SSE) |
-| | Entertainment streaming |
+|                                                                                                                         | `/eventstream` (SSE)                                                                                                                                                                                                                                                                                         |
+|                                                                                                                         | Entertainment streaming                                                                                                                                                                                                                                                                                      |
 
 ## Networking limitations
 
