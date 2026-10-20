@@ -10,13 +10,11 @@ jobs:
     test:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-            # Install dependencies
-            - run: yarn install --frozen-lockfile
-            # Build
-            - run: yarn build
-            # Test
-            - run: yarn check
+            - uses: actions/checkout@v4
+            - uses: oven-sh/setup-bun@v2
+            - run: bun install --frozen-lockfile
+            - run: bunx playwright install --with-deps chromium
+              working-directory: apps/svelte-hue-app
+            - run: bun run build
+            - run: bun run check
+            - run: bun run test

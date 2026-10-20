@@ -4,15 +4,12 @@ Terminal remote for Philips Hue lights: link to a bridge, list all lights, toggl
 
 ## Setup
 
-`hue-app` and `hue-sdk` are local `file:` dependencies that resolve to their `dist/` builds, so build them first:
+`hue-app` and `hue-sdk` are workspace dependencies that resolve to their `dist/` builds, so build them first from the repository root:
 
 ```bash
-(cd ../../packages/hue-sdk && bun install && bun run build)
-(cd ../../packages/hue-app && bun install && bun run build)
 bun install
+bun run --filter hue-sdk --filter hue-app build
 ```
-
-Installed files are symlinks into those packages, so a rebuild is picked up directly. Re-run `bun install` here only when the set of built files changes, for example when a new module is added to `dist/`.
 
 ## Run
 

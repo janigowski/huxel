@@ -8,5 +8,17 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/dawidjaniga/philips-hue-remote.git"
-	}
+	},
+	"workspaces": [
+		"packages/*",
+		"apps/*"
+	],
+	"scripts": {
+		"build": "bun run --filter '*' build",
+		"check": "bun run --filter '*' check",
+		"test": "bun run --filter '*' test",
+		"lint": "bun run --filter '*' lint",
+		"format": "bun run --filter '*' format"
+	},
+	"packageManager": "bun@1.4.2"
 }
