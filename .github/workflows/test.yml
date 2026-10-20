@@ -17,4 +17,5 @@ jobs:
         working-directory: apps/svelte-hue-app
       - run: bun run build
       - run: bun run check
+      - run: bun run lint
       - run: bun run test
