@@ -88,17 +88,17 @@ class Connection {
 		});
 	}
 
-	open(status = 200): FakeBody {
+	open(status = 200, headers: Record<string, string> = {}): FakeBody {
 		this.resolve({
 			status,
-			headers: new Headers({ 'content-type': 'text/event-stream' }),
+			headers: new Headers({ 'content-type': 'text/event-stream', ...headers }),
 			body: this.body
 		});
 		return this.body;
 	}
 
-	respond(status: number, body: string): void {
-		this.open(status);
+	respond(status: number, body: string, headers: Record<string, string> = {}): void {
+		this.open(status, headers);
 		this.body.push(body);
 		this.body.end();
 	}
@@ -338,6 +338,18 @@ describe('events.subscribe messages', () => {
 		expect(subscription.state).toBe('open');
 	});
 
+	it('skips messages with empty data silently', async () => {
+		const { connection, events, errors } = subscribe();
+		await settle();
+		connection(0)
+			.open()
+			.push('data\n\n', 'data:\n\n', sse([lightUpdate()]));
+		await settle();
+
+		expect(errors).toEqual([]);
+		expect(events).toHaveLength(1);
+	});
+
 	it('reports a message that is not an array', async () => {
 		const { connection, events, errors } = subscribe();
 		await settle();
@@ -498,7 +510,22 @@ describe('events.subscribe reconnection', () => {
 		await expectReconnectAfter(connections, 1000);
 	});
 
-	it('resets the backoff after a successful open', async () => {
+	it('backs off exponentially when connections open and end immediately', async () => {
+		const { connections, connection, errors } = subscribe();
+		await settle();
+
+		connection(0).open().end();
+		await settle();
+		for (const delay of [1000, 2000, 4000, 8000, 16000, 30000]) {
+			(await expectReconnectAfter(connections, delay))?.open().end();
+			await settle();
+		}
+
+		expect(errors).toEqual([]);
+		await expectReconnectAfter(connections, 30000);
+	});
+
+	it('resets the backoff after a connection stays open for 30 s', async () => {
 		const { connections, connection, states } = subscribe();
 		await settle();
 
@@ -506,12 +533,31 @@ describe('events.subscribe reconnection', () => {
 		await settle();
 		(await expectReconnectAfter(connections, 1000))?.fail(new TypeError('offline'));
 		await settle();
-		const third = await expectReconnectAfter(connections, 2000);
-		third?.open().end();
+		const body = (await expectReconnectAfter(connections, 2000))?.open();
+		await settle();
+		await vi.advanceTimersByTimeAsync(30_000);
+		body?.end();
 		await settle();
 
 		await expectReconnectAfter(connections, 1000);
 		expect(states).toEqual(['reconnecting', 'open', 'reconnecting']);
+	});
+
+	it('keeps backing off when a connection ends before 30 s', async () => {
+		const { connections, connection } = subscribe();
+		await settle();
+
+		connection(0).fail(new TypeError('offline'));
+		await settle();
+		(await expectReconnectAfter(connections, 1000))?.fail(new TypeError('offline'));
+		await settle();
+		const body = (await expectReconnectAfter(connections, 2000))?.open();
+		await settle();
+		await vi.advanceTimersByTimeAsync(29_999);
+		body?.end();
+		await settle();
+
+		await expectReconnectAfter(connections, 4000);
 	});
 
 	it('transitions through open, reconnecting, open and closed', async () => {
@@ -578,6 +624,90 @@ describe('events.subscribe reconnection', () => {
 		(await expectReconnectAfter(connections, 1000))?.open();
 		await settle();
 		expect(subscription.state).toBe('open');
+	});
+
+	it.each([429, 503])('waits for a Retry-After in seconds on status %i', async (status) => {
+		const { connections, connection } = subscribe();
+		await settle();
+
+		connection(0).respond(status, '', { 'retry-after': '120' });
+		await settle();
+
+		await expectReconnectAfter(connections, 120_000);
+	});
+
+	it('waits until a Retry-After HTTP date', async () => {
+		vi.setSystemTime(new Date('2026-10-20T18:00:00.000Z'));
+		const { connections, connection } = subscribe();
+		await settle();
+
+		connection(0).respond(429, '', { 'retry-after': 'Tue, 20 Oct 2026 18:01:30 GMT' });
+		await settle();
+
+		await expectReconnectAfter(connections, 90_000);
+	});
+
+	it('uses the backoff when it is longer than Retry-After', async () => {
+		const { connections, connection } = subscribe();
+		await settle();
+
+		connection(0).respond(429, '', { 'retry-after': '0' });
+		await settle();
+
+		await expectReconnectAfter(connections, 1000);
+	});
+
+	it('caps Retry-After at 5 minutes', async () => {
+		const { connections, connection } = subscribe();
+		await settle();
+
+		connection(0).respond(503, '', { 'retry-after': '3600' });
+		await settle();
+
+		await expectReconnectAfter(connections, 300_000);
+	});
+
+	it('ignores Retry-After on other statuses and invalid values', async () => {
+		const { connections, connection } = subscribe();
+		await settle();
+
+		connection(0).respond(500, '', { 'retry-after': '120' });
+		await settle();
+		(await expectReconnectAfter(connections, 1000))?.respond(429, '', { 'retry-after': 'soon' });
+		await settle();
+
+		await expectReconnectAfter(connections, 2000);
+	});
+
+	it('stops waiting for an error body that never ends and still reconnects', async () => {
+		const { connections, connection, errors } = subscribe();
+		await settle();
+		const body = connection(0).open(503);
+		body.push('partial');
+		await settle();
+
+		expect(errors).toEqual([]);
+		await vi.advanceTimersByTimeAsync(2000);
+
+		expect(body.finished).toBe(true);
+		expect(connection(0).request.signal?.aborted).toBe(true);
+		expect(errors[0]).toBeInstanceOf(HueApiError);
+		expect(errors[0]).toMatchObject({ status: 503, body: 'partial' });
+		await expectReconnectAfter(connections, 1000);
+	});
+
+	it('cancels reading an error body when closed', async () => {
+		const { connection, errors, subscription } = subscribe();
+		await settle();
+		const body = connection(0).open(503);
+		await settle();
+
+		subscription.close();
+		await settle();
+
+		expect(body.finished).toBe(true);
+		expect(errors).toEqual([]);
+		expect(vi.getTimerCount()).toBe(0);
 	});
 
 	it('reads only a bounded part of an error body', async () => {

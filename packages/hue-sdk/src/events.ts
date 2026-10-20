@@ -41,10 +41,12 @@ export interface EventsApiConfig {
 
 const EVENT_STREAM_PATH = '/eventstream/clip/v2';
 const EVENT_STREAM_LABEL = `GET ${EVENT_STREAM_PATH}`;
-const MIN_RECONNECT_DELAY = 500;
 const BASE_RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_DELAY = 30_000;
+const STABLE_CONNECTION_DURATION = 30_000;
+const MAX_RETRY_AFTER_DELAY = 300_000;
 const MAX_ERROR_BODY = 1000;
+const ERROR_BODY_TIMEOUT = 2000;
 const EVENT_TYPES: readonly string[] = [
 	'add',
 	'update',
@@ -54,8 +56,7 @@ const EVENT_TYPES: readonly string[] = [
 
 export function reconnectDelay(attempt: number): number {
 	const ceiling = Math.min(MAX_RECONNECT_DELAY, BASE_RECONNECT_DELAY * 2 ** attempt);
-	const delay = ceiling / 2 + (Math.random() * ceiling) / 2;
-	return Math.min(MAX_RECONNECT_DELAY, Math.max(MIN_RECONNECT_DELAY, delay));
+	return ceiling / 2 + (Math.random() * ceiling) / 2;
 }
 
 export function createEventsApi(config: EventsApiConfig): EventsApi {
@@ -116,12 +117,15 @@ export function createEventsApi(config: EventsApiConfig): EventsApi {
 				} catch {}
 			}
 
-			function scheduleReconnect(): void {
+			function scheduleReconnect(minimumDelay = 0): void {
 				setState('reconnecting');
 				if (closed) {
 					return;
 				}
-				const delay = reconnectDelay(attempt);
+				const delay = Math.min(
+					MAX_RETRY_AFTER_DELAY,
+					Math.max(reconnectDelay(attempt), minimumDelay)
+				);
 				attempt++;
 				timer = setTimeout(() => {
 					timer = undefined;
@@ -171,7 +175,8 @@ export function createEventsApi(config: EventsApiConfig): EventsApi {
 				}
 
 				if (!isSuccessStatus(response.status)) {
-					const body = await readBoundedBody(response.body);
+					const body = await readErrorBody(response.body);
+					current.abort();
 					if (closed) {
 						return;
 					}
@@ -180,13 +185,15 @@ export function createEventsApi(config: EventsApiConfig): EventsApi {
 					report(createApiError(EVENT_STREAM_LABEL, response.status, errors, body));
 					if (response.status === 401 || response.status === 403) {
 						close();
+					} else if (response.status === 429 || response.status === 503) {
+						scheduleReconnect(retryAfterDelay(response.headers));
 					} else {
 						scheduleReconnect();
 					}
 					return;
 				}
 
-				attempt = 0;
+				const openedAt = Date.now();
 				setState('open');
 				const status = response.status;
 				const parser = createSseParser((message) => {
@@ -209,6 +216,9 @@ export function createEventsApi(config: EventsApiConfig): EventsApi {
 					}
 				}
 				parser.end();
+				if (Date.now() - openedAt >= STABLE_CONNECTION_DURATION) {
+					attempt = 0;
+				}
 				if (!closed) {
 					scheduleReconnect();
 				}
@@ -235,22 +245,46 @@ export function createEventsApi(config: EventsApiConfig): EventsApi {
 	};
 }
 
-async function readBoundedBody(body: AsyncIterable<string>): Promise<string> {
+async function readErrorBody(body: AsyncIterable<string>): Promise<string> {
+	const iterator = body[Symbol.asyncIterator]();
+	let timeout: ReturnType<typeof setTimeout> | undefined;
+	const expired = new Promise<undefined>((resolve) => {
+		timeout = setTimeout(resolve, ERROR_BODY_TIMEOUT, undefined);
+	});
 	let text = '';
 	try {
-		for await (const chunk of body) {
-			text += chunk;
-			if (text.length >= MAX_ERROR_BODY) {
+		while (text.length < MAX_ERROR_BODY) {
+			const result = await Promise.race([iterator.next(), expired]);
+			if (!result || result.done) {
 				break;
 			}
+			text += result.value;
 		}
 	} catch {
 		return text;
+	} finally {
+		clearTimeout(timeout);
+		void Promise.resolve(iterator.return?.()).catch(() => undefined);
 	}
 	return text;
 }
 
+function retryAfterDelay(headers: Headers): number {
+	const value = headers.get('retry-after')?.trim();
+	if (!value) {
+		return 0;
+	}
+	if (/^\d+$/.test(value)) {
+		return Number.parseInt(value, 10) * 1000;
+	}
+	const date = Date.parse(value);
+	return Number.isNaN(date) ? 0 : Math.max(0, date - Date.now());
+}
+
 function readMessage(data: string, status: number, report: (error: unknown) => void): HueEvent[] {
+	if (data === '') {
+		return [];
+	}
 	const parsed = parseJsonBody(data);
 	if (!parsed.ok) {
 		report(
