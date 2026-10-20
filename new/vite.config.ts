@@ -11,6 +11,17 @@ export default defineConfig({
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
 	],
 
+	server: {
+		proxy: {
+			'/bridge': {
+				target: 'https://192.168.1.10',
+				changeOrigin: true,
+				secure: false,
+				rewrite: (path) => path.replace(/^\/bridge/, '')
+			}
+		}
+	},
+
 	test: {
 		expect: { requireAssertions: true },
 
