@@ -1,6 +1,6 @@
 # hue-sdk
 
-Typed, environment-agnostic TypeScript SDK for the Philips Hue [CLIP API v2](https://developers.meethue.com/). ESM-only, zero runtime dependencies. Runs in browsers, Node.js 18+, and Bun.
+Typed, environment-agnostic TypeScript SDK for the Philips Hue [CLIP API v2](https://developers.meethue.com/). ESM-only, single runtime dependency (`lodash-es`). Runs in browsers, Node.js 18+, and Bun.
 
 ## Install
 
@@ -61,7 +61,7 @@ Press the bridge link button before calling `registerApplication`. The SDK perfo
 ## Client
 
 ```ts
-createHueClient({ baseUrl, appKey, httpClient? }) => HueClient
+createHueClient({ baseUrl, appKey, httpClient?, throttle? }) => HueClient
 ```
 
 | Property        | Methods                                                                  |
@@ -158,6 +158,12 @@ const controller = new AbortController();
 setTimeout(() => controller.abort(), 5_000);
 await hue.lights.list({ signal: controller.signal });
 ```
+
+## Rate limiting
+
+The bridge is a low-power device shared by every app in the home. Hue's developer documentation recommends at most about **10 commands per second** to `light` and **1 command per second** to `grouped_light`; exceeding this drops commands or returns HTTP **429**. The REST API is not meant for continuous high-frequency updates (use Entertainment streaming for that).
+
+`createHueClient` throttles writes (`PUT`) with lodash `throttle`, per resource URL: **100 ms** per resource, **1 s** for `grouped_light`. The first call goes out immediately and the last call in each window wins; intermediate calls are dropped and resolve with the previous response. Reads are not throttled. Pass `throttle: false` to disable.
 
 ## Custom transport
 

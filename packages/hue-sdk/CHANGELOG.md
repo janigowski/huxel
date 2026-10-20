@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `PUT` requests are throttled per resource URL with lodash `throttle` (100 ms, 1 s for `grouped_light`), last call wins. Disable with `throttle: false`.
+
 ## [0.1.0] - 2026-10-20
 
 ### Added

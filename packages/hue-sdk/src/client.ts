@@ -11,6 +11,7 @@ import { createRoomsApi, type RoomsApi } from './resources/rooms.js';
 import { createScenesApi, type ScenesApi } from './resources/scenes.js';
 import { createSmartScenesApi, type SmartScenesApi } from './resources/smart-scenes.js';
 import { createZonesApi, type ZonesApi } from './resources/zones.js';
+import { createThrottledHttpClient } from './throttle.js';
 
 export interface HueClientOptions {
 	/** Bridge origin, e.g. `https://192.168.1.100`. `/clip/v2` is appended automatically. */
@@ -19,6 +20,7 @@ export interface HueClientOptions {
 	appKey: string;
 	/** Custom HTTP transport. Defaults to the native `fetch` adapter. */
 	httpClient?: HttpClient;
+	throttle?: boolean;
 }
 
 export interface HueClient {
@@ -35,10 +37,11 @@ export interface HueClient {
 }
 
 export function createHueClient(options: HueClientOptions): HueClient {
+	const httpClient = options.httpClient ?? createFetchHttpClient();
 	const protocol = createHueProtocol({
 		baseUrl: options.baseUrl,
 		appKey: options.appKey,
-		httpClient: options.httpClient ?? createFetchHttpClient()
+		httpClient: options.throttle === false ? httpClient : createThrottledHttpClient(httpClient)
 	});
 
 	return {
