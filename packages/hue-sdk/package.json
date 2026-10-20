@@ -35,11 +35,11 @@
 	],
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.build.json",
-		"check": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
+		"check": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json && bun run check:universal",
 		"test": "vitest run --typecheck",
 		"test:bun": "bunx --bun vitest run",
 		"test:browser": "vitest run --config vitest.browser.config.ts",
-		"check:universal": "sh scripts/check-universal.sh"
+		"check:universal": "sh ../../scripts/check-universal.sh"
 	},
 	"devDependencies": {
 		"@types/lodash-es": "^4.17.12",

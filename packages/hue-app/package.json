@@ -44,9 +44,9 @@
 	],
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.build.json",
-		"check": "tsc --noEmit",
+		"check": "tsc --noEmit && bun run check:universal",
 		"test": "vitest run",
-		"check:universal": "sh scripts/check-universal.sh"
+		"check:universal": "sh ../../scripts/check-universal.sh"
 	},
 	"peerDependencies": {
 		"react": ">=18.0.0",
