@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { SseParser, type SseMessage } from '../src/sse.js';
+import type { SseMessage } from '../src/sse/sse-message-builder.js';
+import { SseParser } from '../src/sse/sse-parser.js';
 
 function parse(...chunks: string[]) {
 	const messages: SseMessage[] = [];

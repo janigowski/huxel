@@ -1,7 +1,7 @@
 import { HueNetworkError } from '../errors.js';
 import type { HttpStreamResponse } from '../http.js';
 import { isSuccessStatus } from '../protocol.js';
-import { SseParser } from '../sse.js';
+import { SseParser } from '../sse/sse-parser.js';
 import type { EventStreamEndpoint } from './event-stream-endpoint.js';
 import type {
 	EventStreamObserver,
