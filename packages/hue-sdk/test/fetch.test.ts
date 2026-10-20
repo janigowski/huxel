@@ -370,3 +370,179 @@ describe('createFetchHttpClient fetch resolution', () => {
 		expect(receivers).toHaveLength(1);
 	});
 });
+
+async function collect(body: AsyncIterable<string>): Promise<string[]> {
+	const chunks: string[] = [];
+	for await (const chunk of body) {
+		chunks.push(chunk);
+	}
+	return chunks;
+}
+
+function byteStream(chunks: Uint8Array[], onCancel?: (reason: unknown) => void) {
+	let index = 0;
+	return new ReadableStream<Uint8Array>({
+		pull(controller) {
+			const chunk = chunks[index++];
+			if (chunk) {
+				controller.enqueue(chunk);
+			} else {
+				controller.close();
+			}
+		},
+		cancel(reason) {
+			onCancel?.(reason);
+		}
+	});
+}
+
+describe('createFetchHttpClient stream', () => {
+	it('forwards url, method, headers and signal to fetch', async () => {
+		const { fetchFn, calls } = fakeFetch(() => new Response('data: x\n\n'));
+		const controller = new AbortController();
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		await client.stream?.({
+			method: 'GET',
+			url: 'https://hue.local/eventstream/clip/v2',
+			headers: { accept: 'text/event-stream', 'hue-application-key': 'key' },
+			signal: controller.signal
+		});
+
+		const { input, init } = firstCall(calls);
+		expect(input).toBe('https://hue.local/eventstream/clip/v2');
+		expect(init?.method).toBe('GET');
+		expect(init?.headers).toEqual({ accept: 'text/event-stream', 'hue-application-key': 'key' });
+		expect(init?.body).toBeUndefined();
+		expect(init?.signal).toBe(controller.signal);
+	});
+
+	it('returns status, headers and the decoded body chunks', async () => {
+		const encoder = new TextEncoder();
+		const { fetchFn } = fakeFetch(
+			() =>
+				new Response(byteStream([encoder.encode(': hi\n\n'), encoder.encode('data: 1\n\n')]), {
+					headers: { 'content-type': 'text/event-stream' }
+				})
+		);
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+
+		expect(response?.status).toBe(200);
+		expect(response?.headers.get('content-type')).toBe('text/event-stream');
+		expect((await collect(response!.body)).join('')).toBe(': hi\n\ndata: 1\n\n');
+	});
+
+	it('decodes multi-byte characters split across chunks', async () => {
+		const bytes = new TextEncoder().encode('data: Zażółć \u{1F4A1}\n\n');
+		const chunks = Array.from(bytes, (byte) => Uint8Array.of(byte));
+		const { fetchFn } = fakeFetch(() => new Response(byteStream(chunks)));
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+
+		expect((await collect(response!.body)).join('')).toBe('data: Zażółć \u{1F4A1}\n\n');
+	});
+
+	it.each([401, 403, 429, 503])('resolves with status %i instead of rejecting', async (status) => {
+		const { fetchFn } = fakeFetch(() => new Response('nope', { status }));
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+
+		expect(response?.status).toBe(status);
+		expect((await collect(response!.body)).join('')).toBe('nope');
+	});
+
+	it('treats a null body as an empty stream', async () => {
+		const { fetchFn } = fakeFetch(() => new Response(null, { status: 204 }));
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+
+		expect(await collect(response!.body)).toEqual([]);
+	});
+
+	it('reads with getReader and does not need ReadableStream async iteration', async () => {
+		const body = byteStream([new TextEncoder().encode('data: x\n\n')]);
+		Object.defineProperty(body, Symbol.asyncIterator, { value: undefined });
+		const { fetchFn } = fakeFetch(
+			() => ({ status: 200, headers: new Headers(), body }) as unknown as Response
+		);
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+
+		expect(await collect(response!.body)).toEqual(['data: x\n\n']);
+		expect(body.locked).toBe(false);
+	});
+
+	it('cancels the response body when iteration stops early', async () => {
+		const encoder = new TextEncoder();
+		const onCancel = vi.fn();
+		const body = byteStream([encoder.encode('a'), encoder.encode('b')], onCancel);
+		const { fetchFn } = fakeFetch(() => new Response(body));
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+		for await (const chunk of response!.body) {
+			expect(chunk).toBe('a');
+			break;
+		}
+
+		expect(onCancel).toHaveBeenCalledTimes(1);
+	});
+
+	it('rejects iteration when reading the body fails', async () => {
+		const failure = new Error('stream broke');
+		const body = new ReadableStream<Uint8Array>({
+			start(controller) {
+				controller.enqueue(new TextEncoder().encode('data: 1\n'));
+				controller.error(failure);
+			}
+		});
+		const { fetchFn } = fakeFetch(() => new Response(body));
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+
+		await expect(collect(response!.body)).rejects.toBe(failure);
+	});
+
+	it('rejects when fetch rejects', async () => {
+		const failure = new TypeError('Failed to fetch');
+		const { fetchFn } = fakeFetch(() => Promise.reject(failure));
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		await expect(client.stream?.({ method: 'GET', url: 'https://hue.local/x' })).rejects.toBe(
+			failure
+		);
+	});
+
+	it('rejects with an AbortError when the signal is aborted while pending', async () => {
+		const { fetchFn } = abortAwareFetch();
+		const controller = new AbortController();
+		const client = createFetchHttpClient({ fetch: fetchFn });
+
+		const pending = client.stream?.({
+			method: 'GET',
+			url: 'https://hue.local/x',
+			signal: controller.signal
+		});
+		controller.abort();
+
+		await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+	});
+
+	it('uses globalThis.fetch resolved at call time', async () => {
+		const client = createFetchHttpClient();
+		const { fetchFn, calls } = fakeFetch(() => new Response('late'));
+		vi.stubGlobal('fetch', fetchFn);
+
+		const response = await client.stream?.({ method: 'GET', url: 'https://hue.local/x' });
+
+		expect(calls).toHaveLength(1);
+		expect((await collect(response!.body)).join('')).toBe('late');
+	});
+});

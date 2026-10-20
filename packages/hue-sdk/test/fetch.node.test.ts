@@ -314,3 +314,91 @@ describe('createFetchHttpClient against a real HTTP server', () => {
 		await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
 	});
 });
+
+describe('createFetchHttpClient stream against a real HTTP server', () => {
+	async function startEventServer() {
+		let stream: ServerResponse | undefined;
+		let onConnected: () => void = () => {};
+		let onClosed: () => void = () => {};
+		const connected = new Promise<void>((resolve) => {
+			onConnected = resolve;
+		});
+		const connectionClosed = new Promise<void>((resolve) => {
+			onClosed = resolve;
+		});
+		const server = await startServer((_request, response) => {
+			response.writeHead(200, { 'content-type': 'text/event-stream' });
+			response.flushHeaders();
+			response.on('close', onClosed);
+			stream = response;
+			onConnected();
+		});
+		return {
+			...server,
+			connected,
+			connectionClosed,
+			send: (chunk: string) => stream?.write(chunk),
+			finish: () => stream?.end()
+		};
+	}
+
+	it('streams chunks as the server writes them and ends with the response', async () => {
+		const server = await startEventServer();
+		const client = createFetchHttpClient();
+
+		const response = await client.stream?.({
+			method: 'GET',
+			url: `${server.baseUrl}/eventstream/clip/v2`,
+			headers: { accept: 'text/event-stream', 'hue-application-key': 'secret' }
+		});
+		await server.connected;
+		expect(response?.status).toBe(200);
+		expect(server.received[0]?.headers['hue-application-key']).toBe('secret');
+		expect(server.received[0]?.headers.accept).toBe('text/event-stream');
+
+		const iterator = response!.body[Symbol.asyncIterator]();
+		server.send(': hi\n\n');
+		expect((await iterator.next()).value).toBe(': hi\n\n');
+		server.send('data: [1]\n\n');
+		expect((await iterator.next()).value).toBe('data: [1]\n\n');
+		server.finish();
+		expect((await iterator.next()).done).toBe(true);
+	});
+
+	it('rejects iteration with an AbortError when aborted mid-stream', async () => {
+		const server = await startEventServer();
+		const controller = new AbortController();
+		const client = createFetchHttpClient();
+
+		const response = await client.stream?.({
+			method: 'GET',
+			url: `${server.baseUrl}/x`,
+			signal: controller.signal
+		});
+		await server.connected;
+		const iterator = response!.body[Symbol.asyncIterator]();
+		server.send('data: 1\n\n');
+		expect((await iterator.next()).value).toBe('data: 1\n\n');
+
+		const pending = iterator.next();
+		controller.abort();
+
+		await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+		await server.connectionClosed;
+	});
+
+	it('closes the connection when iteration stops early', async () => {
+		const server = await startEventServer();
+		const client = createFetchHttpClient();
+
+		const response = await client.stream?.({ method: 'GET', url: `${server.baseUrl}/x` });
+		await server.connected;
+		server.send('data: 1\n\n');
+		for await (const chunk of response!.body) {
+			expect(chunk).toBe('data: 1\n\n');
+			break;
+		}
+
+		await server.connectionClosed;
+	});
+});

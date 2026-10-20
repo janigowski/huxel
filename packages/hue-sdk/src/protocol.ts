@@ -178,7 +178,7 @@ function safeUrl(url: string): string {
 	}
 }
 
-function readErrors(value: unknown): ApiError[] | undefined {
+export function readErrors(value: unknown): ApiError[] | undefined {
 	if (!isRecord(value) || !Array.isArray(value.errors)) {
 		return undefined;
 	}

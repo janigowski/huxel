@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `PUT` requests are throttled per resource URL with lodash `throttle` (100 ms, 1 s for `grouped_light`), last call wins. Disable with `throttle: false`.
+- `client.events.subscribe` for the CLIP v2 event stream (`/eventstream/clip/v2`): typed `HueEvent` batches, runtime validation of every message, `connecting` / `open` / `reconnecting` / `closed` states, automatic reconnection with exponential backoff (1 s doubling, 30 s cap, jitter), permanent stop on 401/403, cancellation via `close()` or `AbortSignal`.
+- Optional `HttpClient.stream()` returning `HttpStreamResponse`, implemented by `createFetchHttpClient` with `getReader()` and `TextDecoder` for Node 18+, browsers and extensions.
+- Spec-compliant incremental Server-Sent Events parser used by the event stream.
 
 ## [0.1.0] - 2026-10-20
 

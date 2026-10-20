@@ -159,6 +159,51 @@ setTimeout(() => controller.abort(), 5_000);
 await hue.lights.list({ signal: controller.signal });
 ```
 
+## Event stream
+
+`client.events.subscribe` connects to the bridge Server-Sent Events stream (`GET /eventstream/clip/v2`) and keeps it alive.
+
+```ts
+const controller = new AbortController();
+
+const subscription = hue.events.subscribe(
+	{
+		onEvents(events) {
+			for (const event of events) {
+				for (const resource of event.data) {
+					if (event.type === 'update' && resource.type === 'light') {
+						console.log(resource.id, resource.on?.on, resource.dimming?.brightness);
+					}
+				}
+			}
+		},
+		onStateChange(state) {
+			if (state === 'open') {
+				void hue.lights.list().then(({ data }) => replaceLightState(data));
+			}
+		},
+		onError(error) {
+			console.warn(error);
+		}
+	},
+	{ signal: controller.signal }
+);
+
+console.log(subscription.state);
+subscription.close();
+```
+
+- `onEvents` receives each batch the bridge sends as `HueEvent[]` (`{ id, creationtime, type: 'add' | 'update' | 'delete' | 'error', data }`). `update` payloads are partial: only `id`, `type` and the changed fields are guaranteed. `resource.type === 'light'` narrows to `LightEventResource`; resource types the SDK does not model pass through unchanged at runtime.
+- States: `connecting` (first attempt) → `open` (2xx headers received) → `reconnecting` (after a disconnect, through backoff and retries until the next `open`) → `closed` (terminal). `onStateChange` fires only on transitions, and no observer callback runs synchronously inside `subscribe()`.
+- **401** (`HueUnauthorizedError`) and **403** (`HueForbiddenError`) are reported via `onError` and stop the stream permanently (`closed`).
+- Other non-2xx statuses (`HueRateLimitError` for 429, `HueApiError` otherwise) and transport failures (`HueNetworkError`, original error on `cause`) are reported via `onError`, then the stream reconnects. A clean end of the stream reconnects without an `onError`.
+- Reconnect delay is exponential with equal jitter: starts at 0.5–1 s, doubles per failed attempt, is capped at 30 s, and resets after a successful `open`. Every reconnect waits at least 500 ms. The server `retry:` field is ignored.
+- Every message is validated at runtime: it must be a JSON array of events with string `id` and `creationtime`, a known event `type` and a `data` array of records with string `id` and `type`. Invalid events and resources are dropped individually and reported as `HueResponseError`; the stream stays open. Exceptions thrown by `onEvents` are passed to `onError` and do not break the stream.
+- `close()` or aborting `signal` is idempotent: it cancels the in-flight request, clears any pending reconnect timer and emits `closed`; nothing is emitted afterwards. An already-aborted signal ends `closed` without a request.
+- Missed events are not replayed (`Last-Event-ID` is not sent). Read the state you need (e.g. `hue.lights.list()`) each time the stream becomes `open`.
+- The bridge also emits events for changes made by this app, so writes echo back as `update` events.
+- The event stream is not throttled and requires an `HttpClient` with `stream()`; `subscribe` throws `HueError` otherwise.
+
 ## Rate limiting
 
 The bridge is a low-power device shared by every app in the home. Hue's developer documentation recommends at most about **10 commands per second** to `light` and **1 command per second** to `grouped_light`; exceeding this drops commands or returns HTTP **429**. The REST API is not meant for continuous high-frequency updates (use Entertainment streaming for that).
@@ -170,6 +215,7 @@ The bridge is a low-power device shared by every app in the home. Hue's develope
 ```ts
 interface HttpClient {
 	request(req: HttpRequest): Promise<HttpResponse>;
+	stream?(req: HttpRequest): Promise<HttpStreamResponse>;
 }
 
 interface HttpRequest {
@@ -185,9 +231,17 @@ interface HttpResponse {
 	headers: Headers;
 	body: string;
 }
+
+interface HttpStreamResponse {
+	status: number;
+	headers: Headers;
+	body: AsyncIterable<string>;
+}
 ```
 
 Implementations must **resolve** for every HTTP status and **reject** only on network failure or abort. Default: `createFetchHttpClient({ fetch? })`.
+
+`stream` is optional and only used by `client.events`. It resolves once response headers arrive; `body` yields decoded text chunks. Aborting `req.signal` must end or reject body iteration, and stopping iteration early should cancel the response. The default client reads `response.body` with `getReader()` and `TextDecoder`, so it works in Node 18+, browsers and extensions. A wrapper that adds behavior to `request` must forward `stream` to keep the event stream working.
 
 Logging wrapper (illustrative):
 
@@ -201,7 +255,8 @@ function withLogging(inner: HttpClient): HttpClient {
 			const res = await inner.request(req);
 			console.log(res.status);
 			return res;
-		}
+		},
+		stream: inner.stream?.bind(inner)
 	};
 }
 
@@ -219,7 +274,6 @@ In Node, you can pass a custom `fetch` (e.g. undici with a `dispatcher` that tru
 | Covered in this package                                                                                                 | Not covered yet                                                                                                                                                                                                                                                                                              |
 | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `light`, `grouped_light`, `room`, `zone`, `scene`, `smart_scene`, `device`, `bridge`, `bridge_home`, generic `resource` | `motion`, `temperature`, `light_level`, `button`, `relative_rotary`, `device_power`, `zigbee_connectivity`, `entertainment`, `entertainment_configuration`, `behavior_script`, `behavior_instance`, `geofence_client`, `geolocation`, `homekit`, `matter`, `service_group`, and other CLIP v2 resource types |
-|                                                                                                                         | `/eventstream` (SSE)                                                                                                                                                                                                                                                                                         |
 |                                                                                                                         | Entertainment streaming                                                                                                                                                                                                                                                                                      |
 
 ## Networking limitations
