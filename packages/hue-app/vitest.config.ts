@@ -3,6 +3,15 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	plugins: [svelte({ dynamicCompileOptions: () => ({ generate: 'client' }) })],
+	environments: {
+		__vitest__: {
+			optimizeDeps: {
+				rolldownOptions: {
+					tsconfig: false
+				}
+			}
+		}
+	},
 	ssr: {
 		resolve: {
 			conditions: ['browser'],

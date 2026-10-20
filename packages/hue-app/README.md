@@ -1,6 +1,6 @@
 # hue-app
 
-Headless, framework agnostic application for controlling Philips Hue lights, built on [`hue-sdk`](../hue-sdk) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes an optional Svelte 5 adapter.
+Headless, framework agnostic application for controlling Philips Hue lights, built on [`hue-sdk`](../hue-sdk) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes optional Svelte 5 and React adapters.
 
 Scope: load lights, read power and brightness, toggle power, change brightness. No discovery, authentication, colors, rooms or real-time events.
 
@@ -107,6 +107,40 @@ await hue.initialize();
 ```
 
 The adapter holds no state. Its getters read the core signals and use `createSubscriber` to notify Svelte, subscribing only while a Svelte effect reads them and releasing the subscription when none does. `hue.lights.all` lists every light, and `hue.status` and `hue.error` mirror the core state.
+
+## React
+
+```tsx
+import { memo } from 'react';
+import type { HueApp } from 'hue-app';
+import { useHueApp, type ReactLight } from 'hue-app/react';
+
+const LightRow = memo(function LightRow({
+	light,
+	onToggle
+}: {
+	light: ReactLight;
+	onToggle: (lightId: string) => Promise<void>;
+}) {
+	return (
+		<button onClick={() => onToggle(light.id)}>
+			{light.isOn ? 'Turn off' : 'Turn on'} {light.name}
+		</button>
+	);
+});
+
+export function Lights({ app }: { app: HueApp }) {
+	const hue = useHueApp(app);
+
+	if (hue.status === 'loading') return <p>Loading…</p>;
+
+	return hue.lights.map((light) => (
+		<LightRow key={light.id} light={light} onToggle={hue.toggleLight} />
+	));
+}
+```
+
+`useHueApp` subscribes with `useSyncExternalStore` and returns an immutable snapshot of the core state: `lights` in collection order, `status`, `error`, and the `initialize`, `toggleLight` and `dimLight` actions. Snapshots are derived once per app and shared by every component using it. The `lights` array and each light object keep their identity until they change, so `memo` rows re-render only when their own light changes, and the actions are stable per app. Optimistic updates and rollbacks show up on the next render. Requires React 18 or newer.
 
 ## Scripts
 
