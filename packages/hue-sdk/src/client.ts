@@ -1,4 +1,4 @@
-import { createEventsApi, type EventsApi } from './events.js';
+import { HueEventsApi, type EventsApi } from './events/events-api.js';
 import { createFetchHttpClient } from './fetch.js';
 import type { HttpClient } from './http.js';
 import { createHueProtocol } from './protocol.js';
@@ -57,6 +57,6 @@ export function createHueClient(options: HueClientOptions): HueClient {
 		devices: createDevicesApi(protocol),
 		bridges: createBridgesApi(protocol),
 		bridgeHomes: createBridgeHomesApi(protocol),
-		events: createEventsApi({ baseUrl: options.baseUrl, appKey: options.appKey, httpClient })
+		events: new HueEventsApi({ baseUrl: options.baseUrl, appKey: options.appKey, httpClient })
 	};
 }

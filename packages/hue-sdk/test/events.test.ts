@@ -10,11 +10,11 @@ import {
 	HueUnauthorizedError
 } from '../src/errors.js';
 import {
-	createEventsApi,
+	HueEventsApi,
 	type EventStreamOptions,
 	type EventStreamState,
 	type EventStreamObserver
-} from '../src/events.js';
+} from '../src/events/events-api.js';
 import type { HttpClient, HttpRequest, HttpStreamResponse } from '../src/http.js';
 import type { HueEvent } from '../src/types/event.js';
 
@@ -139,7 +139,7 @@ function subscribe(options?: EventStreamOptions, overrides: Partial<EventStreamO
 	const events: HueEvent[][] = [];
 	const states: EventStreamState[] = [];
 	const errors: unknown[] = [];
-	const api = createEventsApi({
+	const api = new HueEventsApi({
 		baseUrl: 'https://bridge.local//',
 		appKey: 'app-key',
 		httpClient: http.client
@@ -201,7 +201,7 @@ afterEach(() => {
 
 describe('events.subscribe connection', () => {
 	it('throws synchronously when the HttpClient does not implement stream()', () => {
-		const api = createEventsApi({
+		const api = new HueEventsApi({
 			baseUrl: 'https://bridge.local',
 			appKey: 'key',
 			httpClient: { request: () => Promise.reject(new Error('unused')) }
@@ -249,6 +249,20 @@ describe('events.subscribe connection', () => {
 
 		expect(http.connections).toHaveLength(1);
 		expect(http.connection(0).request.url).toBe('https://bridge.local/eventstream/clip/v2');
+	});
+
+	it('supports a detached subscribe method', async () => {
+		const http = fakeStreamClient();
+		const { subscribe } = createHueClient({
+			baseUrl: 'https://bridge.local',
+			appKey: 'k',
+			httpClient: http.client
+		}).events;
+
+		subscribe({ onEvents: () => {} });
+		await settle();
+
+		expect(http.connections).toHaveLength(1);
 	});
 
 	it('moves to open once a 2xx response is received', async () => {
@@ -777,6 +791,27 @@ describe('events.subscribe closing', () => {
 
 		expect(connections).toHaveLength(0);
 		expect(states).toEqual(['closed']);
+	});
+
+	it.each([
+		['a network error', (connection: Connection) => connection.fail(new TypeError('offline'))],
+		['a retryable status', (connection: Connection) => connection.respond(503, 'busy')]
+	])('stays closed when onError closes the stream after %s', async (_name, failure) => {
+		const states: EventStreamState[] = [];
+		const ref: { close?: () => void } = {};
+		const http = subscribe(undefined, {
+			onStateChange: (state) => states.push(state),
+			onError: () => ref.close?.()
+		});
+		ref.close = () => http.subscription.close();
+		await settle();
+
+		failure(http.connection(0));
+		await settle();
+
+		expect(http.subscription.state).toBe('closed');
+		expect(states).toEqual(['closed']);
+		expect(vi.getTimerCount()).toBe(0);
 	});
 
 	it('is idempotent', async () => {

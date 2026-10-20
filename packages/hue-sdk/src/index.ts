@@ -15,7 +15,7 @@ export type {
 	EventStreamOptions,
 	EventStreamState,
 	EventStreamSubscription
-} from './events.js';
+} from './events/events-api.js';
 export type { RequestOptions } from './protocol.js';
 export * from './errors.js';
 export { discoverBridges } from './discovery.js';

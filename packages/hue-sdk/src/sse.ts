@@ -4,114 +4,148 @@ export interface SseMessage {
 	id: string;
 }
 
-export interface SseParser {
-	push(chunk: string): void;
-	end(): void;
-}
+class SseLineDecoder {
+	private buffer = '';
+	private started = false;
+	private skipLineFeed = false;
 
-export function createSseParser(
-	onMessage: (message: SseMessage) => void,
-	onRetry?: (milliseconds: number) => void
-): SseParser {
-	let buffer = '';
-	let started = false;
-	let skipLineFeed = false;
-	let data = '';
-	let eventType = '';
-	let lastEventId = '';
+	constructor(private readonly onLine: (line: string) => void) {}
 
-	function dispatch(): void {
-		if (data === '') {
-			eventType = '';
+	push(chunk: string): void {
+		if (chunk === '') {
 			return;
 		}
-		const message: SseMessage = {
-			data: data.endsWith('\n') ? data.slice(0, -1) : data,
-			event: eventType === '' ? 'message' : eventType,
-			id: lastEventId
-		};
-		data = '';
-		eventType = '';
-		onMessage(message);
+
+		let text = this.stripByteOrderMark(chunk);
+
+		if (this.skipLineFeed && text !== '') {
+			this.skipLineFeed = false;
+
+			if (text.startsWith('\n')) {
+				text = text.slice(1);
+			}
+		}
+
+		this.buffer += text;
+		this.splitLines();
 	}
 
-	function processLine(line: string): void {
+	reset(): void {
+		this.buffer = '';
+		this.skipLineFeed = false;
+	}
+
+	private stripByteOrderMark(chunk: string): string {
+		if (this.started) {
+			return chunk;
+		}
+
+		this.started = true;
+
+		return chunk.charCodeAt(0) === 0xfeff ? chunk.slice(1) : chunk;
+	}
+
+	private splitLines(): void {
+		let start = 0;
+
+		for (let index = start; index < this.buffer.length; index++) {
+			const char = this.buffer[index];
+
+			if (char !== '\r' && char !== '\n') {
+				continue;
+			}
+
+			const line = this.buffer.slice(start, index);
+
+			if (char === '\r') {
+				if (index + 1 === this.buffer.length) {
+					this.skipLineFeed = true;
+				} else if (this.buffer[index + 1] === '\n') {
+					index++;
+				}
+			}
+
+			start = index + 1;
+			this.onLine(line);
+		}
+
+		this.buffer = this.buffer.slice(start);
+	}
+}
+
+export class SseParser {
+	private readonly lines = new SseLineDecoder((line) => this.processLine(line));
+	private data = '';
+	private eventType = '';
+	private lastEventId = '';
+
+	constructor(
+		private readonly onMessage: (message: SseMessage) => void,
+		private readonly onRetry?: (milliseconds: number) => void
+	) {}
+
+	push(chunk: string): void {
+		this.lines.push(chunk);
+	}
+
+	end(): void {
+		this.lines.reset();
+		this.data = '';
+		this.eventType = '';
+	}
+
+	private processLine(line: string): void {
 		if (line === '') {
-			dispatch();
+			this.dispatch();
 			return;
 		}
+
 		if (line.startsWith(':')) {
 			return;
 		}
+
 		const colon = line.indexOf(':');
 		const field = colon === -1 ? line : line.slice(0, colon);
-		let value = colon === -1 ? '' : line.slice(colon + 1);
-		if (value.startsWith(' ')) {
-			value = value.slice(1);
-		}
+		const value = colon === -1 ? '' : line.slice(colon + 1);
+
+		this.processField(field, value.startsWith(' ') ? value.slice(1) : value);
+	}
+
+	private processField(field: string, value: string): void {
 		switch (field) {
 			case 'event':
-				eventType = value;
+				this.eventType = value;
 				break;
 			case 'data':
-				data += `${value}\n`;
+				this.data += `${value}\n`;
 				break;
 			case 'id':
 				if (!value.includes('\0')) {
-					lastEventId = value;
+					this.lastEventId = value;
 				}
 				break;
 			case 'retry':
 				if (/^\d+$/.test(value)) {
-					onRetry?.(Number.parseInt(value, 10));
+					this.onRetry?.(Number.parseInt(value, 10));
 				}
 				break;
 		}
 	}
 
-	return {
-		push(chunk) {
-			let text = chunk;
-			if (text === '') {
-				return;
-			}
-			if (!started) {
-				started = true;
-				if (text.charCodeAt(0) === 0xfeff) {
-					text = text.slice(1);
-				}
-			}
-			if (skipLineFeed && text !== '') {
-				skipLineFeed = false;
-				if (text.startsWith('\n')) {
-					text = text.slice(1);
-				}
-			}
-			buffer += text;
-			let start = 0;
-			for (let index = start; index < buffer.length; index++) {
-				const char = buffer[index];
-				if (char !== '\r' && char !== '\n') {
-					continue;
-				}
-				const line = buffer.slice(start, index);
-				if (char === '\r') {
-					if (index + 1 === buffer.length) {
-						skipLineFeed = true;
-					} else if (buffer[index + 1] === '\n') {
-						index++;
-					}
-				}
-				start = index + 1;
-				processLine(line);
-			}
-			buffer = buffer.slice(start);
-		},
-		end() {
-			buffer = '';
-			data = '';
-			eventType = '';
-			skipLineFeed = false;
+	private dispatch(): void {
+		if (this.data === '') {
+			this.eventType = '';
+			return;
 		}
-	};
+
+		const message: SseMessage = {
+			data: this.data.endsWith('\n') ? this.data.slice(0, -1) : this.data,
+			event: this.eventType === '' ? 'message' : this.eventType,
+			id: this.lastEventId
+		};
+
+		this.data = '';
+		this.eventType = '';
+		this.onMessage(message);
+	}
 }

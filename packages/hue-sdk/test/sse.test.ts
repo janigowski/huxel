@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { createSseParser, type SseMessage } from '../src/sse.js';
+import { SseParser, type SseMessage } from '../src/sse.js';
 
 function parse(...chunks: string[]) {
 	const messages: SseMessage[] = [];
 	const retries: number[] = [];
-	const parser = createSseParser(
+	const parser = new SseParser(
 		(message) => messages.push(message),
 		(milliseconds) => retries.push(milliseconds)
 	);
@@ -15,7 +15,7 @@ function parse(...chunks: string[]) {
 	return { messages, retries, data: messages.map((message) => message.data) };
 }
 
-describe('createSseParser line endings', () => {
+describe('SseParser line endings', () => {
 	it.each([
 		['LF', 'data: a\n\ndata: b\n\n'],
 		['CRLF', 'data: a\r\n\r\ndata: b\r\n\r\n'],
@@ -48,7 +48,7 @@ describe('createSseParser line endings', () => {
 	});
 });
 
-describe('createSseParser fields', () => {
+describe('SseParser fields', () => {
 	it('joins multi-line data with LF and removes the trailing LF', () => {
 		expect(parse('data: one\ndata: two\ndata\n\n').data).toEqual(['one\ntwo\n']);
 	});
@@ -88,7 +88,7 @@ describe('createSseParser fields', () => {
 	});
 });
 
-describe('createSseParser dispatch', () => {
+describe('SseParser dispatch', () => {
 	it('strips a BOM at the start of the stream only', () => {
 		expect(parse('\uFEFFdata: a\n\n', '\uFEFFdata: b\n\n').data).toEqual(['a']);
 	});
@@ -99,7 +99,7 @@ describe('createSseParser dispatch', () => {
 
 	it('does not dispatch until a blank line is received', () => {
 		const messages: SseMessage[] = [];
-		const parser = createSseParser((message) => messages.push(message));
+		const parser = new SseParser((message) => messages.push(message));
 		parser.push('data: a\n');
 		expect(messages).toEqual([]);
 		parser.push('\n');
