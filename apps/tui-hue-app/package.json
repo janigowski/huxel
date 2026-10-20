@@ -1,12 +1,12 @@
 {
-	"name": "hue-tui",
+	"name": "tui-hue-app",
 	"version": "0.1.0",
 	"description": "Terminal remote for Philips Hue lights",
 	"private": true,
 	"license": "MIT",
 	"type": "module",
 	"bin": {
-		"hue-tui": "./src/index.tsx"
+		"tui-hue-app": "./src/index.tsx"
 	},
 	"scripts": {
 		"start": "bun run src/index.tsx",
@@ -19,12 +19,12 @@
 	"dependencies": {
 		"@opentui/core": "0.6.6",
 		"@opentui/react": "0.6.6",
-		"hue-app": "file:../hue-app",
-		"hue-sdk": "file:../hue-sdk",
+		"hue-app": "file:../../packages/hue-app",
+		"hue-sdk": "file:../../packages/hue-sdk",
 		"react": "^19.2"
 	},
 	"overrides": {
-		"hue-sdk": "file:../hue-sdk"
+		"hue-sdk": "file:../../packages/hue-sdk"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.4.3",

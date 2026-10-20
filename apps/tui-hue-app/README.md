@@ -1,14 +1,14 @@
-# hue-tui
+# tui-hue-app
 
-Terminal remote for Philips Hue lights: link to a bridge, list all lights, toggle and dim them. Built with [OpenTUI](https://opentui.com) and React on top of [`hue-app`](../hue-app) and [`hue-sdk`](../hue-sdk). Requires [Bun](https://bun.sh).
+Terminal remote for Philips Hue lights: link to a bridge, list all lights, toggle and dim them. Built with [OpenTUI](https://opentui.com) and React on top of [`hue-app`](../../packages/hue-app) and [`hue-sdk`](../../packages/hue-sdk). Requires [Bun](https://bun.sh).
 
 ## Setup
 
 `hue-app` and `hue-sdk` are local `file:` dependencies that resolve to their `dist/` builds, so build them first:
 
 ```bash
-(cd ../hue-sdk && bun install && bun run build)
-(cd ../hue-app && bun install && bun run build)
+(cd ../../packages/hue-sdk && bun install && bun run build)
+(cd ../../packages/hue-app && bun install && bun run build)
 bun install
 ```
 
