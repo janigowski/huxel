@@ -1,12 +1,21 @@
 <script lang="ts">
+	import type { HueAppConnection } from 'hue-app';
 	import Label from './Label.svelte';
 
 	interface Props {
 		label: string;
 		date: Date;
+		connection?: HueAppConnection;
 	}
 
-	let { label, date }: Props = $props();
+	let { label, date, connection }: Props = $props();
+
+	const connectionLabels: Record<HueAppConnection, string> = {
+		live: 'Live',
+		reconnecting: 'Reconnecting…',
+		connecting: 'Connecting…',
+		offline: 'Offline'
+	};
 
 	const formattedDate = $derived(
 		date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
@@ -15,8 +24,22 @@
 
 <header class="bar">
 	<span class="title">
-		<span class="dot" aria-hidden="true"></span>
+		<span
+			class={[
+				'dot',
+				{
+					live: connection === undefined || connection === 'live',
+					pending: connection === 'connecting' || connection === 'reconnecting'
+				}
+			]}
+			aria-hidden="true"
+		></span>
 		<Label>{label}</Label>
+		{#if connection}
+			<span class="state" role="status" aria-live="polite">
+				<Label>{connectionLabels[connection]}</Label>
+			</span>
+		{/if}
 	</span>
 	<time datetime={date.toISOString()}>
 		<Label>{formattedDate}</Label>
@@ -42,6 +65,30 @@
 		width: var(--space-3);
 		height: var(--space-3);
 		border-radius: 50%;
+		background: var(--color-mint-muted);
+	}
+
+	.dot.live {
 		background: var(--color-mint);
+	}
+
+	.dot.pending {
+		animation: pulse 1.2s ease-in-out infinite;
+	}
+
+	.state {
+		color: var(--color-mint-muted);
+	}
+
+	@keyframes pulse {
+		50% {
+			opacity: 0.3;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dot.pending {
+			animation: none;
+		}
 	}
 </style>

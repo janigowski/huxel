@@ -19,7 +19,7 @@
 </svelte:head>
 
 <main class="page">
-	<DashboardBar label="Hue control dashboard" date={new Date()} />
+	<DashboardBar label="Hue control dashboard" date={new Date()} connection={hue?.connection} />
 	<Hero title="Home Lights" subtitle="Bridge {bridge.id}" />
 
 	{#if hue}
