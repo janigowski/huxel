@@ -19,8 +19,10 @@
 	const error = $derived(
 		commandError ?? (hue.status === 'error' ? describeError(hue.error) : null)
 	);
+
 	async function run(command: Promise<void>) {
 		commandError = null;
+
 		try {
 			await command;
 		} catch (error) {

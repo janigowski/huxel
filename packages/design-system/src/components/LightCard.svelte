@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { xyToHex } from 'hue-app';
 	import type { SvelteLight } from 'hue-app/svelte';
-	import { findPaletteColor } from '$lib/hue/palette';
+	import { findPaletteColor } from '../palette';
 	import ColorSwatch from './ColorSwatch.svelte';
 	import Label from './Label.svelte';
 	import PowerIcon from './icons/PowerIcon.svelte';

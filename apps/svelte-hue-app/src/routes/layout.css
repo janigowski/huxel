@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 @import '@fontsource-variable/inter';
-@import '../lib/styles/tokens.css';
+@import 'design-system/tokens.css';
 
 body {
 	background: var(--color-background);

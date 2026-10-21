@@ -1,9 +1,9 @@
 import type { SvelteLight } from 'hue-app/svelte';
-import { page } from 'vitest/browser';
-import { describe, expect, it, vi } from 'vitest';
+import { page } from 'vite-plus/test/browser';
+import { describe, expect, it, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
-import { palette } from '$lib/hue/palette';
-import LightGrid from './LightGrid.svelte';
+import { palette } from '../src/palette';
+import LightGrid from '../src/components/LightGrid.svelte';
 
 const red = palette.find((entry) => entry.name === 'Red')!;
 const blue = palette.find((entry) => entry.name === 'Blue')!;
@@ -12,17 +12,17 @@ function light(overrides: Partial<SvelteLight> = {}): SvelteLight {
 	return { id: 'desk', name: 'Desk', isOn: true, brightness: 50, color: red.xy, ...overrides };
 }
 
-function renderGrid(lights: SvelteLight[]) {
+async function renderGrid(lights: SvelteLight[]) {
 	const onchangecolor = vi.fn();
 	const props = { lights, ontoggle: vi.fn(), ondim: vi.fn(), onchangecolor };
-	const screen = render(LightGrid, props);
+	const screen = await render(LightGrid, props);
 
 	return { onchangecolor, rerender: (next: SvelteLight[]) => screen.rerender({ lights: next }) };
 }
 
 describe('LightGrid color editing', () => {
 	it('opens a modal for the clicked light and changes its color', async () => {
-		const { onchangecolor } = renderGrid([
+		const { onchangecolor } = await renderGrid([
 			light(),
 			light({ id: 'lamp', name: 'Lamp', color: blue.xy })
 		]);
@@ -40,7 +40,7 @@ describe('LightGrid color editing', () => {
 	});
 
 	it('disables the color label when the light is off and hides it without color support', async () => {
-		renderGrid([light({ isOn: false }), light({ id: 'plug', name: 'Plug', color: null })]);
+		await renderGrid([light({ isOn: false }), light({ id: 'plug', name: 'Plug', color: null })]);
 
 		await expect.element(page.getByRole('button', { name: 'Desk color: Red' })).toBeDisabled();
 		expect(page.getByRole('button', { name: /Plug color/ }).elements()).toHaveLength(0);
@@ -49,7 +49,7 @@ describe('LightGrid color editing', () => {
 	it('stays modal when the lights are reordered', async () => {
 		const desk = light();
 		const lamp = light({ id: 'lamp', name: 'Lamp' });
-		const { rerender } = renderGrid([desk, lamp]);
+		const { rerender } = await renderGrid([desk, lamp]);
 
 		await page.getByRole('button', { name: 'Desk color: Red' }).click();
 		await expect.element(page.getByRole('dialog')).toBeVisible();
@@ -60,7 +60,7 @@ describe('LightGrid color editing', () => {
 	});
 
 	it('closes when the edited light turns off', async () => {
-		const { rerender } = renderGrid([light()]);
+		const { rerender } = await renderGrid([light()]);
 
 		await page.getByRole('button', { name: 'Desk color: Red' }).click();
 		await expect.element(page.getByRole('dialog')).toBeVisible();

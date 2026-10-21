@@ -1,25 +1,32 @@
 <script lang="ts">
-	import type { BridgeConnection } from '$lib/hue/connection.svelte';
+	import type { Snippet } from 'svelte';
 	import ActionButton from './ActionButton.svelte';
 	import Label from './Label.svelte';
 	import Notice from './Notice.svelte';
 
 	interface Props {
-		connection: BridgeConnection;
+		connecting: boolean;
+		error: string | null;
+		onconnect: () => void;
+		disabled?: boolean;
+		children?: Snippet;
 	}
 
-	let { connection }: Props = $props();
+	let { connecting, error, onconnect, disabled = false, children }: Props = $props();
 </script>
 
 <section class="connect">
 	<Label>Bridge not linked</Label>
 	<p>Press the link button on your Hue bridge, then connect within 30 seconds.</p>
-	<ActionButton onclick={() => connection.connect()} disabled={connection.connecting}>
-		{connection.connecting ? 'Connecting…' : 'Connect bridge'}
+
+	{@render children?.()}
+
+	<ActionButton onclick={onconnect} disabled={connecting || disabled}>
+		{connecting ? 'Connecting…' : 'Connect bridge'}
 	</ActionButton>
 
-	{#if connection.error}
-		<Notice>{connection.error}</Notice>
+	{#if error}
+		<Notice>{error}</Notice>
 	{/if}
 </section>
 

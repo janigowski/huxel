@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { XyColor } from 'hue-app';
-	import { findPaletteColor, palette } from '$lib/hue/palette';
+	import { findPaletteColor, palette } from '../palette';
 	import ColorSwatch from './ColorSwatch.svelte';
 	import Label from './Label.svelte';
 

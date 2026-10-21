@@ -1,0 +1,56 @@
+{
+	"name": "design-system",
+	"version": "0.1.0",
+	"description": "Svelte components and design tokens shared by the Hue apps",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": [
+		"**/*.css"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js",
+			"import": "./dist/index.js"
+		},
+		"./tokens.css": "./dist/tokens.css",
+		"./package.json": "./package.json"
+	},
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "svelte-package --input src --output dist",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"lint": "eslint .",
+		"test": "vp test run"
+	},
+	"peerDependencies": {
+		"hue-app": "workspace:*",
+		"svelte": "^5.46.1"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.39.1",
+		"@sveltejs/package": "^2.5.8",
+		"@sveltejs/vite-plugin-svelte": "^7",
+		"@vitest/browser-playwright": "catalog:",
+		"eslint": "^9.39.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.13.1",
+		"globals": "^16.5.0",
+		"hue-app": "workspace:*",
+		"hue-sdk": "workspace:*",
+		"playwright": "^1.57.0",
+		"svelte": "^5.46.1",
+		"svelte-check": "^4.3.4",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.48.1",
+		"vite": "catalog:",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:",
+		"vitest-browser-svelte": "^3.1.0"
+	}
+}

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { findPaletteColor, palette } from './palette';
+import { describe, expect, it } from 'vite-plus/test';
+import { findPaletteColor, palette } from '../src/palette';
 
 describe('palette', () => {
 	it('defines 12 distinct colors', () => {
