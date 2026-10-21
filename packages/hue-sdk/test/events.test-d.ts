@@ -1,4 +1,4 @@
-import { describe, expectTypeOf, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vite-plus/test';
 import { createHueClient } from '../src/index.js';
 import type {
 	EventStreamState,

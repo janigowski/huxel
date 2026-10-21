@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { createFetchHttpClient } from '../src/fetch.js';
 
 type FetchCall = { input: RequestInfo | URL; init: RequestInit | undefined };

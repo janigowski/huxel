@@ -1,4 +1,4 @@
-import { describe, expectTypeOf, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vite-plus/test';
 import { createHueProtocol } from '../src/protocol.js';
 import { createScenesApi } from '../src/resources/scenes.js';
 import type { ScenesApi } from '../src/resources/scenes.js';

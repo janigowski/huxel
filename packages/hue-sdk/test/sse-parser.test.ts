@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import type { SseMessage } from '../src/sse/sse-message-builder.js';
 import { SseParser } from '../src/sse/sse-parser.js';
 

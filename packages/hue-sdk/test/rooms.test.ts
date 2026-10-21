@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { createHueProtocol } from '../src/protocol.js';
 import { createRoomsApi } from '../src/resources/rooms.js';
 import type { RoomGet } from '../src/types/room.js';

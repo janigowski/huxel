@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { createHueProtocol } from '../src/protocol.js';
 import { createSmartScenesApi } from '../src/resources/smart-scenes.js';
 import type { SmartSceneGet, SmartScenePost, SmartScenePut } from '../src/types/smart-scene.js';

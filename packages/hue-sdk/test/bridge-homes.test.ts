@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { createHueProtocol } from '../src/protocol.js';
 import { createBridgeHomesApi } from '../src/resources/bridge-homes.js';
 import type { BridgeHomeGet } from '../src/types/bridge-home.js';

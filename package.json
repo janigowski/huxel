@@ -14,16 +14,27 @@
 		"apps/*"
 	],
 	"scripts": {
-		"build": "bun run --filter '*' build",
-		"check": "bun run --filter '*' check",
-		"test": "bun run --filter '*' test",
-		"lint": "prettier --check . && bun run --filter '*' lint",
-		"format": "prettier --write ."
+		"build": "vp run -r build",
+		"check": "vp run -r check",
+		"test": "vp run -r test",
+		"lint": "vp fmt --check . && vp run --filter './apps/*' --filter './packages/*' lint",
+		"format": "vp fmt ."
 	},
 	"packageManager": "bun@1.4.2",
 	"devDependencies": {
-		"prettier": "^3.9.10",
-		"prettier-plugin-svelte": "^3.4.0",
-		"prettier-plugin-tailwindcss": "^0.7.2"
+		"svelte": "^5.46.1",
+		"tailwindcss": "^4.1.17",
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
+	},
+	"catalog": {
+		"@vitest/browser-playwright": "5.0.5",
+		"vite": "npm:@voidzero-dev/vite-plus-core@1.3.0",
+		"vitest": "5.0.5",
+		"vite-plus": "1.3.0"
+	},
+	"overrides": {
+		"vite": "catalog:",
+		"vitest": "catalog:"
 	}
 }

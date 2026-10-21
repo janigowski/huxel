@@ -1,6 +1,6 @@
 import { createHueClient, HueApiError, HueNetworkError } from 'hue-sdk';
 import type { HttpClient, HttpRequest, HttpResponse } from 'hue-sdk';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { HueSdkGateway } from '../src/hue-sdk-gateway.js';
 
 interface Reply {

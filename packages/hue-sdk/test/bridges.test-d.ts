@@ -1,4 +1,4 @@
-import { describe, expectTypeOf, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vite-plus/test';
 import { createHueProtocol } from '../src/protocol.js';
 import { createBridgesApi, type BridgesApi } from '../src/resources/bridges.js';
 import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common.js';

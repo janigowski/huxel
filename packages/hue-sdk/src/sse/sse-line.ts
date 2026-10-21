@@ -1,5 +1,7 @@
 export type SseLine =
-	{ kind: 'end-of-message' } | { kind: 'comment' } | { kind: 'field'; name: string; value: string };
+	| { kind: 'end-of-message' }
+	| { kind: 'comment' }
+	| { kind: 'field'; name: string; value: string };
 
 export function parseSseLine(line: string): SseLine {
 	if (line === '') {

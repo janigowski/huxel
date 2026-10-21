@@ -31,7 +31,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dawidjaniga/philips-hue-remote.git",
+		"url": "git+https://github.com/dawidjaniga/philips-hue-remote.git",
 		"directory": "packages/hue-app"
 	},
 	"keywords": [
@@ -43,9 +43,9 @@
 		"react"
 	],
 	"scripts": {
-		"build": "rm -rf dist && tsc -p tsconfig.build.json",
+		"build": "vp pack",
 		"check": "tsc --noEmit && bun run check:universal",
-		"test": "vitest run",
+		"test": "vp test run",
 		"check:universal": "sh ../../scripts/check-universal.sh"
 	},
 	"peerDependencies": {
@@ -71,10 +71,11 @@
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"happy-dom": "^21.0.4",
+		"publint": "^0.3.25",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1",
 		"svelte": "^5.46.1",
 		"typescript": "^5.9.3",
-		"vitest": "^4.0.15"
+		"vite-plus": "catalog:"
 	}
 }
