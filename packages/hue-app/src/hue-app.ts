@@ -1,5 +1,7 @@
 import { batch, computed, signal, type ReadonlySignal } from '@preact/signals-core';
 import { createHueClient, type HttpClient } from 'hue-sdk';
+import { ChangeColor } from './change-color.js';
+import type { XyColor } from './color.js';
 import { DimLight } from './dim-light.js';
 import { HueAppDisposedError, LightNotFoundError } from './errors.js';
 import type { HueAppConnection, HueGateway } from './gateway.js';
@@ -36,6 +38,7 @@ export interface HueAppActions {
 	initialize(): Promise<void>;
 	toggleLight(lightId: string): Promise<void>;
 	dimLight(lightId: string, brightness: number): Promise<void>;
+	changeColor(lightId: string, color: XyColor): Promise<void>;
 	dispose(): void;
 }
 
@@ -52,6 +55,7 @@ export class HueApp implements HueAppActions {
 	readonly #lanes: LightLaneRegistry;
 	readonly #toggleLight: ToggleLight;
 	readonly #dimLight: DimLight;
+	readonly #changeColor: ChangeColor;
 	readonly #liveSync: LiveSync | undefined;
 	#initialization: Promise<void> | undefined;
 	#disposed = false;
@@ -61,6 +65,7 @@ export class HueApp implements HueAppActions {
 		this.#lanes = new LightLaneRegistry(gateway, options.settleMs ?? DEFAULT_SETTLE_MS);
 		this.#toggleLight = new ToggleLight(this.#lanes);
 		this.#dimLight = new DimLight(this.#lanes);
+		this.#changeColor = new ChangeColor(this.#lanes);
 		this.#liveSync =
 			options.live !== false && gateway.watch
 				? new LiveSync(gateway, {
@@ -137,6 +142,10 @@ export class HueApp implements HueAppActions {
 		return this.#dimLight.execute(this.#find(lightId), brightness);
 	}
 
+	async changeColor(lightId: string, color: XyColor): Promise<void> {
+		return this.#changeColor.execute(this.#find(lightId), color);
+	}
+
 	#find(lightId: string): Light {
 		if (this.#disposed) {
 			throw new HueAppDisposedError();
@@ -171,6 +180,7 @@ export function bindActions(app: HueApp): HueAppActions {
 		initialize: () => app.initialize(),
 		toggleLight: (lightId) => app.toggleLight(lightId),
 		dimLight: (lightId, brightness) => app.dimLight(lightId, brightness),
+		changeColor: (lightId, color) => app.changeColor(lightId, color),
 		dispose: () => app.dispose()
 	};
 }

@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
 	createHueApp,
+	HueAppDisposedError,
 	InvalidBrightnessError,
+	InvalidColorError,
+	LightNotColorCapableError,
 	LightNotDimmableError,
 	LightNotFoundError
 } from '../src/index.js';
-import type { BridgeLight, Light } from '../src/index.js';
+import type { BridgeLight, Light, XyColor } from '../src/index.js';
 import { bridgeLight, FakeGateway } from './fakes.js';
 
 async function setup(lights: BridgeLight[] = [bridgeLight()]) {
@@ -217,6 +220,156 @@ describe('dimLight', () => {
 		gateway.brightnessCalls[0]!.result.reject(error);
 		await rejection;
 		expect(light.brightness.value).toBe(30);
+	});
+});
+
+describe('changeColor', () => {
+	const red: XyColor = { x: 0.64, y: 0.33 };
+
+	it('updates synchronously, notifies subscribers, and leaves power and brightness unchanged', async () => {
+		const { app, gateway } = await setup([bridgeLight({ isOn: false, brightness: 30 })]);
+		const light = app.state.lights.get('desk')!;
+		const colors: Array<XyColor | null> = [];
+		const unsubscribe = light.color.subscribe((value) => colors.push(value));
+
+		const change = app.changeColor('desk', red);
+
+		expect(light.color.value).toEqual(red);
+		expect(Object.isFrozen(light.color.value)).toBe(true);
+		expect(light.isOn.value).toBe(false);
+		expect(light.brightness.value).toBe(30);
+		expect(colors).toEqual([{ x: 0.3, y: 0.3 }, red]);
+		expect(gateway.calls.slice(1)).toEqual([{ method: 'setColor', lightId: 'desk', value: red }]);
+
+		gateway.colorCalls[0]!.result.resolve();
+		await change;
+
+		expect(light.color.value).toEqual(red);
+		expect(light.isOn.value).toBe(false);
+		expect(light.brightness.value).toBe(30);
+		unsubscribe();
+	});
+
+	it('reverts and rejects with the same gateway error', async () => {
+		const { app, gateway } = await setup();
+		const light = app.state.lights.get('desk')!;
+		const error = new Error('color failed');
+		const change = app.changeColor('desk', red);
+		const rejection = expect(change).rejects.toBe(error);
+
+		expect(light.color.value).toEqual(red);
+		gateway.colorCalls[0]!.result.reject(error);
+		await rejection;
+
+		expect(light.color.value).toEqual({ x: 0.3, y: 0.3 });
+	});
+
+	it.each([
+		{ x: Number.NaN, y: 0.3 },
+		{ x: 0.3, y: Number.POSITIVE_INFINITY },
+		{ x: -0.01, y: 0.3 },
+		{ x: 0.3, y: 1.01 },
+		{ x: '0.3', y: 0.3 } as unknown as XyColor,
+		null as unknown as XyColor
+	])('rejects invalid color %o without changing state or calling the gateway', async (color) => {
+		const { app, gateway } = await setup();
+		const light = app.state.lights.get('desk')!;
+
+		await expect(app.changeColor('desk', color)).rejects.toBeInstanceOf(InvalidColorError);
+		expect(light.color.value).toEqual({ x: 0.3, y: 0.3 });
+		expect(gateway.colorCalls).toHaveLength(0);
+	});
+
+	it('accepts the bounds of the xy range', async () => {
+		const { app, gateway } = await setup();
+
+		const change = app.changeColor('desk', { x: 0, y: 1 });
+		gateway.colorCalls[0]!.result.resolve();
+
+		await expect(change).resolves.toBeUndefined();
+		expect(app.state.lights.get('desk')?.color.value).toEqual({ x: 0, y: 1 });
+	});
+
+	it('rejects lights without color capability without a gateway call', async () => {
+		const { app, gateway } = await setup([bridgeLight({ color: null })]);
+
+		await expect(app.changeColor('desk', red)).rejects.toBeInstanceOf(LightNotColorCapableError);
+		expect(app.state.lights.get('desk')?.color.value).toBeNull();
+		expect(gateway.colorCalls).toHaveLength(0);
+	});
+
+	it('rejects unknown ids and a disposed app without calling the gateway', async () => {
+		const { app, gateway } = await setup();
+
+		await expect(app.changeColor('missing', red)).rejects.toBeInstanceOf(LightNotFoundError);
+
+		app.dispose();
+
+		await expect(app.changeColor('desk', red)).rejects.toBeInstanceOf(HueAppDisposedError);
+		expect(gateway.colorCalls).toHaveLength(0);
+	});
+
+	it('does not keep a reference to the caller color object', async () => {
+		const { app, gateway } = await setup();
+		const color = { x: 0.5, y: 0.4 };
+
+		const change = app.changeColor('desk', color);
+		color.x = 0.1;
+		gateway.colorCalls[0]!.result.resolve();
+		await change;
+
+		expect(app.state.lights.get('desk')?.color.value).toEqual({ x: 0.5, y: 0.4 });
+	});
+
+	it('coalesces picker input and sends the first and latest colors only', async () => {
+		const { app, gateway } = await setup();
+		const light = app.state.lights.get('desk')!;
+		const blue = { x: 0.15, y: 0.06 };
+
+		const first = app.changeColor('desk', red);
+		const superseded = app.changeColor('desk', { x: 0.3, y: 0.6 });
+		const latest = app.changeColor('desk', blue);
+
+		expect(light.color.value).toEqual(blue);
+		expect(gateway.colorCalls.map((call) => call.color)).toEqual([red]);
+
+		gateway.colorCalls[0]!.result.resolve();
+		await first;
+
+		expect(gateway.colorCalls.map((call) => call.color)).toEqual([red, blue]);
+
+		gateway.colorCalls[1]!.result.resolve();
+		await expect(Promise.all([superseded, latest])).resolves.toEqual([undefined, undefined]);
+		expect(light.color.value).toEqual(blue);
+	});
+
+	it('runs the color lane independently from power and brightness', async () => {
+		const { app, gateway } = await setup();
+		const light = app.state.lights.get('desk')!;
+		const error = new Error('color failed');
+
+		const toggle = app.toggleLight('desk');
+		const dim = app.dimLight('desk', 70);
+		const change = app.changeColor('desk', red);
+		const rejection = expect(change).rejects.toBe(error);
+
+		expect(gateway.calls.slice(1)).toEqual([
+			{ method: 'setPower', lightId: 'desk', value: true },
+			{ method: 'setBrightness', lightId: 'desk', value: 70 },
+			{ method: 'setColor', lightId: 'desk', value: red }
+		]);
+
+		gateway.colorCalls[0]!.result.reject(error);
+		await rejection;
+
+		expect(light.color.value).toEqual({ x: 0.3, y: 0.3 });
+		expect(light.isOn.value).toBe(true);
+		expect(light.brightness.value).toBe(70);
+
+		gateway.powerCalls[0]!.result.resolve();
+		gateway.brightnessCalls[0]!.result.resolve();
+		await Promise.all([toggle, dim]);
+		expect(light.color.value).toEqual({ x: 0.3, y: 0.3 });
 	});
 });
 

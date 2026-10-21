@@ -39,32 +39,39 @@ function setup(reply: Reply | Error) {
 
 const ok = { body: { errors: [], data: [{ rid: 'light-1', rtype: 'light' }] } };
 
-function lightFixture(id: string, name: string, isOn: boolean, dimming?: { brightness: number }) {
+function lightFixture(
+	id: string,
+	name: string,
+	isOn: boolean,
+	dimming?: { brightness: number },
+	xy?: { x: number; y: number }
+) {
 	return {
 		id,
 		type: 'light',
 		metadata: { name, archetype: 'classic_bulb', function: 'functional' },
 		on: { on: isOn },
-		...(dimming ? { dimming } : {})
+		...(dimming ? { dimming } : {}),
+		...(xy ? { color: { xy, gamut_type: 'C' } } : {})
 	};
 }
 
 describe('HueSdkGateway', () => {
 	describe('listLights', () => {
-		it('maps lights and returns null brightness for non-dimmable lights', async () => {
+		it('maps lights and returns null brightness and color for lights without them', async () => {
 			const { gateway, requests } = setup({
 				body: {
 					errors: [],
 					data: [
-						lightFixture('a', 'Desk', true, { brightness: 54.7 }),
+						lightFixture('a', 'Desk', true, { brightness: 54.7 }, { x: 0.4573, y: 0.41 }),
 						lightFixture('b', 'Plug', false)
 					]
 				}
 			});
 
 			await expect(gateway.listLights()).resolves.toEqual([
-				{ id: 'a', name: 'Desk', isOn: true, brightness: 54.7 },
-				{ id: 'b', name: 'Plug', isOn: false, brightness: null }
+				{ id: 'a', name: 'Desk', isOn: true, brightness: 54.7, color: { x: 0.4573, y: 0.41 } },
+				{ id: 'b', name: 'Plug', isOn: false, brightness: null, color: null }
 			]);
 			expect(requests[0]).toMatchObject({
 				method: 'GET',
@@ -157,6 +164,47 @@ describe('HueSdkGateway', () => {
 			});
 
 			await expect(gateway.setBrightness('light-1', 10)).rejects.toBeInstanceOf(HueApiError);
+		});
+	});
+
+	describe('setColor', () => {
+		it('sends only the xy color without touching power or brightness', async () => {
+			const { gateway, requests } = setup(ok);
+
+			await gateway.setColor('light-1', { x: 0.64, y: 0.33 });
+
+			expect(requests).toHaveLength(1);
+			expect(requests[0]).toMatchObject({
+				method: 'PUT',
+				url: 'https://bridge.local/clip/v2/resource/light/light-1'
+			});
+			expect(JSON.parse(requests[0]?.body ?? '')).toEqual({ color: { xy: { x: 0.64, y: 0.33 } } });
+		});
+
+		it('rejects on HTTP errors', async () => {
+			const { gateway } = setup({
+				status: 500,
+				body: { errors: [{ description: 'boom', error_code: 'internal_error' }] }
+			});
+
+			await expect(gateway.setColor('light-1', { x: 0.3, y: 0.3 })).rejects.toBeInstanceOf(
+				HueApiError
+			);
+		});
+
+		it('rejects when a successful response carries errors', async () => {
+			const { gateway } = setup({
+				body: {
+					errors: [
+						{ description: 'color not supported', error_code: 'attribute_may_have_no_effect' }
+					],
+					data: [{ rid: 'light-1', rtype: 'light' }]
+				}
+			});
+
+			await expect(gateway.setColor('light-1', { x: 0.3, y: 0.3 })).rejects.toBeInstanceOf(
+				HueApiError
+			);
 		});
 	});
 });

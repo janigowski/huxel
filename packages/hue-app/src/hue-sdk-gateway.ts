@@ -7,6 +7,7 @@ import type {
 	LightPut,
 	ResourceIdentifierResponse
 } from 'hue-sdk';
+import type { XyColor } from './color.js';
 import type {
 	BridgeLight,
 	HueAppConnection,
@@ -50,6 +51,10 @@ export class HueSdkGateway implements HueGateway {
 		await this.#update(lightId, { dimming: { brightness } });
 	}
 
+	async setColor(lightId: string, color: XyColor): Promise<void> {
+		await this.#update(lightId, { color: { xy: { x: color.x, y: color.y } } });
+	}
+
 	watch(observer: LightChangeObserver): () => void {
 		let active = true;
 		const additions = new Map<string, LightUpdate[]>();
@@ -72,6 +77,7 @@ export class HueSdkGateway implements HueGateway {
 
 		const reportState = (state: EventStreamState): void => {
 			observer.onConnectionChange(CONNECTION_STATES[state]);
+
 			if (state === 'open') {
 				observer.onConnected();
 			}
@@ -82,14 +88,18 @@ export class HueSdkGateway implements HueGateway {
 				if (!active) {
 					return;
 				}
+
 				const changes: LightChange[] = [];
+
 				for (const event of events) {
 					for (const resource of event.data) {
 						if (resource.type !== 'light') {
 							continue;
 						}
+
 						if (event.type === 'add') {
 							const light = fromEventResource(resource);
+
 							if (light) {
 								additions.delete(resource.id);
 								changes.push({ kind: 'added', light });
@@ -121,7 +131,7 @@ export class HueSdkGateway implements HueGateway {
 					reportState(state);
 				}
 			},
-			onError: () => {}
+			onError: () => { }
 		});
 
 		if (active) {
@@ -155,7 +165,8 @@ function fromEventResource(resource: LightEventResource): BridgeLight | undefine
 		id: resource.id,
 		name,
 		isOn,
-		brightness: typeof brightness === 'number' ? brightness : null
+		brightness: typeof brightness === 'number' ? brightness : null,
+		color: toXyColor(resource.color?.xy)
 	};
 }
 
@@ -163,12 +174,16 @@ function toLightUpdate(resource: LightEventResource): LightUpdate | undefined {
 	const change: LightUpdate = { kind: 'updated', id: resource.id };
 	const isOn = resource.on?.on;
 	const brightness = resource.dimming?.brightness;
+	const color = toXyColor(resource.color?.xy);
 	const name = resource.metadata?.name;
 	if (typeof isOn === 'boolean') {
 		change.isOn = isOn;
 	}
 	if (typeof brightness === 'number') {
 		change.brightness = brightness;
+	}
+	if (color) {
+		change.color = color;
 	}
 	if (typeof name === 'string') {
 		change.name = name;
@@ -181,8 +196,19 @@ function toBridgeLight(light: LightGet): BridgeLight {
 		id: light.id,
 		name: light.metadata.name,
 		isOn: light.on.on,
-		brightness: light.dimming?.brightness ?? null
+		brightness: light.dimming?.brightness ?? null,
+		color: toXyColor(light.color?.xy)
 	};
+}
+
+function toXyColor(xy: Partial<XyColor> | undefined): XyColor | null {
+	const x = xy?.x;
+	const y = xy?.y;
+	if (typeof x !== 'number' || typeof y !== 'number') {
+		return null;
+	}
+
+	return { x, y };
 }
 
 function assertApplied(lightId: string, response: ResourceIdentifierResponse): void {

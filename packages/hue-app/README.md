@@ -2,7 +2,7 @@
 
 Headless, framework agnostic application for controlling Philips Hue lights, built on [`hue-sdk`](../hue-sdk) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes optional Svelte 5 and React adapters.
 
-Scope: load lights, read name, power and brightness, toggle power, change brightness, and follow changes made elsewhere (Hue app, switches, automations) in real time. No discovery, authentication, colors or rooms.
+Scope: load lights, read name, power, brightness and color, toggle power, change brightness and color, and follow changes made elsewhere (Hue app, switches, automations) in real time. Colors are CIE 1931 xy; color temperature, gradients and effects are not supported. No discovery, authentication or rooms.
 
 ## Install
 
@@ -13,7 +13,7 @@ bun add hue-app hue-sdk
 ## CLI / Node.js
 
 ```ts
-import { createHueApp } from 'hue-app';
+import { createHueApp, hexToXy } from 'hue-app';
 
 const app = createHueApp({ baseUrl: 'https://192.168.1.100', appKey });
 
@@ -28,6 +28,7 @@ const unsubscribe = light.isOn.subscribe((isOn) => {
 
 await app.toggleLight(light.id);
 await app.dimLight(light.id, 50);
+if (light.color.value) await app.changeColor(light.id, hexToXy('#ff8000'));
 
 unsubscribe();
 app.dispose();
@@ -45,10 +46,13 @@ createHueApp(
 	}
 ): HueApp
 describeError(error: unknown): string
+hexToXy(hex: string): XyColor   // '#rrggbb' or 'rrggbb', throws TypeError otherwise
+xyToHex(color: XyColor): string // '#rrggbb' at full brightness
 
 app.initialize(): Promise<void>
 app.toggleLight(lightId: string): Promise<void>
 app.dimLight(lightId: string, brightness: number): Promise<void>
+app.changeColor(lightId: string, color: XyColor): Promise<void>
 app.dispose(): void
 
 app.state.lights.value          // readonly Light[]
@@ -62,22 +66,28 @@ light.id                        // string
 light.name                      // ReadonlySignal<string>
 light.isOn                      // ReadonlySignal<boolean>
 light.brightness                // ReadonlySignal<number | null>, 0–100, null when not dimmable
+light.color                     // ReadonlySignal<XyColor | null>, null when the light has no color
+
+interface XyColor { readonly x: number; readonly y: number } // CIE 1931 xy, each 0–1
 ```
 
-State is read-only: signals are computed, light objects are frozen, and mutations only happen through `toggleLight`, `dimLight` and live sync. `initialize()` loads lights once; concurrent calls share the same load and a call after a failure retries.
+State is read-only: signals are computed, light and color objects are frozen, and mutations only happen through `toggleLight`, `dimLight`, `changeColor` and live sync. `initialize()` loads lights once; concurrent calls share the same load and a call after a failure retries.
 
-The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness` and the optional `watch`), which is useful for tests.
+`hexToXy` converts an sRGB hex color to xy rounded to 4 decimals, like the bridge reports it; black maps to the D65 white point. `xyToHex` converts back at full brightness, so the result has at least one channel at `ff`. Colors outside the sRGB gamut are clamped. The bridge maps xy into each bulb's own gamut, so the light may look different from the screen.
+
+The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness`, `setColor` and the optional `watch`), which is useful for tests.
 
 `describeError` turns an error into a user-facing message, appending each `cause` in parentheses and asking the user to press the link button for `HueLinkButtonNotPressedError`.
 
 ## Optimistic updates
 
-`toggleLight` and `dimLight` update state synchronously, then send the command. The returned promise resolves when the bridge accepts the command and rejects with the bridge error otherwise.
+`toggleLight`, `dimLight` and `changeColor` update state synchronously, then send the command. The returned promise resolves when the bridge accepts the command and rejects with the bridge error otherwise.
 
-- Each light has one command lane for power and one for brightness. At most one request per lane is in flight.
-- Commands issued while a request is in flight collapse into one pending command with the latest value. While dragging a slider through 40, 60 and 80, the UI shows 80 immediately and the bridge receives 40 then 80. The caller for 60 settles with the outcome of 80.
+- Each light has one command lane for power, one for brightness and one for color. At most one request per lane is in flight.
+- Commands issued while a request is in flight collapse into one pending command with the latest value. While dragging a slider through 40, 60 and 80, the UI shows 80 immediately and the bridge receives 40 then 80. The caller for 60 settles with the outcome of 80. A color picker behaves the same way.
 - A failed command reverts to the latest value reported by the bridge while the command was outstanding, or else to the last value the bridge confirmed, unless a newer command is pending. Older responses never overwrite newer values.
 - `dimLight` only changes brightness, never power. Values outside 0–100 reject with `InvalidBrightnessError`; non-dimmable lights reject with `LightNotDimmableError`; unknown ids reject with `LightNotFoundError`.
+- `changeColor` only changes color, never power or brightness. Colors whose `x` or `y` is not a number between 0 and 1 reject with `InvalidColorError`; lights without color reject with `LightNotColorCapableError`; unknown ids reject with `LightNotFoundError`. A color equal to the current one, compared by `x` and `y`, does not notify subscribers.
 
 ## Upgrading
 
@@ -99,8 +109,8 @@ After the first successful `initialize()`, the app subscribes to the bridge even
 Stream errors themselves are not exposed; a permanent failure only shows up as `connection` going `'offline'`. Recreate the app to try again.
 
 - Every time the stream opens, including reconnects, the app reloads all lights because the bridge does not replay missed events. Existing light objects are kept and updated, new lights are added and missing lights are removed. Only the latest reload is applied, and values or additions and removals received as events while a reload is in flight win over the reloaded snapshot. A failed reload is ignored: current lights, `status` and `error` stay unchanged, events keep flowing and the next reconnect reloads again.
-- Each batch of events is applied in one signal batch. Events for unknown lights are ignored; an addition for a known light updates it in place. New lights are built from the add event itself; only when it is incomplete is the light fetched, and updates arriving meanwhile are held and applied on top of the fetched light. If that fetch fails, the light appears only after the next reconnect reload.
-- Names apply immediately. Remote power and brightness go through the same command lanes as commands and never affect each other:
+- Each batch of events is applied in one signal batch. Events for unknown lights are ignored; an addition for a known light updates it in place. New lights are built from the add event itself, treating missing brightness or color as unsupported; only when the name or power is missing is the light fetched, and updates arriving meanwhile are held and applied on top of the fetched light. If that fetch fails, the light appears only after the next reconnect reload.
+- Names apply immediately. Remote power, brightness and color go through the same command lanes as commands and never affect each other:
   - When a lane is idle and outside its settle window, a remote value applies immediately.
   - While a command is in flight or pending, and for `settleMs` after every response, remote values are buffered; only the latest is kept. Once the lane is idle and the window has ended, the buffered value applies if it differs from the current value.
   - The bridge echoes the app's own writes. Dragging a slider through 40, 60 and 80 may echo 40 while 80 is pending; the UI stays at 80, and when the echo of 80 arrives within the window nothing changes. Raise `settleMs` for slow bridges, or set it to `0` to apply buffered values as soon as the lane is idle.
@@ -109,7 +119,7 @@ Stream errors themselves are not exposed; a permanent failure only shows up as `
 
 ## Dispose
 
-`dispose()` stops the event stream, clears every settle timer and sets `connection` to `'offline'`. It is idempotent and terminal: afterwards `initialize()`, `toggleLight()` and `dimLight()` reject with `HueAppDisposedError`, and late events or reload results are ignored. Commands already in flight or pending still run and their promises settle normally. Disposing during the initial load discards its result, rejects that `initialize()` with `HueAppDisposedError` and never starts live sync.
+`dispose()` stops the event stream, clears every settle timer and sets `connection` to `'offline'`. It is idempotent and terminal: afterwards `initialize()`, `toggleLight()`, `dimLight()` and `changeColor()` reject with `HueAppDisposedError`, and late events or reload results are ignored. Commands already in flight or pending still run and their promises settle normally. Disposing during the initial load discards its result, rejects that `initialize()` with `HueAppDisposedError` and never starts live sync.
 
 ## Svelte 5
 
@@ -126,6 +136,7 @@ hue.dispose();
 
 ```svelte
 <script lang="ts">
+	import { hexToXy } from 'hue-app';
 	import type { SvelteHueApp } from 'hue-app/svelte';
 
 	let { hue, lightId }: { hue: SvelteHueApp; lightId: string } = $props();
@@ -147,10 +158,14 @@ hue.dispose();
 			oninput={(event) => hue.dimLight(lightId, Number(event.currentTarget.value))}
 		/>
 	{/if}
+
+	{#if light.color !== null}
+		<button onclick={() => hue.changeColor(lightId, hexToXy('#ff3b30'))}>Red</button>
+	{/if}
 {/if}
 ```
 
-The adapter holds no state. Its getters read the core signals and use `createSubscriber` to notify Svelte, subscribing only while a Svelte effect reads them and releasing the subscription when none does. `hue.lights.all` lists every light, `light.name`, `light.isOn` and `light.brightness` are plain reactive values, and `hue.status`, `hue.error` and `hue.connection` mirror the core state. `hue.dispose()` disposes the underlying app.
+The adapter holds no state. Its getters read the core signals and use `createSubscriber` to notify Svelte, subscribing only while a Svelte effect reads them and releasing the subscription when none does. `hue.lights.all` lists every light, `light.name`, `light.isOn`, `light.brightness` and `light.color` are plain reactive values, and `hue.status`, `hue.error` and `hue.connection` mirror the core state. `hue.dispose()` disposes the underlying app.
 
 ## React
 
@@ -184,7 +199,7 @@ export function Lights({ app }: { app: HueApp }) {
 }
 ```
 
-`useHueApp` subscribes with `useSyncExternalStore` and returns an immutable snapshot of the core state: `lights` in collection order, `status`, `error`, `connection`, and the `initialize`, `toggleLight`, `dimLight` and `dispose` actions. Snapshots are derived once per app and shared by every component using it. The `lights` array and each light object keep their identity until they change, so `memo` rows re-render only when their own light changes, and the actions are stable per app. Optimistic updates and rollbacks show up on the next render. Requires React 18 or newer.
+`useHueApp` subscribes with `useSyncExternalStore` and returns an immutable snapshot of the core state: `lights` in collection order, `status`, `error`, `connection`, and the `initialize`, `toggleLight`, `dimLight`, `changeColor` and `dispose` actions. Each light snapshot includes `color`. Snapshots are derived once per app and shared by every component using it. The `lights` array and each light object keep their identity until they change, so `memo` rows re-render only when their own light changes, and the actions are stable per app. Optimistic updates and rollbacks show up on the next render. Requires React 18 or newer.
 
 ## Scripts
 

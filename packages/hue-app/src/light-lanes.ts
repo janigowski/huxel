@@ -1,3 +1,4 @@
+import type { XyColor } from './color.js';
 import { CommandLane } from './command-lane.js';
 import type { HueGateway } from './gateway.js';
 import type { Light } from './light.js';
@@ -5,6 +6,7 @@ import type { Light } from './light.js';
 export interface LightLanes {
 	readonly power: CommandLane<boolean>;
 	readonly brightness: CommandLane<number | null>;
+	readonly color: CommandLane<XyColor | null>;
 }
 
 export class LightLaneRegistry {
@@ -58,6 +60,12 @@ export class LightLaneRegistry {
 				(brightness) => light.setBrightness(brightness),
 				(brightness) => this.#gateway.setBrightness(light.id, brightness ?? 0),
 				this.#settleMs
+			),
+			color: new CommandLane<XyColor | null>(
+				() => light.color.peek(),
+				(color) => light.setColor(color),
+				(color) => (color ? this.#gateway.setColor(light.id, color) : Promise.resolve()),
+				this.#settleMs
 			)
 		};
 	}
@@ -66,4 +74,5 @@ export class LightLaneRegistry {
 function disposeLanes(lanes: LightLanes): void {
 	lanes.power.dispose();
 	lanes.brightness.dispose();
+	lanes.color.dispose();
 }

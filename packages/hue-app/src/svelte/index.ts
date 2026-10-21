@@ -46,6 +46,7 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 	const name = reader(light.name);
 	const isOn = reader(light.isOn);
 	const brightness = reader(light.brightness);
+	const color = reader(light.color);
 
 	return {
 		id: light.id,
@@ -57,6 +58,9 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 		},
 		get brightness() {
 			return brightness();
+		},
+		get color() {
+			return color();
 		}
 	};
 }

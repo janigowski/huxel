@@ -60,9 +60,11 @@ describe('createSvelteHueApp', () => {
 			id: 'desk',
 			name: 'Desk',
 			isOn: false,
-			brightness: 40
+			brightness: 40,
+			color: { x: 0.3, y: 0.3 }
 		});
 		expect(hue.lights.get('lamp')?.brightness).toBeNull();
+		expect(hue.lights.get('lamp')?.color).toBeNull();
 		expect(hue.lights.get('missing')).toBeUndefined();
 	});
 
@@ -193,6 +195,36 @@ describe('createSvelteHueApp', () => {
 		expect(light.isOn).toBe(false);
 		expect(light.brightness).toBe(40);
 
+		cleanup();
+	});
+
+	test('tracks optimistic, rolled back, and remote color changes reactively', async () => {
+		const { gateway, hue } = await setup();
+		const light = hue.lights.get('desk') as SvelteLight;
+		const { runs, cleanup } = watch(() => light.color);
+
+		at(gateway.observers, 0).onChanges([
+			{ kind: 'updated', id: 'desk', color: { x: 0.15, y: 0.06 } }
+		]);
+		flushSync();
+		expect(runs.at(-1)).toEqual({ x: 0.15, y: 0.06 });
+
+		const changed = hue.changeColor('desk', { x: 0.64, y: 0.33 });
+		flushSync();
+		expect(runs.at(-1)).toEqual({ x: 0.64, y: 0.33 });
+
+		at(gateway.commands, 0).reject(new Error('rejected'));
+		await expect(changed).rejects.toThrow('rejected');
+		flushSync();
+
+		expect(runs).toEqual([
+			{ x: 0.3, y: 0.3 },
+			{ x: 0.15, y: 0.06 },
+			{ x: 0.64, y: 0.33 },
+			{ x: 0.15, y: 0.06 }
+		]);
+		expect(light.color).toEqual({ x: 0.15, y: 0.06 });
+		hue.dispose();
 		cleanup();
 	});
 

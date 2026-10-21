@@ -132,6 +132,66 @@ describe('HueSdkGateway.watch', () => {
 		]);
 	});
 
+	it('maps color updates and builds added lights with color from the event payload', () => {
+		const { stream, changes, gets } = setup();
+
+		stream().onEvents([
+			event('update', [
+				{ id: 'a', type: 'light', color: { xy: { x: 0.64, y: 0.33 } } } as HueEventResource,
+				{
+					id: 'b',
+					type: 'light',
+					on: { on: true },
+					color: { xy: { x: 0.15, y: 0.06 } }
+				} as HueEventResource,
+				{ id: 'c', type: 'light', color: { xy: { x: 0.2 } } } as HueEventResource
+			]),
+			event('add', [
+				{
+					...lightGet('d', 'Strip', true, 50),
+					color: { xy: { x: 0.3, y: 0.6 }, gamut_type: 'C' }
+				} as HueEventResource,
+				lightGet('e', 'Plug', false) as HueEventResource
+			])
+		]);
+
+		expect(gets).toHaveLength(0);
+		expect(changes).toEqual([
+			[
+				{ kind: 'updated', id: 'a', color: { x: 0.64, y: 0.33 } },
+				{ kind: 'updated', id: 'b', isOn: true, color: { x: 0.15, y: 0.06 } },
+				{
+					kind: 'added',
+					light: { id: 'd', name: 'Strip', isOn: true, brightness: 50, color: { x: 0.3, y: 0.6 } }
+				},
+				{
+					kind: 'added',
+					light: { id: 'e', name: 'Plug', isOn: false, brightness: null, color: null }
+				}
+			]
+		]);
+	});
+
+	it('maps the color of fetched added lights', async () => {
+		const { stream, changes, gets } = setup();
+
+		stream().onEvents([event('add', [{ id: 'a', type: 'light' }])]);
+		gets[0]!.result.resolve({
+			errors: [],
+			data: [{ ...lightGet('a', 'Lamp', true, 70), color: { xy: { x: 0.5, y: 0.4 } } } as LightGet]
+		});
+		await flushMicrotasks();
+
+		expect(changes).toEqual([
+			[
+				{
+					kind: 'added',
+					light: { id: 'a', name: 'Lamp', isOn: true, brightness: 70, color: { x: 0.5, y: 0.4 } }
+				}
+			]
+		]);
+	});
+
 	it('emits one onChanges per SDK batch and skips batches without light changes', () => {
 		const { stream, changes } = setup();
 
@@ -142,7 +202,7 @@ describe('HueSdkGateway.watch', () => {
 		stream().onEvents([
 			event('update', [
 				{ id: 'room', type: 'room', on: { on: true } },
-				{ id: 'a', type: 'light', color: { xy: { x: 0.1, y: 0.2 } } } as HueEventResource
+				{ id: 'a', type: 'light', color_temperature: { mirek: 300 } } as HueEventResource
 			]),
 			event('error', [{ id: 'a', type: 'light', on: { on: false } }])
 		]);
@@ -187,8 +247,14 @@ describe('HueSdkGateway.watch', () => {
 		expect(changes).toEqual([
 			[
 				{ kind: 'updated', id: 'a', isOn: false },
-				{ kind: 'added', light: { id: 'b', name: 'Lamp', isOn: true, brightness: 35 } },
-				{ kind: 'added', light: { id: 'c', name: 'Plug', isOn: false, brightness: null } },
+				{
+					kind: 'added',
+					light: { id: 'b', name: 'Lamp', isOn: true, brightness: 35, color: null }
+				},
+				{
+					kind: 'added',
+					light: { id: 'c', name: 'Plug', isOn: false, brightness: null, color: null }
+				},
 				{ kind: 'updated', id: 'b', brightness: 50 }
 			]
 		]);
@@ -211,7 +277,7 @@ describe('HueSdkGateway.watch', () => {
 		await flushMicrotasks();
 
 		expect(changes.at(-1)).toEqual([
-			{ kind: 'added', light: { id: 'a', name: 'Lamp', isOn: true, brightness: 10 } },
+			{ kind: 'added', light: { id: 'a', name: 'Lamp', isOn: true, brightness: 10, color: null } },
 			{ kind: 'updated', id: 'a', brightness: 90 },
 			{ kind: 'updated', id: 'a', isOn: false }
 		]);
@@ -230,7 +296,12 @@ describe('HueSdkGateway.watch', () => {
 		await flushMicrotasks();
 
 		expect(changes).toEqual([
-			[{ kind: 'added', light: { id: 'a', name: 'Fresh', isOn: true, brightness: 60 } }]
+			[
+				{
+					kind: 'added',
+					light: { id: 'a', name: 'Fresh', isOn: true, brightness: 60, color: null }
+				}
+			]
 		]);
 	});
 
@@ -245,7 +316,7 @@ describe('HueSdkGateway.watch', () => {
 		await flushMicrotasks();
 
 		expect(changes).toEqual([
-			[{ kind: 'added', light: { id: 'a', name: 'Lamp', isOn: true, brightness: 70 } }]
+			[{ kind: 'added', light: { id: 'a', name: 'Lamp', isOn: true, brightness: 70, color: null } }]
 		]);
 	});
 
@@ -259,7 +330,12 @@ describe('HueSdkGateway.watch', () => {
 		await flushMicrotasks();
 
 		expect(changes).toEqual([
-			[{ kind: 'added', light: { id: 'a', name: 'Plug', isOn: false, brightness: null } }]
+			[
+				{
+					kind: 'added',
+					light: { id: 'a', name: 'Plug', isOn: false, brightness: null, color: null }
+				}
+			]
 		]);
 	});
 
@@ -296,7 +372,12 @@ describe('HueSdkGateway.watch', () => {
 		await flushMicrotasks();
 
 		expect(changes).toEqual([
-			[{ kind: 'added', light: { id: 'a', name: 'Newer', isOn: true, brightness: null } }]
+			[
+				{
+					kind: 'added',
+					light: { id: 'a', name: 'Newer', isOn: true, brightness: null, color: null }
+				}
+			]
 		]);
 	});
 

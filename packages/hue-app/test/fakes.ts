@@ -1,4 +1,4 @@
-import type { BridgeLight, HueGateway, LightChangeObserver } from '../src/index.js';
+import type { BridgeLight, HueGateway, LightChangeObserver, XyColor } from '../src/index.js';
 
 export interface Deferred<T> {
 	readonly promise: Promise<T>;
@@ -34,14 +34,22 @@ export interface BrightnessCall {
 	readonly result: Deferred<void>;
 }
 
+export interface ColorCall {
+	readonly lightId: string;
+	readonly color: XyColor;
+	readonly result: Deferred<void>;
+}
+
 export class FakeGateway implements HueGateway {
 	readonly listCalls: Deferred<BridgeLight[]>[] = [];
 	readonly powerCalls: PowerCall[] = [];
 	readonly brightnessCalls: BrightnessCall[] = [];
+	readonly colorCalls: ColorCall[] = [];
 	readonly calls: Array<
 		| { readonly method: 'listLights' }
 		| { readonly method: 'setPower'; readonly lightId: string; readonly value: boolean }
 		| { readonly method: 'setBrightness'; readonly lightId: string; readonly value: number }
+		| { readonly method: 'setColor'; readonly lightId: string; readonly value: XyColor }
 	> = [];
 	readonly observers: LightChangeObserver[] = [];
 	unwatchCalls = 0;
@@ -75,6 +83,13 @@ export class FakeGateway implements HueGateway {
 		return result.promise;
 	}
 
+	setColor(lightId: string, color: XyColor): Promise<void> {
+		const result = deferred<void>();
+		this.colorCalls.push({ lightId, color, result });
+		this.calls.push({ method: 'setColor', lightId, value: color });
+		return result.promise;
+	}
+
 	watch(observer: LightChangeObserver): () => void {
 		this.observers.push(observer);
 		return () => {
@@ -89,6 +104,7 @@ export function bridgeLight(overrides: Partial<BridgeLight> = {}): BridgeLight {
 		name: 'Desk',
 		isOn: false,
 		brightness: 30,
+		color: { x: 0.3, y: 0.3 },
 		...overrides
 	};
 }

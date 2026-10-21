@@ -29,7 +29,8 @@ function lightSnapshot(light: ReadonlyLight): ReactLight {
 				id: light.id,
 				name: light.name.value,
 				isOn: light.isOn.value,
-				brightness: light.brightness.value
+				brightness: light.brightness.value,
+				color: light.color.value
 			})
 		);
 		lightSnapshots.set(light, snapshot);

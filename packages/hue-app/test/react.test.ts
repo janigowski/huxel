@@ -59,8 +59,8 @@ describe('useHueApp', () => {
 		expect(hue.status).toBe('ready');
 		expect(hue.error).toBeUndefined();
 		expect(hue.lights).toEqual([
-			{ id: 'desk', name: 'Desk', isOn: false, brightness: 40 },
-			{ id: 'lamp', name: 'Lamp', isOn: true, brightness: null }
+			{ id: 'desk', name: 'Desk', isOn: false, brightness: 40, color: { x: 0.3, y: 0.3 } },
+			{ id: 'lamp', name: 'Lamp', isOn: true, brightness: null, color: null }
 		]);
 		expect(Object.isFrozen(hue.lights)).toBe(true);
 		expect(Object.isFrozen(light(hue, 'desk'))).toBe(true);
@@ -143,6 +143,26 @@ describe('useHueApp', () => {
 		expect(light(hook.result.current, 'desk')).toMatchObject({ isOn: false, brightness: 40 });
 	});
 
+	test('shows an optimistic color change and its rollback', async () => {
+		const { gateway, hook } = await setup();
+
+		let changed!: Promise<void>;
+		act(() => {
+			changed = hook.result.current.changeColor('desk', { x: 0.64, y: 0.33 });
+		});
+
+		expect(light(hook.result.current, 'desk').color).toEqual({ x: 0.64, y: 0.33 });
+		expect(Object.isFrozen(light(hook.result.current, 'desk').color)).toBe(true);
+
+		await act(async () => {
+			at(gateway.commands, 0).reject(new Error('rejected'));
+			await expect(changed).rejects.toThrow('rejected');
+		});
+
+		expect(light(hook.result.current, 'desk').color).toEqual({ x: 0.3, y: 0.3 });
+		expect(light(hook.result.current, 'lamp').color).toBeNull();
+	});
+
 	test('keeps snapshots and actions stable while nothing changed', async () => {
 		const { gateway, hook, renders } = await setup();
 		const before = hook.result.current;
@@ -163,6 +183,7 @@ describe('useHueApp', () => {
 		expect(after.initialize).toBe(before.initialize);
 		expect(after.toggleLight).toBe(before.toggleLight);
 		expect(after.dimLight).toBe(before.dimLight);
+		expect(after.changeColor).toBe(before.changeColor);
 
 		await act(async () => {
 			at(gateway.commands, 0).resolve();

@@ -4,6 +4,7 @@ import {
 	createHueApp,
 	HueAppDisposedError,
 	HueAppError,
+	LightNotColorCapableError,
 	LightNotDimmableError,
 	LightNotFoundError
 } from '../src/index.js';
@@ -12,7 +13,8 @@ import type {
 	HueAppConnection,
 	HueGateway,
 	LightChange,
-	LightChangeObserver
+	LightChangeObserver,
+	XyColor
 } from '../src/index.js';
 import { bridgeLight, FakeGateway, flushMicrotasks } from './fakes.js';
 
@@ -383,6 +385,150 @@ describe('reconciliation with command lanes', () => {
 	});
 });
 
+describe('remote color', () => {
+	const red: XyColor = { x: 0.64, y: 0.33 };
+	const blue: XyColor = { x: 0.15, y: 0.06 };
+
+	it('applies a remote color immediately while the lane is quiet without touching other fields', async () => {
+		const { light, update } = await setup();
+
+		update({ color: red });
+
+		expect(light().color.value).toEqual(red);
+		expect(Object.isFrozen(light().color.value)).toBe(true);
+		expect(light().brightness.value).toBe(30);
+		expect(light().isOn.value).toBe(false);
+		expect(vi.getTimerCount()).toBe(0);
+	});
+
+	it('does not notify when a remote color equals the current color', async () => {
+		const { app, gateway, light, update } = await setup();
+		const seen: Array<XyColor | null> = [];
+		const unsubscribe = light().color.subscribe((value) => seen.push(value));
+
+		update({ color: { x: 0.3, y: 0.3 } });
+
+		const change = app.changeColor('desk', red);
+		gateway.colorCalls[0]!.result.resolve();
+		await change;
+		update({ color: { ...red } });
+		await vi.advanceTimersByTimeAsync(SETTLE_MS);
+		update({ color: { ...red } });
+
+		expect(seen).toEqual([{ x: 0.3, y: 0.3 }, red]);
+		unsubscribe();
+	});
+
+	it('buffers a remote color during the settle window and applies it once the window ends', async () => {
+		const { app, gateway, light, update } = await setup();
+
+		const change = app.changeColor('desk', red);
+		gateway.colorCalls[0]!.result.resolve();
+		await change;
+
+		update({ color: blue });
+		expect(light().color.value).toEqual(red);
+
+		await vi.advanceTimersByTimeAsync(SETTLE_MS - 1);
+		expect(light().color.value).toEqual(red);
+
+		await vi.advanceTimersByTimeAsync(1);
+		expect(light().color.value).toEqual(blue);
+		expect(vi.getTimerCount()).toBe(0);
+	});
+
+	it('does not flicker when the bridge echoes intermediate colors', async () => {
+		const { app, gateway, light, update } = await setup();
+		const seen: Array<XyColor | null> = [];
+		const unsubscribe = light().color.subscribe((value) => seen.push(value));
+
+		const first = app.changeColor('desk', red);
+		const latest = app.changeColor('desk', blue);
+		update({ color: red });
+		gateway.colorCalls[0]!.result.resolve();
+		await first;
+		gateway.colorCalls[1]!.result.resolve();
+		await latest;
+		update({ color: blue });
+		await vi.advanceTimersByTimeAsync(SETTLE_MS);
+
+		expect(seen).toEqual([{ x: 0.3, y: 0.3 }, red, blue]);
+		unsubscribe();
+	});
+
+	it('reverts a failed color command to the buffered remote color', async () => {
+		const { app, gateway, light, update } = await setup();
+		const error = new Error('color failed');
+
+		const change = app.changeColor('desk', red);
+		const rejection = expect(change).rejects.toBe(error);
+		update({ color: blue });
+		expect(light().color.value).toEqual(red);
+
+		gateway.colorCalls[0]!.result.reject(error);
+		await rejection;
+
+		expect(light().color.value).toEqual(blue);
+	});
+
+	it('keeps remote color independent from busy power and brightness lanes', async () => {
+		const { app, gateway, light, update } = await setup();
+
+		const toggle = app.toggleLight('desk');
+		const dim = app.dimLight('desk', 80);
+		update({ color: red, isOn: false, brightness: 10 });
+
+		expect(light().color.value).toEqual(red);
+		expect(light().isOn.value).toBe(true);
+		expect(light().brightness.value).toBe(80);
+
+		gateway.powerCalls[0]!.result.resolve();
+		gateway.brightnessCalls[0]!.result.resolve();
+		await Promise.all([toggle, dim]);
+	});
+
+	it('merges color from a resync, keeps event colors received meanwhile, and respects in-flight commands', async () => {
+		const { app, gateway, light, startResync, resync, update } = await setup({
+			lights: [bridgeLight(), bridgeLight({ id: 'floor', name: 'Floor' })]
+		});
+
+		await resync([
+			bridgeLight({ color: red }),
+			bridgeLight({ id: 'floor', name: 'Floor', color: null })
+		]);
+		expect(light().color.value).toEqual(red);
+		expect(light('floor').color.value).toBeNull();
+		await expect(app.changeColor('floor', blue)).rejects.toBeInstanceOf(LightNotColorCapableError);
+
+		const snapshot = startResync();
+		update({ color: blue });
+		snapshot.resolve([bridgeLight({ color: red }), bridgeLight({ id: 'floor', color: red })]);
+		await flushMicrotasks();
+		expect(light().color.value).toEqual(blue);
+		expect(light('floor').color.value).toEqual(red);
+
+		const change = app.changeColor('desk', { x: 0.3, y: 0.6 });
+		await resync([bridgeLight({ color: blue }), bridgeLight({ id: 'floor', color: red })]);
+		expect(light().color.value).toEqual({ x: 0.3, y: 0.6 });
+
+		gateway.colorCalls[0]!.result.resolve();
+		await change;
+	});
+
+	it('builds added lights with their color', async () => {
+		const { observer, light } = await setup();
+
+		observer.onChanges([
+			{ kind: 'added', light: bridgeLight({ id: 'strip', name: 'Strip', color: blue }) },
+			{ kind: 'added', light: bridgeLight({ id: 'plug', name: 'Plug', color: null }) }
+		]);
+
+		expect(light('strip').color.value).toEqual(blue);
+		expect(Object.isFrozen(light('strip').color.value)).toBe(true);
+		expect(light('plug').color.value).toBeNull();
+	});
+});
+
 describe('live changes', () => {
 	it('applies one batch atomically', async () => {
 		const { app, observer } = await setup({
@@ -729,7 +875,8 @@ describe('live sync lifecycle', () => {
 		const gateway: HueGateway = {
 			listLights: () => fake.listLights(),
 			setPower: (id, isOn) => fake.setPower(id, isOn),
-			setBrightness: (id, brightness) => fake.setBrightness(id, brightness)
+			setBrightness: (id, brightness) => fake.setBrightness(id, brightness),
+			setColor: (id, color) => fake.setColor(id, color)
 		};
 		const app = createHueApp({ gateway });
 		const initialization = app.initialize();

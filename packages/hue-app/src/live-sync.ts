@@ -1,4 +1,5 @@
 import { batch, type Signal } from '@preact/signals-core';
+import type { XyColor } from './color.js';
 import type { BridgeLight, HueAppConnection, HueGateway, LightChange } from './gateway.js';
 import { Light } from './light.js';
 import type { LightLaneRegistry } from './light-lanes.js';
@@ -7,6 +8,7 @@ interface LightFields {
 	name?: string;
 	isOn?: boolean;
 	brightness?: number | null;
+	color?: XyColor | null;
 }
 
 interface Resync {
@@ -39,6 +41,7 @@ export class LiveSync {
 		}
 		this.#started = true;
 		this.#target.connection.value = 'connecting';
+
 		let unwatch: () => void;
 		try {
 			unwatch = this.#gateway.watch({
@@ -196,6 +199,9 @@ export class LiveSync {
 		if (fields.brightness !== undefined) {
 			this.#target.lanes.get(light).brightness.reconcile(fields.brightness);
 		}
+		if (fields.color !== undefined) {
+			this.#target.lanes.get(light).color.reconcile(fields.color);
+		}
 	}
 }
 
@@ -210,11 +216,19 @@ function updatedFields(change: Extract<LightChange, { kind: 'updated' }>): Light
 	if (change.brightness !== undefined) {
 		fields.brightness = change.brightness;
 	}
+	if (change.color !== undefined) {
+		fields.color = change.color;
+	}
 	return fields;
 }
 
 function withoutFields(state: BridgeLight, overrides: LightFields | undefined): LightFields {
-	const fields: LightFields = { name: state.name, isOn: state.isOn, brightness: state.brightness };
+	const fields: LightFields = {
+		name: state.name,
+		isOn: state.isOn,
+		brightness: state.brightness,
+		color: state.color
+	};
 	if (overrides) {
 		for (const key of Object.keys(overrides) as (keyof LightFields)[]) {
 			delete fields[key];
