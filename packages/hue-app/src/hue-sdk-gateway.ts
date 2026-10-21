@@ -131,7 +131,7 @@ export class HueSdkGateway implements HueGateway {
 					reportState(state);
 				}
 			},
-			onError: () => { }
+			onError: () => {}
 		});
 
 		if (active) {
