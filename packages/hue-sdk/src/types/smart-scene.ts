@@ -1,7 +1,13 @@
 import type { ResourceIdentifier } from './common.js';
 
 export type WeekDay =
-	'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+	| 'monday'
+	| 'tuesday'
+	| 'wednesday'
+	| 'thursday'
+	| 'friday'
+	| 'saturday'
+	| 'sunday';
 
 export type SmartSceneStartTimeKind = 'time' | 'sunset';
 

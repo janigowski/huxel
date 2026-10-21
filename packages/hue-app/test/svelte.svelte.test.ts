@@ -1,6 +1,6 @@
 import type { ReadonlySignal } from '@preact/signals-core';
 import { flushSync, tick } from 'svelte';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vite-plus/test';
 import { createHueApp, type HueApp } from '../src/index.js';
 import { createSvelteHueApp, type SvelteHueApp, type SvelteLight } from '../src/svelte/index.js';
 import { at, desk, FakeGateway, lamp } from './fake-gateway.js';

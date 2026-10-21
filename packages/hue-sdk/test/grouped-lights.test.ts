@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { createHueProtocol } from '../src/protocol.js';
 import { createGroupedLightsApi } from '../src/resources/grouped-lights.js';
 import type { GroupedLightGet } from '../src/types/grouped-light.js';

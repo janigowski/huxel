@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { Signal } from '@preact/signals-core';
 import { act, cleanup, renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vite-plus/test';
 import { createHueApp } from '../src/index.js';
 import { useHueApp, type ReactHueApp, type ReactLight } from '../src/react/index.js';
 import { at, desk, FakeGateway, lamp } from './fake-gateway.js';

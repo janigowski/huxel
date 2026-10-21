@@ -1,5 +1,5 @@
 import { effect } from '@preact/signals-core';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
 	createHueApp,
 	HueAppDisposedError,

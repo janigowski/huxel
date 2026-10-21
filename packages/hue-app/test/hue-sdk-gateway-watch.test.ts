@@ -7,7 +7,7 @@ import type {
 	HueEventResource,
 	LightGet
 } from 'hue-sdk';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 import { HueSdkGateway } from '../src/hue-sdk-gateway.js';
 import { createHueApp } from '../src/index.js';
 import type { HueAppConnection, LightChange, LightChangeObserver } from '../src/index.js';

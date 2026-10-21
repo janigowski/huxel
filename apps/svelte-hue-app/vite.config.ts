@@ -1,15 +1,15 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vitest/config';
-import { playwright } from '@vitest/browser-playwright';
+import { defineConfig, lazyPlugins } from 'vite-plus';
+import { playwright } from 'vite-plus/test/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
-	plugins: [
+	plugins: lazyPlugins(() => [
 		tailwindcss(),
 		sveltekit(),
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
-	],
+	]),
 
 	server: {
 		proxy: {
@@ -27,8 +27,6 @@ export default defineConfig({
 
 		projects: [
 			{
-				extends: './vite.config.ts',
-
 				test: {
 					name: 'client',
 
@@ -44,8 +42,6 @@ export default defineConfig({
 			},
 
 			{
-				extends: './vite.config.ts',
-
 				test: {
 					name: 'server',
 					environment: 'node',

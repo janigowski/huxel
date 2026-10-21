@@ -55,7 +55,10 @@ export interface ResourceIdentifier {
 }
 
 export type ApiErrorCode =
-	'communication_error' | 'attribute_may_have_no_effect' | 'client_error' | 'internal_error';
+	| 'communication_error'
+	| 'attribute_may_have_no_effect'
+	| 'client_error'
+	| 'internal_error';
 
 export interface ApiError {
 	/** A human-readable explanation specific to this occurrence of the problem. */

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { createHueClient } from '../src/index.js';
 import { envelope, mockHttpClient } from './mock-http.js';
 

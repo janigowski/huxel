@@ -23,7 +23,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dawidjaniga/philips-hue-remote.git",
+		"url": "git+https://github.com/dawidjaniga/philips-hue-remote.git",
 		"directory": "packages/hue-sdk"
 	},
 	"keywords": [
@@ -34,20 +34,22 @@
 		"typescript"
 	],
 	"scripts": {
-		"build": "rm -rf dist && tsc -p tsconfig.build.json",
+		"build": "vp pack",
 		"check": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json && bun run check:universal",
-		"test": "vitest run --typecheck",
-		"test:bun": "bunx --bun vitest run",
-		"test:browser": "vitest run --config vitest.browser.config.ts",
+		"test": "vp test run --typecheck",
+		"test:bun": "bunx --bun vp test run",
+		"test:browser": "vp test run --config vitest.browser.config.ts",
 		"check:universal": "sh ../../scripts/check-universal.sh"
 	},
 	"devDependencies": {
 		"@types/lodash-es": "^4.17.12",
 		"@types/node": "^22",
-		"@vitest/browser-playwright": "^4.1.12",
+		"@vitest/browser-playwright": "catalog:",
 		"playwright": "^1.64.1",
+		"publint": "^0.3.25",
 		"typescript": "^5.9.3",
-		"vitest": "^4.0.15"
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
 	},
 	"dependencies": {
 		"lodash-es": "^4.18.1"
