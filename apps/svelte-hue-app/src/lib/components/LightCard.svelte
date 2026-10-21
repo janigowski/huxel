@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { xyToHex } from 'hue-app';
 	import type { SvelteLight } from 'hue-app/svelte';
+	import { findPaletteColor } from '$lib/hue/palette';
+	import ColorSwatch from './ColorSwatch.svelte';
 	import Label from './Label.svelte';
 	import PowerIcon from './icons/PowerIcon.svelte';
 
@@ -8,12 +11,15 @@
 		index: number;
 		ontoggle: () => void;
 		ondim: (brightness: number) => void;
+		oneditcolor: () => void;
 	}
 
-	let { light, index, ontoggle, ondim }: Props = $props();
+	let { light, index, ontoggle, ondim, oneditcolor }: Props = $props();
 
 	const number = $derived(String(index + 1).padStart(2, '0'));
 	const level = $derived(light.isOn ? Math.round(light.brightness ?? 100) : 0);
+	const paletteColor = $derived(findPaletteColor(light.color));
+	const colorName = $derived(paletteColor?.name ?? 'Custom');
 </script>
 
 <article class="card" class:on={light.isOn}>
@@ -25,6 +31,20 @@
 		<span class="metric">{level}<small>%</small></span>
 		<Label>{light.name}</Label>
 	</button>
+
+	{#if light.color !== null}
+		<button
+			class="color"
+			type="button"
+			aria-haspopup="dialog"
+			aria-label="{light.name} color: {colorName}"
+			disabled={!light.isOn}
+			onclick={oneditcolor}
+		>
+			<ColorSwatch hex={paletteColor?.hex ?? xyToHex(light.color)} />
+			<Label>{colorName}</Label>
+		</button>
+	{/if}
 
 	{#if light.brightness !== null}
 		<input
@@ -102,6 +122,24 @@
 	.metric small {
 		font-size: var(--text-body);
 		font-weight: var(--font-weight-semibold);
+	}
+
+	.color {
+		display: inline-flex;
+		align-items: center;
+		align-self: flex-start;
+		gap: var(--space-2);
+		padding: var(--space-1) var(--space-2);
+		border: var(--rule-thin) solid currentColor;
+		background: none;
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.color:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
 	}
 
 	.dimmer {

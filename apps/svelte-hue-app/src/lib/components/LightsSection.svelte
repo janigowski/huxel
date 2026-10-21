@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { describeError } from 'hue-app';
+	import { describeError, type XyColor } from 'hue-app';
 	import type { SvelteHueApp } from 'hue-app/svelte';
 	import LightGrid from './LightGrid.svelte';
 	import Notice from './Notice.svelte';
@@ -35,6 +35,10 @@
 	function dim(lightId: string, brightness: number) {
 		return run(hue.dimLight(lightId, brightness));
 	}
+
+	function changeColor(lightId: string, color: XyColor) {
+		return run(hue.changeColor(lightId, color));
+	}
 </script>
 
 <section>
@@ -47,6 +51,6 @@
 	{#if loading && lights.length === 0}
 		<Notice tone="muted">Loading lights…</Notice>
 	{:else}
-		<LightGrid {lights} ontoggle={toggle} ondim={dim} />
+		<LightGrid {lights} ontoggle={toggle} ondim={dim} onchangecolor={changeColor} />
 	{/if}
 </section>

@@ -37,4 +37,7 @@
 
 	--tile-min-width: 9rem;
 	--icon-tile-size: 1.75rem;
+	--swatch-size-small: 0.75rem;
+	--dialog-width: 26rem;
+	--color-backdrop: rgb(0 0 0 / 0.6);
 }
