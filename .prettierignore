@@ -1,0 +1,10 @@
+bun.lock
+dist
+coverage
+
+apps/svelte-hue-app/.svelte-kit
+apps/svelte-hue-app/build
+apps/svelte-hue-app/static
+apps/svelte-hue-app/project.inlang
+apps/svelte-hue-app/src/lib/paraglide
+packages/hue-sdk/docs/clip-v2

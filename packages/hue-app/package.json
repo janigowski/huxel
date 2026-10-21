@@ -44,11 +44,9 @@
 	],
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.build.json",
-		"check": "tsc --noEmit",
+		"check": "tsc --noEmit && bun run check:universal",
 		"test": "vitest run",
-		"check:universal": "sh scripts/check-universal.sh",
-		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"check:universal": "sh ../../scripts/check-universal.sh"
 	},
 	"peerDependencies": {
 		"react": ">=18.0.0",
@@ -64,7 +62,7 @@
 	},
 	"dependencies": {
 		"@preact/signals-core": "^1.14.4",
-		"hue-sdk": "file:../hue-sdk"
+		"hue-sdk": "workspace:^"
 	},
 	"devDependencies": {
 		"@sveltejs/vite-plugin-svelte": "^7",
@@ -73,7 +71,6 @@
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"happy-dom": "^21.0.4",
-		"prettier": "^3.7.4",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1",
 		"svelte": "^5.46.1",
