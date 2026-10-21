@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { hexToXy, xyToHex } from '../src/index.js';
 
 function channels(hex: string): number[] {

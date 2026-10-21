@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"types": ["chrome", "node", "vite/client"],
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"allowJs": true,
+		"checkJs": true,
+		"resolveJsonModule": true,
+		"noEmit": true
+	},
+	"include": ["src", "test", "*.config.js", "*.config.ts"]
+}

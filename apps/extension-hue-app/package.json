@@ -1,0 +1,44 @@
+{
+	"name": "extension-hue-app",
+	"private": true,
+	"version": "0.1.0",
+	"description": "Chromium browser extension (Arc, Chrome) for Philips Hue lights",
+	"type": "module",
+	"scripts": {
+		"dev": "vp dev",
+		"watch": "vp build --watch",
+		"build": "vp build",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"lint": "eslint .",
+		"test": "vp test run",
+		"test:e2e": "vp test run --project e2e"
+	},
+	"dependencies": {
+		"@fontsource-variable/inter": "^5.3.0",
+		"design-system": "workspace:*",
+		"hue-app": "workspace:*",
+		"hue-sdk": "workspace:*"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.39.1",
+		"@sveltejs/vite-plugin-svelte": "^7",
+		"@tailwindcss/vite": "^4.1.17",
+		"@types/chrome": "^0.3.6",
+		"@types/node": "^22",
+		"@vitest/browser-playwright": "catalog:",
+		"eslint": "^9.39.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.13.1",
+		"globals": "^16.5.0",
+		"playwright": "^1.57.0",
+		"svelte": "^5.46.1",
+		"svelte-check": "^4.3.4",
+		"tailwindcss": "^4.1.17",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.48.1",
+		"vite": "catalog:",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:",
+		"vitest-browser-svelte": "^3.1.0"
+	}
+}

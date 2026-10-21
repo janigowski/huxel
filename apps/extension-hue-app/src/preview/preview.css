@@ -1,0 +1,10 @@
+html.preview {
+	min-height: 100%;
+	background: var(--color-ink);
+}
+
+html.preview body {
+	min-height: 37.5rem;
+	margin: var(--space-8) auto;
+	outline: var(--rule-thin) solid var(--color-mint-muted);
+}

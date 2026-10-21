@@ -1,0 +1,14 @@
+{
+	"manifest_version": 3,
+	"name": "Hue Remote",
+	"description": "Control Philips Hue lights on your local network.",
+	"version": "0.1.0",
+	"minimum_chrome_version": "120",
+	"action": {
+		"default_title": "Hue Remote",
+		"default_popup": "popup.html"
+	},
+	"permissions": ["storage"],
+	"host_permissions": ["https://discovery.meethue.com/*"],
+	"optional_host_permissions": ["https://*/*"]
+}

@@ -1,21 +1,21 @@
-import { page, userEvent } from 'vitest/browser';
-import { describe, expect, it, vi } from 'vitest';
+import { page, userEvent } from 'vite-plus/test/browser';
+import { describe, expect, it, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
-import { palette } from '$lib/hue/palette';
-import ColorDialog from './ColorDialog.svelte';
+import { palette } from '../src/palette';
+import ColorDialog from '../src/components/ColorDialog.svelte';
 
 const red = palette.find((entry) => entry.name === 'Red')!;
 const blue = palette.find((entry) => entry.name === 'Blue')!;
 
-function renderDialog(onchange = vi.fn()) {
-	render(ColorDialog, { open: true, lightName: 'Kitchen', color: red.xy, onchange });
+async function renderDialog(onchange = vi.fn()) {
+	await render(ColorDialog, { open: true, lightName: 'Kitchen', color: red.xy, onchange });
 
 	return onchange;
 }
 
 describe('ColorDialog', () => {
 	it('opens as a modal labelled by its heading', async () => {
-		renderDialog();
+		await renderDialog();
 
 		const dialog = page.getByRole('dialog', { name: 'Kitchen color' });
 
@@ -24,7 +24,7 @@ describe('ColorDialog', () => {
 	});
 
 	it('exposes a named radio for every palette color', async () => {
-		renderDialog();
+		await renderDialog();
 
 		await expect.element(page.getByRole('dialog')).toBeVisible();
 		expect(page.getByRole('radio').elements()).toHaveLength(12);
@@ -35,14 +35,14 @@ describe('ColorDialog', () => {
 	});
 
 	it('checks the current color', async () => {
-		renderDialog();
+		await renderDialog();
 
 		await expect.element(page.getByRole('radio', { name: 'Red' })).toBeChecked();
 		await expect.element(page.getByRole('radio', { name: 'Blue' })).not.toBeChecked();
 	});
 
 	it('calls onchange with the chosen color and stays open', async () => {
-		const onchange = renderDialog();
+		const onchange = await renderDialog();
 
 		await page.getByText('Blue').click();
 
@@ -51,7 +51,7 @@ describe('ColorDialog', () => {
 	});
 
 	it('closes on Escape', async () => {
-		renderDialog();
+		await renderDialog();
 
 		const dialog = page.getByRole('dialog', { name: 'Kitchen color' });
 
@@ -62,7 +62,7 @@ describe('ColorDialog', () => {
 	});
 
 	it('closes with the close button', async () => {
-		renderDialog();
+		await renderDialog();
 
 		await page.getByRole('button', { name: 'Close' }).click();
 

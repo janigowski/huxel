@@ -1,14 +1,11 @@
 <script lang="ts">
-	import ConnectPanel from '$lib/components/ConnectPanel.svelte';
-	import DashboardBar from '$lib/components/DashboardBar.svelte';
-	import Hero from '$lib/components/Hero.svelte';
-	import LightsSection from '$lib/components/LightsSection.svelte';
+	import { ConnectPanel, DashboardBar, Hero, LightsSection } from 'design-system';
 	import { bridge } from '$lib/hue/bridge';
 	import { BridgeConnection } from '$lib/hue/connection.svelte';
 	import { createSvelteHueApp } from 'hue-app/svelte';
 	import { untrack } from 'svelte';
 
-	const connection = new BridgeConnection();
+	const connection = new BridgeConnection(localStorage);
 	const hue = $derived(connection.app ? createSvelteHueApp(connection.app) : null);
 
 	$effect(() => {
@@ -32,7 +29,11 @@
 	{#if hue}
 		<LightsSection {hue} />
 	{:else}
-		<ConnectPanel {connection} />
+		<ConnectPanel
+			connecting={connection.connecting}
+			error={connection.error}
+			onconnect={() => connection.connect()}
+		/>
 	{/if}
 </main>
 
