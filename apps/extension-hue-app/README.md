@@ -29,6 +29,8 @@ bun run watch
 2. Click **Load unpacked** and select `apps/extension-hue-app/dist`.
 3. Pin **Hue Remote**. `watch` rebuilds on every change, and you see the result when you reopen the popup. Click reload on the extensions page only after changing `public/manifest.json`.
 
+To develop from several git worktrees without reloading the extension from a different folder each time, run `bun run watch:shared` instead and load `~/Documents/Extensions/hue-remote` once. It builds into that fixed folder from whichever worktree runs it, so run it in only one worktree at a time.
+
 ## Linking a bridge
 
 1. The bridge uses a certificate the browser does not trust. Open `https://<bridge address>` in a tab, choose **Advanced** and then **Proceed**, and close the tab. If you skip this, the popup links to the bridge when it cannot reach it.
