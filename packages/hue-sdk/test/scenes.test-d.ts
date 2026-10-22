@@ -1,21 +1,21 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createScenesApi } from '../src/resources/scenes.js';
-import type { ScenesApi } from '../src/resources/scenes.js';
+import { createHueProtocol } from '../src/protocol';
+import { createScenesApi } from '../src/resources/scenes';
+import type { ScenesApi } from '../src/resources/scenes';
 import type {
 	ApiResponse,
 	EmptyObject,
 	ResourceIdentifier,
 	ResourceIdentifierResponse
-} from '../src/types/common.js';
+} from '../src/types/common';
 import type {
 	SceneActionContentGet,
 	SceneActionContentPut,
 	SceneGet,
 	ScenePost,
 	ScenePut
-} from '../src/types/scene.js';
-import { mockHttpClient } from './mock-http.js';
+} from '../src/types/scene';
+import { mockHttpClient } from './mock-http';
 
 const scenes = createScenesApi(
 	createHueProtocol({ baseUrl: 'https://bridge', appKey: 'key', httpClient: mockHttpClient({}) })

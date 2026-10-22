@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../types/common.js';
-import type { SmartSceneGet, SmartScenePost, SmartScenePut } from '../types/smart-scene.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse, ResourceIdentifierResponse } from '../types/common';
+import type { SmartSceneGet, SmartScenePost, SmartScenePut } from '../types/smart-scene';
 
 export interface SmartScenesApi {
 	/** `GET /resource/smart_scene` */

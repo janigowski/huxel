@@ -1,4 +1,4 @@
-import type { BridgeLight, HueGateway, LightChangeObserver } from '../src/index.js';
+import type { BridgeLight, HueGateway, LightChangeObserver } from '../src/index';
 
 export interface Deferred<T> {
 	promise: Promise<T>;
@@ -29,15 +29,15 @@ export class FakeGateway implements HueGateway {
 	}
 
 	setPower(): Promise<void> {
-		return this.#command();
+		return this.command();
 	}
 
 	setBrightness(): Promise<void> {
-		return this.#command();
+		return this.command();
 	}
 
 	setColor(): Promise<void> {
-		return this.#command();
+		return this.command();
 	}
 
 	watch(observer: LightChangeObserver): () => void {
@@ -47,7 +47,7 @@ export class FakeGateway implements HueGateway {
 		};
 	}
 
-	#command(): Promise<void> {
+	private command(): Promise<void> {
 		const call = deferred<void>();
 		this.commands.push(call);
 		return call.promise;

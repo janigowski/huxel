@@ -5,8 +5,10 @@
     "": {
       "name": "philips-hue-remote",
       "devDependencies": {
+        "@types/node": "^22",
         "svelte": "^5.46.1",
         "tailwindcss": "^4.1.17",
+        "typescript": "^5.9.3",
         "vite": "catalog:",
         "vite-plus": "catalog:",
       },

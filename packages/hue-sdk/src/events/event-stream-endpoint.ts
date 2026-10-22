@@ -1,7 +1,7 @@
-import { HueError, HueNetworkError } from '../errors.js';
-import type { HttpRequest, HttpStreamResponse } from '../http.js';
-import { trimTrailingSlashes } from '../protocol.js';
-import type { EventsApiConfig } from './events-api.js';
+import { HueError, HueNetworkError } from '../errors';
+import type { HttpRequest, HttpStreamResponse } from '../http';
+import { trimTrailingSlashes } from '../protocol';
+import type { EventsApiConfig } from './events-api';
 
 const EVENT_STREAM_PATH = '/eventstream/clip/v2';
 

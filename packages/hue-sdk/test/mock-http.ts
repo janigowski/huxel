@@ -1,4 +1,4 @@
-import type { HttpClient, HttpRequest, HttpResponse } from '../src/http.js';
+import type { HttpClient, HttpRequest, HttpResponse } from '../src/http';
 
 export interface MockReply {
 	status?: number;

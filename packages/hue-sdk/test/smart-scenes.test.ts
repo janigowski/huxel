@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createSmartScenesApi } from '../src/resources/smart-scenes.js';
-import type { SmartSceneGet, SmartScenePost, SmartScenePut } from '../src/types/smart-scene.js';
-import { envelope, mockHttpClient, parseBody } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createSmartScenesApi } from '../src/resources/smart-scenes';
+import type { SmartSceneGet, SmartScenePost, SmartScenePut } from '../src/types/smart-scene';
+import { envelope, mockHttpClient, parseBody } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const APP_KEY = 'test-app-key';

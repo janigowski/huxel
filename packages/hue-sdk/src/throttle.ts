@@ -1,5 +1,5 @@
 import { throttle } from 'lodash-es';
-import type { HttpClient, HttpRequest, HttpResponse } from './http.js';
+import type { HttpClient, HttpRequest, HttpResponse } from './http';
 
 const LIGHT_WAIT_MS = 100;
 const GROUP_WAIT_MS = 1000;

@@ -1,4 +1,4 @@
-import type { EmptyObject, ResourceIdentifier, XYColor } from './common.js';
+import type { EmptyObject, ResourceIdentifier, XYColor } from './common';
 import type {
 	ColorFeatureBasicGet,
 	ColorFeatureBasicPut,
@@ -12,7 +12,7 @@ import type {
 	GradientPut,
 	OnFeature,
 	OnFeaturePut
-} from './light.js';
+} from './light';
 
 export type SceneActiveStatus = 'inactive' | 'static' | 'dynamic_palette';
 

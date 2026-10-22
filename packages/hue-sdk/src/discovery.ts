@@ -1,6 +1,6 @@
-import { createFetchHttpClient } from './fetch.js';
-import { HueResponseError } from './errors.js';
-import type { HttpClient, HttpRequest } from './http.js';
+import { createFetchHttpClient } from './fetch';
+import { HueResponseError } from './errors';
+import type { HttpClient, HttpRequest } from './http';
 import {
 	createApiError,
 	excerpt,
@@ -8,7 +8,7 @@ import {
 	isSuccessStatus,
 	parseJsonBody,
 	sendRequest
-} from './protocol.js';
+} from './protocol';
 
 export const DEFAULT_DISCOVERY_URL = 'https://discovery.meethue.com/';
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createDevicesApi } from '../src/resources/devices.js';
-import type { DeviceGet } from '../src/types/device.js';
-import { envelope, mockHttpClient, parseBody } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createDevicesApi } from '../src/resources/devices';
+import type { DeviceGet } from '../src/types/device';
+import { envelope, mockHttpClient, parseBody } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const APP_KEY = 'test-app-key';

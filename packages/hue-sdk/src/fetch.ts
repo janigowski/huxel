@@ -1,4 +1,4 @@
-import type { HttpClient } from './http.js';
+import type { HttpClient } from './http';
 
 export interface FetchHttpClientOptions {
 	fetch?: typeof globalThis.fetch;

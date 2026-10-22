@@ -15,15 +15,19 @@
 	],
 	"scripts": {
 		"build": "vp run -r build",
-		"check": "vp run -r check",
-		"test": "vp run -r test",
+		"check": "vp run -r check && tsc --noEmit -p scripts/codemods && bun run codemod:check",
+		"test": "bun test scripts/codemods && vp run -r test",
 		"lint": "vp fmt --check . && vp run --filter './apps/*' --filter './packages/*' lint",
-		"format": "vp fmt ."
+		"format": "vp fmt .",
+		"codemod": "bun scripts/codemods/run.ts",
+		"codemod:check": "bun scripts/codemods/run.ts --check"
 	},
 	"packageManager": "bun@1.4.2",
 	"devDependencies": {
+		"@types/node": "^22",
 		"svelte": "^5.46.1",
 		"tailwindcss": "^4.1.17",
+		"typescript": "^5.9.3",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
 	},

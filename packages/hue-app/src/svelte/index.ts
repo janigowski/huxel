@@ -1,9 +1,9 @@
 import type { ReadonlySignal } from '@preact/signals-core';
 import { createSubscriber } from 'svelte/reactivity';
-import type { HueAppConnection } from '../gateway.js';
-import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app.js';
-import type { LightCollection } from '../light-collection.js';
-import type { LightSnapshot, ReadonlyLight } from '../light.js';
+import type { HueAppConnection } from '../gateway';
+import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app';
+import type { LightCollection } from '../light-collection';
+import type { LightSnapshot, ReadonlyLight } from '../light';
 
 export type SvelteLight = LightSnapshot;
 

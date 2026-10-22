@@ -7,9 +7,9 @@ import {
 	LightNotColorCapableError,
 	LightNotDimmableError,
 	LightNotFoundError
-} from '../src/index.js';
-import type { BridgeLight, Light, XyColor } from '../src/index.js';
-import { bridgeLight, FakeGateway } from './fakes.js';
+} from '../src/index';
+import type { BridgeLight, Light, XyColor } from '../src/index';
+import { bridgeLight, FakeGateway } from './fakes';
 
 async function setup(lights: BridgeLight[] = [bridgeLight()]) {
 	const gateway = new FakeGateway();

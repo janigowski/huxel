@@ -1,9 +1,9 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createZonesApi, type ZonesApi } from '../src/resources/zones.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common.js';
-import type { ZoneGet, ZonePost, ZonePut } from '../src/types/zone.js';
-import { mockHttpClient } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createZonesApi, type ZonesApi } from '../src/resources/zones';
+import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common';
+import type { ZoneGet, ZonePost, ZonePut } from '../src/types/zone';
+import { mockHttpClient } from './mock-http';
 
 const zones = createZonesApi(
 	createHueProtocol({ baseUrl: 'https://bridge', appKey: 'key', httpClient: mockHttpClient() })

@@ -1,4 +1,4 @@
-import { startTimer, stopTimer, type TimerHandle } from './timers.js';
+import { startTimer, stopTimer, type TimerHandle } from './timers';
 
 interface Waiter {
 	resolve(): void;
@@ -19,17 +19,17 @@ interface Pending<T> {
  * confirmed value, only when no newer command is pending.
  */
 export class CommandLane<T> {
-	readonly #read: () => T;
-	readonly #write: (value: T) => void;
-	readonly #send: (value: T) => Promise<void>;
-	readonly #settleMs: number;
-	#confirmed: T;
-	#pending: Pending<T> | undefined;
-	#remote: { value: T; sequence: number } | undefined;
-	#received = 0;
-	#settle: TimerHandle | undefined;
-	#running = false;
-	#disposed = false;
+	private readonly read: () => T;
+	private readonly write: (value: T) => void;
+	private readonly send: (value: T) => Promise<void>;
+	private readonly settleMs: number;
+	private confirmed: T;
+	private pending: Pending<T> | undefined;
+	private remote: { value: T; sequence: number } | undefined;
+	private received = 0;
+	private settle: TimerHandle | undefined;
+	private running = false;
+	private disposed = false;
 
 	constructor(
 		read: () => T,
@@ -37,125 +37,125 @@ export class CommandLane<T> {
 		send: (value: T) => Promise<void>,
 		settleMs = 0
 	) {
-		this.#read = read;
-		this.#write = write;
-		this.#send = send;
-		this.#settleMs = settleMs;
-		this.#confirmed = read();
+		this.read = read;
+		this.write = write;
+		this.send = send;
+		this.settleMs = settleMs;
+		this.confirmed = read();
 	}
 
 	submit(value: T): Promise<void> {
-		const idle = !this.#running;
+		const idle = !this.running;
 		if (idle) {
-			this.#confirmed = this.#read();
+			this.confirmed = this.read();
 		}
 		const result = new Promise<void>((resolve, reject) => {
-			if (this.#pending) {
-				this.#pending.value = value;
-				this.#pending.waiters.push({ resolve, reject });
+			if (this.pending) {
+				this.pending.value = value;
+				this.pending.waiters.push({ resolve, reject });
 			} else {
-				this.#pending = { value, waiters: [{ resolve, reject }] };
+				this.pending = { value, waiters: [{ resolve, reject }] };
 			}
 		});
 		if (idle) {
-			void this.#drain();
+			void this.drain();
 		}
-		this.#write(value);
+		this.write(value);
 		return result;
 	}
 
 	reconcile(remote: T): void {
-		if (this.#disposed) {
+		if (this.disposed) {
 			return;
 		}
-		if (this.#isBusy()) {
-			this.#received += 1;
-			this.#remote = { value: remote, sequence: this.#received };
+		if (this.isBusy()) {
+			this.received += 1;
+			this.remote = { value: remote, sequence: this.received };
 			return;
 		}
-		this.#remote = undefined;
-		this.#apply(remote);
+		this.remote = undefined;
+		this.apply(remote);
 	}
 
 	dispose(): void {
-		this.#disposed = true;
-		this.#remote = undefined;
-		this.#stopSettle();
+		this.disposed = true;
+		this.remote = undefined;
+		this.stopSettle();
 	}
 
-	#isBusy(): boolean {
-		return this.#running || this.#pending !== undefined || this.#settle !== undefined;
+	private isBusy(): boolean {
+		return this.running || this.pending !== undefined || this.settle !== undefined;
 	}
 
-	async #drain(): Promise<void> {
-		this.#running = true;
+	private async drain(): Promise<void> {
+		this.running = true;
 		try {
-			while (this.#pending) {
-				const command = this.#pending;
-				this.#pending = undefined;
-				const sentAfter = this.#received;
+			while (this.pending) {
+				const command = this.pending;
+				this.pending = undefined;
+				const sentAfter = this.received;
 				try {
-					await this.#send(command.value);
-					this.#restartSettle();
-					this.#confirmed = command.value;
-					if (this.#remote && this.#remote.sequence <= sentAfter) {
-						this.#remote = undefined;
+					await this.send(command.value);
+					this.restartSettle();
+					this.confirmed = command.value;
+					if (this.remote && this.remote.sequence <= sentAfter) {
+						this.remote = undefined;
 					}
 					command.waiters.forEach((waiter) => waiter.resolve());
 				} catch (error) {
-					this.#restartSettle();
+					this.restartSettle();
 					command.waiters.forEach((waiter) => waiter.reject(error));
-					if (!this.#pending) {
-						this.#revert();
+					if (!this.pending) {
+						this.revert();
 					}
 				}
 			}
 		} finally {
-			this.#running = false;
+			this.running = false;
 		}
-		this.#flush();
+		this.flush();
 	}
 
-	#revert(): void {
-		const remote = this.#remote;
+	private revert(): void {
+		const remote = this.remote;
 		if (remote) {
-			this.#remote = undefined;
-			this.#confirmed = remote.value;
+			this.remote = undefined;
+			this.confirmed = remote.value;
 		}
-		this.#write(this.#confirmed);
+		this.write(this.confirmed);
 	}
 
-	#flush(): void {
-		const remote = this.#remote;
-		if (this.#disposed || this.#isBusy() || !remote) {
+	private flush(): void {
+		const remote = this.remote;
+		if (this.disposed || this.isBusy() || !remote) {
 			return;
 		}
-		this.#remote = undefined;
-		this.#apply(remote.value);
+		this.remote = undefined;
+		this.apply(remote.value);
 	}
 
-	#apply(value: T): void {
-		this.#confirmed = value;
-		if (!Object.is(this.#read(), value)) {
-			this.#write(value);
+	private apply(value: T): void {
+		this.confirmed = value;
+		if (!Object.is(this.read(), value)) {
+			this.write(value);
 		}
 	}
 
-	#restartSettle(): void {
-		if (this.#disposed || !(this.#settleMs > 0)) {
+	private restartSettle(): void {
+		if (this.disposed || !(this.settleMs > 0)) {
 			return;
 		}
-		this.#stopSettle();
-		this.#settle = startTimer(() => {
-			this.#settle = undefined;
-			this.#flush();
-		}, this.#settleMs);
+		this.stopSettle();
+		this.settle = startTimer(() => {
+			this.settle = undefined;
+			this.flush();
+		}, this.settleMs);
 	}
 
-	#stopSettle(): void {
-		if (this.#settle !== undefined) {
-			stopTimer(this.#settle);
-			this.#settle = undefined;
+	private stopSettle(): void {
+		if (this.settle !== undefined) {
+			stopTimer(this.settle);
+			this.settle = undefined;
 		}
 	}
 }

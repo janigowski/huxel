@@ -1,0 +1,14 @@
+---
+description: Mechanical syntax rewrites go through AST codemods
+alwaysApply: true
+---
+
+# Codemods
+
+Repository-wide syntax rewrites use the AST codemods in `scripts/codemods`. Do not rewrite imports or `#private` fields with search-and-replace.
+
+- `bun run codemod` rewrites the working tree.
+- `bun run codemod:check` reports files that still need it. `bun run check` runs this.
+- `bun test scripts/codemods` covers the transforms.
+
+The codemods parse TypeScript, JavaScript, and `<script>` blocks in Svelte files. They only edit import specifiers and private identifiers, so hex colors, strings, and CSS stay as they are.

@@ -1,4 +1,4 @@
-import type { XyColor } from './color.js';
+import type { XyColor } from './color';
 
 export class HueAppError extends Error {
 	override name = 'HueAppError';

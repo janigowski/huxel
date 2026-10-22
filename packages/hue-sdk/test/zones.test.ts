@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createZonesApi } from '../src/resources/zones.js';
-import type { ZoneGet } from '../src/types/zone.js';
-import { envelope, mockHttpClient, parseBody } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createZonesApi } from '../src/resources/zones';
+import type { ZoneGet } from '../src/types/zone';
+import { envelope, mockHttpClient, parseBody } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const APP_KEY = 'test-app-key';

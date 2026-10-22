@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../types/common.js';
-import type { LightGet, LightPut } from '../types/light.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse, ResourceIdentifierResponse } from '../types/common';
+import type { LightGet, LightPut } from '../types/light';
 
 export interface LightsApi {
 	/** `GET /resource/light` */

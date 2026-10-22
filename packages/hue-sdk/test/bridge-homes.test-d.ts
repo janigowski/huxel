@@ -1,9 +1,9 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createBridgeHomesApi, type BridgeHomesApi } from '../src/resources/bridge-homes.js';
-import type { ApiResponse } from '../src/types/common.js';
-import type { BridgeHomeGet } from '../src/types/bridge-home.js';
-import { mockHttpClient } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createBridgeHomesApi, type BridgeHomesApi } from '../src/resources/bridge-homes';
+import type { ApiResponse } from '../src/types/common';
+import type { BridgeHomeGet } from '../src/types/bridge-home';
+import { mockHttpClient } from './mock-http';
 
 const bridgeHomes = createBridgeHomesApi(
 	createHueProtocol({ baseUrl: 'https://bridge', appKey: 'key', httpClient: mockHttpClient() })

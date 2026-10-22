@@ -8,10 +8,10 @@ import type {
 	LightGet
 } from 'hue-sdk';
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { HueSdkGateway } from '../src/hue-sdk-gateway.js';
-import { createHueApp } from '../src/index.js';
-import type { HueAppConnection, LightChange, LightChangeObserver } from '../src/index.js';
-import { deferred, flushMicrotasks, type Deferred } from './fakes.js';
+import { HueSdkGateway } from '../src/hue-sdk-gateway';
+import { createHueApp } from '../src/index';
+import type { HueAppConnection, LightChange, LightChangeObserver } from '../src/index';
+import { deferred, flushMicrotasks, type Deferred } from './fakes';
 
 function fakeClient() {
 	const observers: EventStreamObserver[] = [];

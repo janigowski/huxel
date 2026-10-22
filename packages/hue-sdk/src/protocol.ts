@@ -6,9 +6,9 @@ import {
 	HueRateLimitError,
 	HueResponseError,
 	HueUnauthorizedError
-} from './errors.js';
-import type { HttpClient, HttpMethod, HttpRequest, HttpResponse } from './http.js';
-import type { ApiError, ApiResponse } from './types/common.js';
+} from './errors';
+import type { HttpClient, HttpMethod, HttpRequest, HttpResponse } from './http';
+import type { ApiError, ApiResponse } from './types/common';
 
 export interface RequestOptions {
 	signal?: AbortSignal;

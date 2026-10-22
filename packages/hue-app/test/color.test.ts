@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { hexToXy, xyToHex } from '../src/index.js';
+import { hexToXy, xyToHex } from '../src/index';
 
 function channels(hex: string): number[] {
 	return [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16));

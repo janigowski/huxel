@@ -1,0 +1,28 @@
+---
+description: Use TypeScript private members instead of #private fields
+alwaysApply: true
+---
+
+# Private members
+
+Use TypeScript `private` and `private readonly` members. Do not use ECMAScript `#private` fields.
+
+```ts
+export class Gate {
+	private closed = false;
+
+	close(): void {
+		if (this.closed) {
+			return;
+		}
+
+		this.closed = true;
+	}
+}
+```
+
+When the class already has a public member of that name, the private member gets a `State` suffix. `#name` beside public `name` becomes `private nameState`.
+
+A `#field in value` brand check has no TypeScript equivalent. Leave that field as `#private` and do not force the codemod through it.
+
+`bun run check` fails while `#private` members remain. Update them with `bun run codemod`.

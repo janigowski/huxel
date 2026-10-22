@@ -1,17 +1,13 @@
-import { HueNetworkError } from '../errors.js';
-import type { HttpStreamResponse } from '../http.js';
-import { isSuccessStatus } from '../protocol.js';
-import { SseParser } from '../sse/sse-parser.js';
-import type { EventStreamEndpoint } from './event-stream-endpoint.js';
-import type {
-	EventStreamObserver,
-	EventStreamState,
-	EventStreamSubscription
-} from './events-api.js';
-import { HueEventDecoder } from './hue-event-decoder.js';
-import { ObserverChannel } from './observer-channel.js';
-import { ReconnectPolicy } from './reconnect-policy.js';
-import { StreamRejection } from './stream-rejection.js';
+import { HueNetworkError } from '../errors';
+import type { HttpStreamResponse } from '../http';
+import { isSuccessStatus } from '../protocol';
+import { SseParser } from '../sse/sse-parser';
+import type { EventStreamEndpoint } from './event-stream-endpoint';
+import type { EventStreamObserver, EventStreamState, EventStreamSubscription } from './events-api';
+import { HueEventDecoder } from './hue-event-decoder';
+import { ObserverChannel } from './observer-channel';
+import { ReconnectPolicy } from './reconnect-policy';
+import { StreamRejection } from './stream-rejection';
 
 export class EventStream implements EventStreamSubscription {
 	private currentState: EventStreamState = 'connecting';

@@ -1,7 +1,7 @@
-import type { XyColor } from './color.js';
-import { CommandLane } from './command-lane.js';
-import type { HueGateway } from './gateway.js';
-import type { Light } from './light.js';
+import type { XyColor } from './color';
+import { CommandLane } from './command-lane';
+import type { HueGateway } from './gateway';
+import type { Light } from './light';
 
 export interface LightLanes {
 	readonly power: CommandLane<boolean>;
@@ -10,62 +10,62 @@ export interface LightLanes {
 }
 
 export class LightLaneRegistry {
-	readonly #gateway: HueGateway;
-	readonly #settleMs: number;
-	readonly #lanes = new Map<Light, LightLanes>();
-	#disposed = false;
+	private readonly gateway: HueGateway;
+	private readonly settleMs: number;
+	private readonly lanes = new Map<Light, LightLanes>();
+	private disposed = false;
 
 	constructor(gateway: HueGateway, settleMs: number) {
-		this.#gateway = gateway;
-		this.#settleMs = settleMs;
+		this.gateway = gateway;
+		this.settleMs = settleMs;
 	}
 
 	get(light: Light): LightLanes {
-		let lanes = this.#lanes.get(light);
+		let lanes = this.lanes.get(light);
 		if (!lanes) {
-			lanes = this.#create(light);
-			if (this.#disposed) {
+			lanes = this.create(light);
+			if (this.disposed) {
 				disposeLanes(lanes);
 				return lanes;
 			}
-			this.#lanes.set(light, lanes);
+			this.lanes.set(light, lanes);
 		}
 		return lanes;
 	}
 
 	delete(light: Light): void {
-		const lanes = this.#lanes.get(light);
+		const lanes = this.lanes.get(light);
 		if (lanes) {
-			this.#lanes.delete(light);
+			this.lanes.delete(light);
 			disposeLanes(lanes);
 		}
 	}
 
 	dispose(): void {
-		this.#disposed = true;
-		this.#lanes.forEach(disposeLanes);
-		this.#lanes.clear();
+		this.disposed = true;
+		this.lanes.forEach(disposeLanes);
+		this.lanes.clear();
 	}
 
-	#create(light: Light): LightLanes {
+	private create(light: Light): LightLanes {
 		return {
 			power: new CommandLane<boolean>(
 				() => light.isOn.peek(),
 				(isOn) => light.setPower(isOn),
-				(isOn) => this.#gateway.setPower(light.id, isOn),
-				this.#settleMs
+				(isOn) => this.gateway.setPower(light.id, isOn),
+				this.settleMs
 			),
 			brightness: new CommandLane<number | null>(
 				() => light.brightness.peek(),
 				(brightness) => light.setBrightness(brightness),
-				(brightness) => this.#gateway.setBrightness(light.id, brightness ?? 0),
-				this.#settleMs
+				(brightness) => this.gateway.setBrightness(light.id, brightness ?? 0),
+				this.settleMs
 			),
 			color: new CommandLane<XyColor | null>(
 				() => light.color.peek(),
 				(color) => light.setColor(color),
-				(color) => (color ? this.#gateway.setColor(light.id, color) : Promise.resolve()),
-				this.#settleMs
+				(color) => (color ? this.gateway.setColor(light.id, color) : Promise.resolve()),
+				this.settleMs
 			)
 		};
 	}

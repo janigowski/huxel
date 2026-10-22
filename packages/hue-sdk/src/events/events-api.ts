@@ -1,7 +1,7 @@
-import type { HttpClient } from '../http.js';
-import type { HueEvent } from '../types/event.js';
-import { EventStreamEndpoint } from './event-stream-endpoint.js';
-import { EventStream } from './event-stream.js';
+import type { HttpClient } from '../http';
+import type { HueEvent } from '../types/event';
+import { EventStreamEndpoint } from './event-stream-endpoint';
+import { EventStream } from './event-stream';
 
 export type EventStreamState = 'connecting' | 'open' | 'reconnecting' | 'closed';
 

@@ -1,5 +1,5 @@
-import type { ResourceIdentifier, ResourceType } from './common.js';
-import type { LightGet } from './light.js';
+import type { ResourceIdentifier, ResourceType } from './common';
+import type { LightGet } from './light';
 
 export type HueEventType = 'add' | 'update' | 'delete' | 'error';
 

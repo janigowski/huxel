@@ -1,9 +1,9 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createGroupedLightsApi, type GroupedLightsApi } from '../src/resources/grouped-lights.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common.js';
-import type { GroupedLightGet, GroupedLightPut } from '../src/types/grouped-light.js';
-import { mockHttpClient } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createGroupedLightsApi, type GroupedLightsApi } from '../src/resources/grouped-lights';
+import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common';
+import type { GroupedLightGet, GroupedLightPut } from '../src/types/grouped-light';
+import { mockHttpClient } from './mock-http';
 
 const groupedLights = createGroupedLightsApi(
 	createHueProtocol({ baseUrl: 'https://bridge', appKey: 'key', httpClient: mockHttpClient() })

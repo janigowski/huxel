@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueClient } from '../src/index.js';
-import type { AnyResourceGet, ApiResponse, LightGet, UncoveredResourceGet } from '../src/index.js';
+import { createHueClient } from '../src/index';
+import type { AnyResourceGet, ApiResponse, LightGet, UncoveredResourceGet } from '../src/index';
 
 const hue = createHueClient({ baseUrl: 'https://bridge', appKey: 'key' });
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { createHueClient } from '../src/index.js';
-import type { LightGet } from '../src/index.js';
-import { envelope, mockHttpClient, parseBody } from './mock-http.js';
+import { createHueClient } from '../src/index';
+import type { LightGet } from '../src/index';
+import { envelope, mockHttpClient, parseBody } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const APP_KEY = 'test-app-key';

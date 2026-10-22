@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createRoomsApi } from '../src/resources/rooms.js';
-import type { RoomGet } from '../src/types/room.js';
-import { envelope, mockHttpClient, parseBody } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createRoomsApi } from '../src/resources/rooms';
+import type { RoomGet } from '../src/types/room';
+import { envelope, mockHttpClient, parseBody } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const APP_KEY = 'test-app-key';

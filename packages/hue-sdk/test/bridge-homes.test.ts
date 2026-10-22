@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createBridgeHomesApi } from '../src/resources/bridge-homes.js';
-import type { BridgeHomeGet } from '../src/types/bridge-home.js';
-import { envelope, mockHttpClient } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createBridgeHomesApi } from '../src/resources/bridge-homes';
+import type { BridgeHomeGet } from '../src/types/bridge-home';
+import { envelope, mockHttpClient } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const APP_KEY = 'test-app-key';

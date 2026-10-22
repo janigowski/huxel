@@ -3,8 +3,8 @@ import type {
 	EmptyObject,
 	GeometryObject,
 	ResourceIdentifier
-} from './common.js';
-import type { IdentifyPut } from './light.js';
+} from './common';
+import type { IdentifyPut } from './light';
 
 export type DeviceArchetype =
 	| 'bridge_v2'

@@ -7,7 +7,7 @@ import {
 	LightNotColorCapableError,
 	LightNotDimmableError,
 	LightNotFoundError
-} from '../src/index.js';
+} from '../src/index';
 import type {
 	BridgeLight,
 	HueAppConnection,
@@ -15,8 +15,8 @@ import type {
 	LightChange,
 	LightChangeObserver,
 	XyColor
-} from '../src/index.js';
-import { bridgeLight, FakeGateway, flushMicrotasks } from './fakes.js';
+} from '../src/index';
+import { bridgeLight, FakeGateway, flushMicrotasks } from './fakes';
 
 const SETTLE_MS = 1000;
 

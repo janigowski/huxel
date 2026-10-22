@@ -1,18 +1,18 @@
-import { HueEventsApi, type EventsApi } from './events/events-api.js';
-import { createFetchHttpClient } from './fetch.js';
-import type { HttpClient } from './http.js';
-import { createHueProtocol } from './protocol.js';
-import { createBridgeHomesApi, type BridgeHomesApi } from './resources/bridge-homes.js';
-import { createBridgesApi, type BridgesApi } from './resources/bridges.js';
-import { createDevicesApi, type DevicesApi } from './resources/devices.js';
-import { createGroupedLightsApi, type GroupedLightsApi } from './resources/grouped-lights.js';
-import { createLightsApi, type LightsApi } from './resources/lights.js';
-import { createResourcesApi, type ResourcesApi } from './resources/resources.js';
-import { createRoomsApi, type RoomsApi } from './resources/rooms.js';
-import { createScenesApi, type ScenesApi } from './resources/scenes.js';
-import { createSmartScenesApi, type SmartScenesApi } from './resources/smart-scenes.js';
-import { createZonesApi, type ZonesApi } from './resources/zones.js';
-import { createThrottledHttpClient } from './throttle.js';
+import { HueEventsApi, type EventsApi } from './events/events-api';
+import { createFetchHttpClient } from './fetch';
+import type { HttpClient } from './http';
+import { createHueProtocol } from './protocol';
+import { createBridgeHomesApi, type BridgeHomesApi } from './resources/bridge-homes';
+import { createBridgesApi, type BridgesApi } from './resources/bridges';
+import { createDevicesApi, type DevicesApi } from './resources/devices';
+import { createGroupedLightsApi, type GroupedLightsApi } from './resources/grouped-lights';
+import { createLightsApi, type LightsApi } from './resources/lights';
+import { createResourcesApi, type ResourcesApi } from './resources/resources';
+import { createRoomsApi, type RoomsApi } from './resources/rooms';
+import { createScenesApi, type ScenesApi } from './resources/scenes';
+import { createSmartScenesApi, type SmartScenesApi } from './resources/smart-scenes';
+import { createZonesApi, type ZonesApi } from './resources/zones';
+import { createThrottledHttpClient } from './throttle';
 
 export interface HueClientOptions {
 	/** Bridge origin, e.g. `https://192.168.1.100`. `/clip/v2` is appended automatically. */

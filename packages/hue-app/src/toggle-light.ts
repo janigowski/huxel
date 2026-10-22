@@ -1,14 +1,14 @@
-import type { Light } from './light.js';
-import type { LightLaneRegistry } from './light-lanes.js';
+import type { Light } from './light';
+import type { LightLaneRegistry } from './light-lanes';
 
 export class ToggleLight {
-	readonly #lanes: LightLaneRegistry;
+	private readonly lanes: LightLaneRegistry;
 
 	constructor(lanes: LightLaneRegistry) {
-		this.#lanes = lanes;
+		this.lanes = lanes;
 	}
 
 	execute(light: Light): Promise<void> {
-		return this.#lanes.get(light).power.submit(!light.isOn.peek());
+		return this.lanes.get(light).power.submit(!light.isOn.peek());
 	}
 }

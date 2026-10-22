@@ -1,6 +1,6 @@
 import { computed, signal, type ReadonlySignal, type Signal } from '@preact/signals-core';
-import { freezeColor, sameColor, type XyColor } from './color.js';
-import type { BridgeLight } from './gateway.js';
+import { freezeColor, sameColor, type XyColor } from './color';
+import type { BridgeLight } from './gateway';
 
 export class Light {
 	readonly id: string;
@@ -10,42 +10,42 @@ export class Light {
 	readonly brightness: ReadonlySignal<number | null>;
 	readonly color: ReadonlySignal<XyColor | null>;
 
-	readonly #name: Signal<string>;
-	readonly #isOn: Signal<boolean>;
-	readonly #brightness: Signal<number | null>;
-	readonly #color: Signal<XyColor | null>;
+	private readonly nameState: Signal<string>;
+	private readonly isOnState: Signal<boolean>;
+	private readonly brightnessState: Signal<number | null>;
+	private readonly colorState: Signal<XyColor | null>;
 
 	constructor(state: BridgeLight) {
 		this.id = state.id;
-		this.#name = signal(state.name);
-		this.#isOn = signal(state.isOn);
-		this.#brightness = signal(state.brightness);
-		this.#color = signal(freezeColor(state.color ?? null));
-		this.name = computed(() => this.#name.value);
-		this.isOn = computed(() => this.#isOn.value);
-		this.brightness = computed(() => this.#brightness.value);
-		this.color = computed(() => this.#color.value);
+		this.nameState = signal(state.name);
+		this.isOnState = signal(state.isOn);
+		this.brightnessState = signal(state.brightness);
+		this.colorState = signal(freezeColor(state.color ?? null));
+		this.name = computed(() => this.nameState.value);
+		this.isOn = computed(() => this.isOnState.value);
+		this.brightness = computed(() => this.brightnessState.value);
+		this.color = computed(() => this.colorState.value);
 		Object.freeze(this);
 	}
 
 	setName(name: string): void {
-		this.#name.value = name;
+		this.nameState.value = name;
 	}
 
 	setPower(isOn: boolean): void {
-		this.#isOn.value = isOn;
+		this.isOnState.value = isOn;
 	}
 
 	setBrightness(brightness: number | null): void {
-		this.#brightness.value = brightness;
+		this.brightnessState.value = brightness;
 	}
 
 	setColor(color: XyColor | null): void {
-		if (sameColor(this.#color.peek(), color)) {
+		if (sameColor(this.colorState.peek(), color)) {
 			return;
 		}
 
-		this.#color.value = freezeColor(color);
+		this.colorState.value = freezeColor(color);
 	}
 }
 

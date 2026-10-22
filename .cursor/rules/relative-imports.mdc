@@ -1,0 +1,18 @@
+---
+description: Relative imports omit the .js extension
+alwaysApply: true
+---
+
+# Relative imports
+
+Write relative imports without a `.js` suffix. Keep `.js` only when the imported file is JavaScript, such as `svelte.config.js`.
+
+```ts
+import { createHueClient } from './client';
+import type { HueClient } from './client';
+import config from './svelte.config.js';
+```
+
+`hue-sdk` and `hue-app` use `"moduleResolution": "bundler"`. `NodeNext` rejects extensionless relative imports, so do not switch those packages back. `vp pack` adds `.js` again in published `dist` files.
+
+`bun run check` fails while relative `.js` imports of TypeScript files remain. Update them with `bun run codemod`.

@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse } from '../types/common.js';
-import type { BridgeHomeGet } from '../types/bridge-home.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse } from '../types/common';
+import type { BridgeHomeGet } from '../types/bridge-home';
 
 export interface BridgeHomesApi {
 	/** `GET /resource/bridge_home` */

@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
-import {
-	HueApiError,
-	HueNetworkError,
-	HueRateLimitError,
-	HueResponseError
-} from '../src/errors.js';
-import { discoverBridges } from '../src/discovery.js';
-import { failingHttpClient, mockHttpClient } from './mock-http.js';
+import { HueApiError, HueNetworkError, HueRateLimitError, HueResponseError } from '../src/errors';
+import { discoverBridges } from '../src/discovery';
+import { failingHttpClient, mockHttpClient } from './mock-http';
 
 const bridge = { id: '001788fffe100491', internalipaddress: '192.168.2.23', port: 443 };
 

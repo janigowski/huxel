@@ -1,19 +1,19 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createSmartScenesApi } from '../src/resources/smart-scenes.js';
-import type { SmartScenesApi } from '../src/resources/smart-scenes.js';
+import { createHueProtocol } from '../src/protocol';
+import { createSmartScenesApi } from '../src/resources/smart-scenes';
+import type { SmartScenesApi } from '../src/resources/smart-scenes';
 import type {
 	ApiResponse,
 	ResourceIdentifier,
 	ResourceIdentifierResponse
-} from '../src/types/common.js';
+} from '../src/types/common';
 import type {
 	SmartSceneGet,
 	SmartScenePost,
 	SmartScenePut,
 	WeekDay
-} from '../src/types/smart-scene.js';
-import { mockHttpClient } from './mock-http.js';
+} from '../src/types/smart-scene';
+import { mockHttpClient } from './mock-http';
 
 const smartScenes = createSmartScenesApi(
 	createHueProtocol({ baseUrl: 'https://bridge', appKey: 'key', httpClient: mockHttpClient({}) })

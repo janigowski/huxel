@@ -9,9 +9,9 @@ import {
 	HueRateLimitError,
 	HueResponseError,
 	HueUnauthorizedError
-} from '../src/index.js';
-import type { HttpClient } from '../src/index.js';
-import { envelope, failingHttpClient, mockHttpClient } from './mock-http.js';
+} from '../src/index';
+import type { HttpClient } from '../src/index';
+import { envelope, failingHttpClient, mockHttpClient } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const APP_KEY = 'secret-app-key';
