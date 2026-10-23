@@ -2,7 +2,7 @@
 
 Headless, framework agnostic application for controlling Philips Hue lights, built on [`hue-sdk`](../hue-sdk) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes optional Svelte 5 and React adapters.
 
-Scope: load lights, read name, power, brightness and color, toggle power, change brightness and color, and follow changes made elsewhere (Hue app, switches, automations) in real time. Colors are CIE 1931 xy; color temperature, gradients and effects are not supported. No discovery or authentication. Rooms and zones are opt-in through `roomsAndZones: true`.
+Scope: load lights, rooms and zones, read name, power, brightness and color, toggle power, change brightness and color, and follow changes made elsewhere (Hue app, switches, automations) in real time. Colors are CIE 1931 xy; color temperature, gradients and effects are not supported. No discovery or authentication. Rooms and zones are listed by name.
 
 ## Install
 
@@ -43,7 +43,6 @@ createHueApp(
 	({ baseUrl: string; appKey: string; httpClient?: HttpClient } | { gateway: HueGateway }) & {
 		live?: boolean;    // default true
 		settleMs?: number; // default 1500
-		roomsAndZones?: boolean; // default false
 	}
 ): HueApp
 describeError(error: unknown): string
@@ -54,7 +53,7 @@ app.initialize(): Promise<void>
 app.toggleLight(lightId: string): Promise<void>
 app.dimLight(lightId: string, brightness: number): Promise<void>
 app.changeColor(lightId: string, color: XyColor): Promise<void>
-app.toggleRoom(roomId: string): Promise<void>       // requires roomsAndZones
+app.toggleRoom(roomId: string): Promise<void>
 app.dimRoom(roomId: string, brightness: number): Promise<void>
 app.changeRoomColor(roomId: string, color: XyColor): Promise<void>
 app.toggleZone(zoneId: string): Promise<void>
@@ -86,17 +85,17 @@ State is read-only: signals are computed, light and color objects are frozen, an
 
 `hexToXy` converts an sRGB hex color to xy rounded to 4 decimals, like the bridge reports it; black maps to the D65 white point. `xyToHex` converts back at full brightness, so the result has at least one channel at `ff`. Colors outside the sRGB gamut are clamped. The bridge maps xy into each bulb's own gamut, so the light may look different from the screen.
 
-The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness`, `setColor` and the optional `watch`). With `roomsAndZones: true` it also needs `listAreas`, `setAreaPower`, `setAreaBrightness` and `setAreaColor`, which is useful for tests.
+The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness`, `setColor` and the optional `watch`). Area commands also need `listAreas`, `setAreaPower`, `setAreaBrightness` and `setAreaColor`. `HueSdkGateway` provides them. A gateway without those methods still loads lights; room and zone collections stay empty.
 
 `describeError` turns an error into a user-facing message, appending each `cause` in parentheses and asking the user to press the link button for `HueLinkButtonNotPressedError`.
 
 ## Rooms and zones
 
-`roomsAndZones: true` loads rooms and zones and controls them through the grouped light service each one owns. The Svelte dashboard is the only app that turns this on. The React adapter does not expose the actions, and leaving the option off keeps the previous lights-only behaviour: no extra bridge requests, and `toggleRoom` rejects with `AreasUnsupportedError`.
+`initialize()` loads rooms and zones alongside lights and controls them through the grouped light service each one owns. `app.state.rooms` and `app.state.zones` are sorted by name. The React adapter does not expose the actions. A lights-only gateway makes no area requests, and `toggleRoom` rejects with `AreasUnsupportedError`.
 
 `app.state.rooms` and `app.state.zones` use the same fields as lights. `isOn` is true when any light in the group is on. Brightness is the bridge average for the lights that are on, or `null` when the group cannot be dimmed. Commands use the same optimistic lanes as lights and never rewrite the individual light objects; those update from their own events.
 
-Unknown ids reject with `RoomNotFoundError` or `ZoneNotFoundError`. A gateway without the area methods rejects `initialize()` with `AreasUnsupportedError`.
+Unknown ids reject with `RoomNotFoundError` or `ZoneNotFoundError`.
 
 ## Optimistic updates
 
@@ -184,7 +183,7 @@ hue.dispose();
 {/if}
 ```
 
-The adapter holds no state. Its getters read the core signals and use `createSubscriber` to notify Svelte, subscribing only while a Svelte effect reads them and releasing the subscription when none does. `hue.lights.all` lists every light, `hue.rooms.all` and `hue.zones.all` list rooms and zones when `roomsAndZones` is enabled, and `light.name`, `light.isOn`, `light.brightness` and `light.color` are plain reactive values. `hue.status`, `hue.error` and `hue.connection` mirror the core state. `hue.dispose()` disposes the underlying app. Room and zone commands are `toggleRoom`, `dimRoom`, `changeRoomColor`, `toggleZone`, `dimZone` and `changeZoneColor`.
+The adapter holds no state. Its getters read the core signals and use `createSubscriber` to notify Svelte, subscribing only while a Svelte effect reads them and releasing the subscription when none does. `hue.lights.all` lists every light, `hue.rooms.all` and `hue.zones.all` list rooms and zones by name, and `light.name`, `light.isOn`, `light.brightness` and `light.color` are plain reactive values. `hue.status`, `hue.error` and `hue.connection` mirror the core state. `hue.dispose()` disposes the underlying app. Room and zone commands are `toggleRoom`, `dimRoom`, `changeRoomColor`, `toggleZone`, `dimZone` and `changeZoneColor`.
 
 ## React
 

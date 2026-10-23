@@ -71,7 +71,7 @@ async function setup(
 	areas: { rooms: BridgeArea[]; zones: BridgeArea[] } = { rooms: [living], zones: [downstairs] }
 ) {
 	const gateway = new AreasGateway();
-	const app = createHueApp({ gateway, roomsAndZones: true, settleMs: 0 });
+	const app = createHueApp({ gateway, settleMs: 0 });
 	const initialization = app.initialize();
 	gateway.listCalls[0]?.resolve([bridgeLight()]);
 	gateway.areaLists[0]?.resolve(areas);
@@ -87,27 +87,17 @@ function assertPublicArea(area: Area): void {
 void assertPublicArea;
 
 describe('rooms and zones', () => {
-	it('leaves rooms and zones empty unless the option is enabled', async () => {
-		const gateway = new AreasGateway();
+	it('leaves rooms and zones empty when the gateway has no area support', async () => {
+		const gateway = new FakeGateway();
 		const app = createHueApp({ gateway });
 		const initialization = app.initialize();
 		gateway.listCalls[0]?.resolve([bridgeLight()]);
 		await initialization;
 
-		expect(gateway.areaLists).toHaveLength(0);
+		expect(app.state.status.value).toBe('ready');
 		expect(app.state.rooms.value).toEqual([]);
 		expect(app.state.zones.value).toEqual([]);
 		await expect(app.toggleRoom('living')).rejects.toBeInstanceOf(AreasUnsupportedError);
-	});
-
-	it('rejects initialization when the gateway cannot list areas', async () => {
-		const gateway = new FakeGateway();
-		const app = createHueApp({ gateway, roomsAndZones: true });
-
-		await expect(app.initialize()).rejects.toBeInstanceOf(AreasUnsupportedError);
-
-		expect(gateway.listCalls).toHaveLength(0);
-		expect(app.state.status.value).toBe('error');
 	});
 
 	it('loads rooms and zones alongside lights', async () => {
@@ -122,6 +112,22 @@ describe('rooms and zones', () => {
 		expect(app.state.zones.get('downstairs')?.brightness.value).toBeNull();
 		expect(app.state.zones.get('downstairs')?.color.value).toBeNull();
 		expect(app.state.lights.get('desk')?.isOn.value).toBe(false);
+	});
+
+	it('lists rooms and zones by name', async () => {
+		const { app } = await setup({
+			rooms: [
+				{ ...living, id: 'bedroom', name: 'Bedroom' },
+				{ ...living, id: 'attic', name: 'Attic' }
+			],
+			zones: [
+				{ ...downstairs, id: 'upstairs', name: 'Upstairs' },
+				{ ...downstairs, id: 'garden', name: 'Garden' }
+			]
+		});
+
+		expect(app.state.rooms.value.map((room) => room.name.value)).toEqual(['Attic', 'Bedroom']);
+		expect(app.state.zones.value.map((zone) => zone.name.value)).toEqual(['Garden', 'Upstairs']);
 	});
 
 	it('toggles a room through its grouped light and reverts when the bridge rejects it', async () => {

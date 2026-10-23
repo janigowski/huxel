@@ -47,7 +47,6 @@ export interface HueBridgeOptions {
 export type HueAppOptions = (HueBridgeOptions | { gateway: HueGateway }) & {
 	live?: boolean;
 	settleMs?: number;
-	roomsAndZones?: boolean;
 };
 
 export interface HueAppActions {
@@ -73,7 +72,6 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 	readonly state: HueAppState;
 
 	private readonly gateway: HueGateway;
-	private readonly roomsAndZones: boolean;
 	private readonly areaGateway: AreaGateway | undefined;
 	private readonly lights = signal<ReadonlyMap<string, Light>>(new Map());
 	private readonly rooms = signal<ReadonlyMap<string, Area>>(new Map());
@@ -93,14 +91,10 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 	private initialization: Promise<void> | undefined;
 	private disposed = false;
 
-	constructor(
-		gateway: HueGateway,
-		options: { live?: boolean; settleMs?: number; roomsAndZones?: boolean } = {}
-	) {
+	constructor(gateway: HueGateway, options: { live?: boolean; settleMs?: number } = {}) {
 		const settleMs = options.settleMs ?? DEFAULT_SETTLE_MS;
 		this.gateway = gateway;
-		this.roomsAndZones = options.roomsAndZones === true;
-		this.areaGateway = this.roomsAndZones ? asAreaGateway(gateway) : undefined;
+		this.areaGateway = asAreaGateway(gateway);
 		this.lanes = new LightLaneRegistry(gateway, settleMs);
 		this.areaLanes = this.areaGateway
 			? new AreaLaneRegistry(this.areaGateway, settleMs)
@@ -169,10 +163,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		let rooms: BridgeArea[] = [];
 		let zones: BridgeArea[] = [];
 		try {
-			if (this.roomsAndZones) {
-				if (!this.areaGateway) {
-					throw new AreasUnsupportedError();
-				}
+			if (this.areaGateway) {
 				const [lights, areas] = await Promise.all([
 					this.gateway.listLights(),
 					this.areaGateway.listAreas()
@@ -198,7 +189,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		}
 		batch(() => {
 			this.lights.value = new Map(bridgeLights.map((state) => [state.id, new Light(state)]));
-			if (this.roomsAndZones) {
+			if (this.areaGateway) {
 				this.rooms.value = new Map(rooms.map((state) => [state.id, new Area(state)]));
 				this.zones.value = new Map(zones.map((state) => [state.id, new Area(state)]));
 			}
@@ -272,7 +263,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		if (this.disposed) {
 			throw new HueAppDisposedError();
 		}
-		if (!this.roomsAndZones) {
+		if (!this.areaGateway) {
 			throw new AreasUnsupportedError();
 		}
 
@@ -288,7 +279,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		if (this.disposed) {
 			throw new HueAppDisposedError();
 		}
-		if (!this.roomsAndZones) {
+		if (!this.areaGateway) {
 			throw new AreasUnsupportedError();
 		}
 
@@ -315,7 +306,7 @@ export function createHueApp(options: HueAppOptions): HueApp {
 					})
 				);
 
-	return new HueApp(gateway, { live, settleMs, roomsAndZones: options.roomsAndZones });
+	return new HueApp(gateway, { live, settleMs });
 }
 
 function asAreaGateway(gateway: HueGateway): AreaGateway | undefined {

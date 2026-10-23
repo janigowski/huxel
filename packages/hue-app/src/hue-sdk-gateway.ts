@@ -8,7 +8,8 @@ import type {
 	LightPut,
 	ResourceIdentifierResponse
 } from 'hue-sdk';
-import { createAreaEventSession, joinAreas } from './area-events';
+import { AreaCatalog } from './area-catalog';
+import { AreaEventSession } from './area-event-session';
 import { xyColorFrom, type XyColor } from './color';
 import type {
 	AreaChange,
@@ -37,6 +38,7 @@ const CONNECTION_STATES: Record<EventStreamState, HueAppConnection> = {
  */
 export class HueSdkGateway implements HueGateway {
 	private readonly client: HueClient;
+	private readonly catalog = new AreaCatalog();
 
 	constructor(client: HueClient) {
 		this.client = client;
@@ -67,8 +69,8 @@ export class HueSdkGateway implements HueGateway {
 		]);
 
 		return {
-			rooms: joinAreas(rooms.data, groupedLights.data),
-			zones: joinAreas(zones.data, groupedLights.data)
+			rooms: this.catalog.join(rooms.data, groupedLights.data),
+			zones: this.catalog.join(zones.data, groupedLights.data)
 		};
 	}
 
@@ -88,7 +90,7 @@ export class HueSdkGateway implements HueGateway {
 		let active = true;
 		const additions = new Map<string, LightUpdate[]>();
 		const areas = observer.onAreaChanges
-			? createAreaEventSession(this.client, (changes) => {
+			? new AreaEventSession(this.client, (changes) => {
 					if (active && changes.length > 0) {
 						observer.onAreaChanges?.(changes);
 					}

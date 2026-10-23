@@ -16,8 +16,7 @@
 
 	let commandError = $state<string | null>(null);
 
-	const items = $derived([...groups].sort((a, b) => a.name.localeCompare(b.name)));
-	const onCount = $derived(items.filter((group) => group.isOn).length);
+	const onCount = $derived(groups.filter((group) => group.isOn).length);
 	const loadingLabel = $derived(`Loading ${title.toLowerCase()}…`);
 
 	async function run(command: Promise<void>) {
@@ -32,17 +31,17 @@
 </script>
 
 <section class="groups">
-	<SectionHeader {title} active={onCount} total={items.length} />
+	<SectionHeader {title} active={onCount} total={groups.length} />
 
 	{#if commandError}
 		<Notice>{commandError}</Notice>
 	{/if}
 
-	{#if loading && items.length === 0}
+	{#if loading && groups.length === 0}
 		<Notice tone="muted">{loadingLabel}</Notice>
 	{:else}
 		<LightGrid
-			lights={items}
+			lights={groups}
 			ontoggle={(id) => run(ontoggle(id))}
 			ondim={(id, brightness) => run(ondim(id, brightness))}
 			onchangecolor={(id, color) => run(onchangecolor(id, color))}

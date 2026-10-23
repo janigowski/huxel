@@ -1,46 +1,11 @@
-import {
-	createHueClient,
-	type HttpClient,
-	type HttpRequest,
-	type HttpResponse,
-	type HueEvent,
-	type HueEventResource
-} from 'hue-sdk';
+import type { GroupedLightGet, HueEvent, HueEventResource, RoomGet, ZoneGet } from 'hue-sdk';
 import { describe, expect, it } from 'vite-plus/test';
 import type { AreaChange, LightChangeObserver } from '../src/index';
 import { HueSdkGateway } from '../src/hue-sdk-gateway';
+import { FakeHueClient } from './fake-hue-client';
 import { flushMicrotasks } from './fakes';
 
-function pathname(url: string): string {
-	const clip = url.indexOf('/clip/v2');
-	return clip === -1 ? url : url.slice(clip);
-}
-
-function routingHttp(routes: Record<string, unknown>) {
-	const requests: HttpRequest[] = [];
-	const httpClient: HttpClient = {
-		async request(request) {
-			requests.push(request);
-			const path = pathname(request.url);
-			const body = routes[path];
-			if (body === undefined) {
-				throw new Error(`Unexpected ${request.method} ${path}`);
-			}
-			return {
-				status: 200,
-				headers: {} as HttpResponse['headers'],
-				body: JSON.stringify(body)
-			};
-		}
-	};
-	return { httpClient, requests };
-}
-
-function envelope(data: unknown) {
-	return { errors: [], data };
-}
-
-const kitchen = {
+const kitchen: RoomGet = {
 	id: 'room-1',
 	type: 'room',
 	children: [],
@@ -51,7 +16,7 @@ const kitchen = {
 	metadata: { name: 'Kitchen', archetype: 'kitchen' }
 };
 
-const emptyRoom = {
+const emptyRoom: RoomGet = {
 	id: 'room-2',
 	type: 'room',
 	children: [],
@@ -59,7 +24,7 @@ const emptyRoom = {
 	metadata: { name: 'Empty', archetype: 'other' }
 };
 
-const downstairs = {
+const downstairs: ZoneGet = {
 	id: 'zone-1',
 	type: 'zone',
 	children: [],
@@ -67,30 +32,23 @@ const downstairs = {
 	metadata: { name: 'Downstairs', archetype: 'downstairs' }
 };
 
+const kitchenLight: GroupedLightGet = {
+	id: 'gl-kitchen',
+	type: 'grouped_light',
+	owner: { rid: 'room-1', rtype: 'room' },
+	on: { on: true },
+	dimming: { brightness: 25 },
+	color: { xy: { x: 0.5, y: 0.4 } }
+};
+
 describe('HueSdkGateway areas', () => {
 	it('joins rooms and zones with their grouped lights and skips groups that have none', async () => {
-		const { httpClient, requests } = routingHttp({
-			'/clip/v2/resource/room': envelope([kitchen, emptyRoom]),
-			'/clip/v2/resource/zone': envelope([downstairs]),
-			'/clip/v2/resource/grouped_light': envelope([
-				{
-					id: 'gl-kitchen',
-					type: 'grouped_light',
-					owner: { rid: 'room-1', rtype: 'room' },
-					on: { on: true },
-					dimming: { brightness: 25 },
-					color: { xy: { x: 0.5, y: 0.4 } }
-				}
-			])
+		const fake = new FakeHueClient({
+			rooms: [kitchen, emptyRoom],
+			zones: [downstairs],
+			groupedLights: [kitchenLight]
 		});
-		const gateway = new HueSdkGateway(
-			createHueClient({
-				baseUrl: 'https://bridge.local',
-				appKey: 'key',
-				httpClient,
-				throttle: false
-			})
-		);
+		const gateway = new HueSdkGateway(fake.client);
 
 		await expect(gateway.listAreas()).resolves.toEqual({
 			rooms: [
@@ -105,78 +63,34 @@ describe('HueSdkGateway areas', () => {
 			],
 			zones: []
 		});
-		expect(requests.map((request) => pathname(request.url)).sort()).toEqual([
-			'/clip/v2/resource/grouped_light',
-			'/clip/v2/resource/room',
-			'/clip/v2/resource/zone'
-		]);
+		expect(fake.lists).toEqual(['rooms', 'zones', 'groupedLights']);
 	});
 
 	it('sends room and zone commands to the grouped light', async () => {
-		const { httpClient, requests } = routingHttp({
-			'/clip/v2/resource/grouped_light/gl-kitchen': envelope([
-				{ rid: 'gl-kitchen', rtype: 'grouped_light' }
-			])
-		});
-		const gateway = new HueSdkGateway(
-			createHueClient({
-				baseUrl: 'https://bridge.local',
-				appKey: 'key',
-				httpClient,
-				throttle: false
-			})
-		);
+		const fake = new FakeHueClient();
+		const gateway = new HueSdkGateway(fake.client);
 
 		await gateway.setAreaPower('gl-kitchen', false);
 		await gateway.setAreaBrightness('gl-kitchen', 12);
 		await gateway.setAreaColor('gl-kitchen', { x: 0.1, y: 0.2 });
 
-		expect(requests.map((request) => JSON.parse(request.body ?? ''))).toEqual([
-			{ on: { on: false } },
-			{ dimming: { brightness: 12 } },
-			{ color: { xy: { x: 0.1, y: 0.2 } } }
+		expect(fake.updates).toEqual([
+			{ id: 'gl-kitchen', body: { on: { on: false } } },
+			{ id: 'gl-kitchen', body: { dimming: { brightness: 12 } } },
+			{ id: 'gl-kitchen', body: { color: { xy: { x: 0.1, y: 0.2 } } } }
 		]);
-		expect(pathname(requests[0]?.url ?? '')).toBe('/clip/v2/resource/grouped_light/gl-kitchen');
 	});
 
 	it('maps room, zone and grouped-light events', async () => {
-		const gets: string[] = [];
-		const sessions: Array<(events: HueEvent[]) => void> = [];
-		const client = {
-			events: {
-				subscribe(observer: { onEvents: (events: HueEvent[]) => void }) {
-					sessions.push(observer.onEvents);
-					return { state: 'connecting' as const, close() {} };
-				}
-			},
-			groupedLights: {
-				async get(id: string) {
-					gets.push(id);
-					return {
-						errors: [],
-						data: [
-							{
-								id,
-								type: 'grouped_light',
-								owner: { rid: 'room-1', rtype: 'room' },
-								on: { on: false },
-								dimming: { brightness: 80 }
-							}
-						]
-					};
-				}
-			},
-			rooms: {
-				async get() {
-					return { errors: [], data: [] };
-				}
-			},
-			zones: {
-				async get() {
-					return { errors: [], data: [] };
-				}
-			}
-		};
+		const fake = new FakeHueClient({
+			groupedLight: (id) => ({
+				id,
+				type: 'grouped_light',
+				owner: { rid: 'room-1', rtype: 'room' },
+				on: { on: false },
+				dimming: { brightness: 80 }
+			})
+		});
 		const changes: AreaChange[][] = [];
 		const lights: unknown[] = [];
 		const observer: LightChangeObserver = {
@@ -189,12 +103,7 @@ describe('HueSdkGateway areas', () => {
 				changes.push(batch);
 			}
 		};
-		new HueSdkGateway(client as never).watch(observer);
-
-		const emit = sessions[0];
-		if (!emit) {
-			throw new Error('watch did not subscribe');
-		}
+		new HueSdkGateway(fake.client).watch(observer);
 
 		const event = (type: HueEvent['type'], data: HueEventResource[]): HueEvent => ({
 			id: 'event',
@@ -203,7 +112,7 @@ describe('HueSdkGateway areas', () => {
 			data
 		});
 
-		emit([
+		fake.emit([
 			event('update', [
 				{ id: 'room-1', type: 'room', metadata: { name: 'Cook' } } as HueEventResource,
 				{ id: 'gl-kitchen', type: 'grouped_light', on: { on: true } } as HueEventResource,
@@ -219,7 +128,7 @@ describe('HueSdkGateway areas', () => {
 		]);
 		expect(lights).toEqual([]);
 
-		emit([
+		fake.emit([
 			event('add', [
 				{
 					id: 'room-1',
@@ -229,14 +138,14 @@ describe('HueSdkGateway areas', () => {
 				} as HueEventResource
 			])
 		]);
-		emit([
+		fake.emit([
 			event('update', [
 				{ id: 'gl-kitchen', type: 'grouped_light', on: { on: true } } as HueEventResource
 			])
 		]);
 		await flushMicrotasks();
 
-		expect(gets).toEqual(['gl-kitchen']);
+		expect(fake.gets).toEqual(['gl-kitchen']);
 		expect(changes.at(-1)).toEqual([
 			{
 				kind: 'added',

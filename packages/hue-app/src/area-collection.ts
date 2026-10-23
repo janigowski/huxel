@@ -7,7 +7,11 @@ export class AreaCollection {
 
 	constructor(byId: ReadonlySignal<ReadonlyMap<string, ReadonlyArea>>) {
 		this.byId = byId;
-		this.all = computed(() => [...byId.value.values()]);
+		this.all = computed(() =>
+			[...byId.value.values()].sort((left, right) =>
+				left.name.value.localeCompare(right.name.value)
+			)
+		);
 	}
 
 	get value(): readonly ReadonlyArea[] {
