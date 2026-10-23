@@ -9,5 +9,7 @@ describe('/+page.svelte', () => {
 
 		const heading = page.getByRole('heading', { level: 1 });
 		await expect.element(heading).toBeInTheDocument();
+		await expect.element(page.getByRole('heading', { name: 'Rooms' })).not.toBeInTheDocument();
+		await expect.element(page.getByRole('heading', { name: 'Zones' })).not.toBeInTheDocument();
 	});
 });

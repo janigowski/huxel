@@ -12,7 +12,9 @@ export class BridgeConnection {
 	error = $state<string | null>(null);
 
 	app = $derived(
-		this.appKey ? createHueApp({ baseUrl: bridgeBaseUrl(), appKey: this.appKey }) : null
+		this.appKey
+			? createHueApp({ baseUrl: bridgeBaseUrl(), appKey: this.appKey, roomsAndZones: true })
+			: null
 	);
 
 	private readonly storage: AppKeyStorage;

@@ -1,22 +1,39 @@
 import type { ReadonlySignal } from '@preact/signals-core';
 import { createSubscriber } from 'svelte/reactivity';
+import type { AreaCollection } from '../area-collection';
+import type { AreaSnapshot, ReadonlyArea } from '../area';
+import type { XyColor } from '../color';
 import type { HueAppConnection } from '../gateway';
 import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app';
 import type { LightCollection } from '../light-collection';
 import type { LightSnapshot, ReadonlyLight } from '../light';
 
 export type SvelteLight = LightSnapshot;
+export type SvelteArea = AreaSnapshot;
 
 export interface SvelteLightCollection {
 	readonly all: readonly SvelteLight[];
 	get(id: string): SvelteLight | undefined;
 }
 
+export interface SvelteAreaCollection {
+	readonly all: readonly SvelteArea[];
+	get(id: string): SvelteArea | undefined;
+}
+
 export interface SvelteHueApp extends HueAppActions {
 	readonly lights: SvelteLightCollection;
+	readonly rooms: SvelteAreaCollection;
+	readonly zones: SvelteAreaCollection;
 	readonly status: HueAppStatus;
 	readonly error: unknown;
 	readonly connection: HueAppConnection;
+	toggleRoom(roomId: string): Promise<void>;
+	dimRoom(roomId: string, brightness: number): Promise<void>;
+	changeRoomColor(roomId: string, color: XyColor): Promise<void>;
+	toggleZone(zoneId: string): Promise<void>;
+	dimZone(zoneId: string, brightness: number): Promise<void>;
+	changeZoneColor(zoneId: string, color: XyColor): Promise<void>;
 }
 
 type Subscribable = Pick<ReadonlySignal<unknown>, 'subscribe'>;
@@ -66,15 +83,23 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 }
 
 function createSvelteLightCollection(lights: LightCollection): SvelteLightCollection {
-	const subscribe = track(lights);
-	const wrappers = new WeakMap<ReadonlyLight, SvelteLight>();
-	const lists = new WeakMap<readonly ReadonlyLight[], readonly SvelteLight[]>();
+	return createSvelteCollection(lights);
+}
 
-	function wrap(light: ReadonlyLight): SvelteLight {
-		let wrapper = wrappers.get(light);
+function createSvelteAreaCollection(areas: AreaCollection): SvelteAreaCollection {
+	return createSvelteCollection(areas);
+}
+
+function createSvelteCollection(source: LightCollection | AreaCollection): SvelteLightCollection {
+	const subscribe = track(source);
+	const wrappers = new WeakMap<ReadonlyLight | ReadonlyArea, SvelteLight>();
+	const lists = new WeakMap<readonly (ReadonlyLight | ReadonlyArea)[], readonly SvelteLight[]>();
+
+	function wrap(entity: ReadonlyLight | ReadonlyArea): SvelteLight {
+		let wrapper = wrappers.get(entity);
 		if (!wrapper) {
-			wrapper = createSvelteLight(light);
-			wrappers.set(light, wrapper);
+			wrapper = createSvelteLight(entity);
+			wrappers.set(entity, wrapper);
 		}
 		return wrapper;
 	}
@@ -82,7 +107,7 @@ function createSvelteLightCollection(lights: LightCollection): SvelteLightCollec
 	return {
 		get all() {
 			subscribe();
-			const current = lights.value;
+			const current = source.value;
 			let list = lists.get(current);
 			if (!list) {
 				list = Object.freeze(current.map(wrap));
@@ -92,8 +117,8 @@ function createSvelteLightCollection(lights: LightCollection): SvelteLightCollec
 		},
 		get(id) {
 			subscribe();
-			const light = lights.get(id);
-			return light ? wrap(light) : undefined;
+			const entity = source.get(id);
+			return entity ? wrap(entity) : undefined;
 		}
 	};
 }
@@ -105,6 +130,8 @@ export function createSvelteHueApp(app: HueApp): SvelteHueApp {
 
 	return {
 		lights: createSvelteLightCollection(app.state.lights),
+		rooms: createSvelteAreaCollection(app.state.rooms),
+		zones: createSvelteAreaCollection(app.state.zones),
 		get status() {
 			return status();
 		},
@@ -114,6 +141,12 @@ export function createSvelteHueApp(app: HueApp): SvelteHueApp {
 		get connection() {
 			return connection();
 		},
-		...bindActions(app)
+		...bindActions(app),
+		toggleRoom: (roomId) => app.toggleRoom(roomId),
+		dimRoom: (roomId, brightness) => app.dimRoom(roomId, brightness),
+		changeRoomColor: (roomId, color) => app.changeRoomColor(roomId, color),
+		toggleZone: (zoneId) => app.toggleZone(zoneId),
+		dimZone: (zoneId, brightness) => app.dimZone(zoneId, brightness),
+		changeZoneColor: (zoneId, color) => app.changeZoneColor(zoneId, color)
 	};
 }

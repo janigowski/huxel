@@ -1,8 +1,16 @@
 import { batch, type Signal } from '@preact/signals-core';
 import type { XyColor } from './color';
-import type { BridgeLight, HueAppConnection, HueGateway, LightChange } from './gateway';
+import type {
+	AreaChange,
+	BridgeLight,
+	HueAppConnection,
+	HueGateway,
+	LightChange,
+	LightChangeObserver
+} from './gateway';
 import { Light } from './light';
 import type { LightLaneRegistry } from './light-lanes';
+import type { AreaSync } from './area-sync';
 
 interface LightFields {
 	name?: string;
@@ -30,9 +38,12 @@ export class LiveSync {
 	private started = false;
 	private disposed = false;
 
-	constructor(gateway: HueGateway, target: LiveSyncTarget) {
+	private readonly areas: AreaSync | undefined;
+
+	constructor(gateway: HueGateway, target: LiveSyncTarget, areas?: AreaSync) {
 		this.gateway = gateway;
 		this.target = target;
+		this.areas = areas;
 	}
 
 	start(): void {
@@ -43,12 +54,21 @@ export class LiveSync {
 		this.target.connection.value = 'connecting';
 
 		let unwatch: () => void;
+		const observer: LightChangeObserver = {
+			onChanges: (changes) => this.onChanges(changes),
+			onConnected: () => {
+				void this.runResync();
+				void this.areas?.resync();
+			},
+			onConnectionChange: (state) => this.onConnectionChange(state)
+		};
+		if (this.areas) {
+			observer.onAreaChanges = (changes: AreaChange[]) => {
+				this.areas?.onChanges(changes);
+			};
+		}
 		try {
-			unwatch = this.gateway.watch({
-				onChanges: (changes) => this.onChanges(changes),
-				onConnected: () => void this.runResync(),
-				onConnectionChange: (state) => this.onConnectionChange(state)
-			});
+			unwatch = this.gateway.watch(observer);
 		} catch {
 			if (!this.disposed) {
 				this.target.connection.value = 'offline';
@@ -67,6 +87,7 @@ export class LiveSync {
 			return;
 		}
 		this.disposed = true;
+		this.areas?.dispose();
 		this.resync = undefined;
 		const unwatch = this.unwatch;
 		this.unwatch = undefined;

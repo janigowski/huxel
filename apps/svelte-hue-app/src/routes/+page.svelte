@@ -2,6 +2,7 @@
 	import { ConnectPanel, DashboardBar, Hero, LightsSection } from 'design-system';
 	import { bridge } from '$lib/hue/bridge';
 	import { BridgeConnection } from '$lib/hue/connection.svelte';
+	import GroupsSection from '$lib/hue/GroupsSection.svelte';
 	import { createSvelteHueApp } from 'hue-app/svelte';
 	import { untrack } from 'svelte';
 
@@ -28,6 +29,22 @@
 
 	{#if hue}
 		<LightsSection {hue} />
+		<GroupsSection
+			title="Rooms"
+			groups={hue.rooms.all}
+			loading={hue.status === 'idle' || hue.status === 'loading'}
+			ontoggle={(id) => hue.toggleRoom(id)}
+			ondim={(id, brightness) => hue.dimRoom(id, brightness)}
+			onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
+		/>
+		<GroupsSection
+			title="Zones"
+			groups={hue.zones.all}
+			loading={hue.status === 'idle' || hue.status === 'loading'}
+			ontoggle={(id) => hue.toggleZone(id)}
+			ondim={(id, brightness) => hue.dimZone(id, brightness)}
+			onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
+		/>
 	{:else}
 		<ConnectPanel
 			connecting={connection.connecting}

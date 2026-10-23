@@ -44,6 +44,52 @@ export class LightNotColorCapableError extends HueAppError {
 	}
 }
 
+export class AreasUnsupportedError extends HueAppError {
+	override name = 'AreasUnsupportedError';
+
+	constructor() {
+		super('Rooms and zones are not available');
+	}
+}
+
+export class RoomNotFoundError extends HueAppError {
+	override name = 'RoomNotFoundError';
+
+	constructor(public readonly roomId: string) {
+		super(`Room "${roomId}" not found`);
+	}
+}
+
+export class ZoneNotFoundError extends HueAppError {
+	override name = 'ZoneNotFoundError';
+
+	constructor(public readonly zoneId: string) {
+		super(`Zone "${zoneId}" not found`);
+	}
+}
+
+export class AreaNotDimmableError extends HueAppError {
+	override name = 'AreaNotDimmableError';
+
+	constructor(
+		public readonly kind: 'room' | 'zone',
+		public readonly id: string
+	) {
+		super(`${kind === 'room' ? 'Room' : 'Zone'} "${id}" does not support brightness`);
+	}
+}
+
+export class AreaNotColorCapableError extends HueAppError {
+	override name = 'AreaNotColorCapableError';
+
+	constructor(
+		public readonly kind: 'room' | 'zone',
+		public readonly id: string
+	) {
+		super(`${kind === 'room' ? 'Room' : 'Zone'} "${id}" does not support color`);
+	}
+}
+
 export class InvalidColorError extends HueAppError {
 	override name = 'InvalidColorError';
 
