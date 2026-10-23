@@ -1,6 +1,6 @@
-import { parseSseLine } from './sse-line.js';
-import { SseLineSplitter } from './sse-line-splitter.js';
-import { SseMessageBuilder, type SseMessage } from './sse-message-builder.js';
+import { parseSseLine } from './sse-line';
+import { SseLineSplitter } from './sse-line-splitter';
+import { SseMessageBuilder, type SseMessage } from './sse-message-builder';
 
 export class SseParser {
 	private readonly lines = new SseLineSplitter((line) => this.handleLine(line));

@@ -1,4 +1,4 @@
-import type { AreaArchetype, GeometryObject, ResourceIdentifier } from './common.js';
+import type { AreaArchetype, GeometryObject, ResourceIdentifier } from './common';
 
 export type RoomArchetype = AreaArchetype;
 

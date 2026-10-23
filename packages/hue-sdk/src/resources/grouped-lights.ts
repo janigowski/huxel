@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../types/common.js';
-import type { GroupedLightGet, GroupedLightPut } from '../types/grouped-light.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse, ResourceIdentifierResponse } from '../types/common';
+import type { GroupedLightGet, GroupedLightPut } from '../types/grouped-light';
 
 export interface GroupedLightsApi {
 	/** `GET /resource/grouped_light` */

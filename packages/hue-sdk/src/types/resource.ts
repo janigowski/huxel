@@ -1,13 +1,13 @@
-import type { BridgeHomeGet } from './bridge-home.js';
-import type { BridgeGet } from './bridge.js';
-import type { ResourceType } from './common.js';
-import type { DeviceGet } from './device.js';
-import type { GroupedLightGet } from './grouped-light.js';
-import type { LightGet } from './light.js';
-import type { RoomGet } from './room.js';
-import type { SceneGet } from './scene.js';
-import type { SmartSceneGet } from './smart-scene.js';
-import type { ZoneGet } from './zone.js';
+import type { BridgeHomeGet } from './bridge-home';
+import type { BridgeGet } from './bridge';
+import type { ResourceType } from './common';
+import type { DeviceGet } from './device';
+import type { GroupedLightGet } from './grouped-light';
+import type { LightGet } from './light';
+import type { RoomGet } from './room';
+import type { SceneGet } from './scene';
+import type { SmartSceneGet } from './smart-scene';
+import type { ZoneGet } from './zone';
 
 export type CoveredResourceGet =
 	| LightGet

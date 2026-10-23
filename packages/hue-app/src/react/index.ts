@@ -1,8 +1,8 @@
 import { computed, type ReadonlySignal } from '@preact/signals-core';
 import { useSyncExternalStore } from 'react';
-import type { HueAppConnection } from '../gateway.js';
-import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app.js';
-import type { LightSnapshot, ReadonlyLight } from '../light.js';
+import type { HueAppConnection } from '../gateway';
+import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app';
+import type { LightSnapshot, ReadonlyLight } from '../light';
 
 export type ReactLight = LightSnapshot;
 

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
-import { createHueClient } from '../src/client.js';
+import { createHueClient } from '../src/client';
 import {
 	HueApiError,
 	HueError,
@@ -8,15 +8,15 @@ import {
 	HueRateLimitError,
 	HueResponseError,
 	HueUnauthorizedError
-} from '../src/errors.js';
+} from '../src/errors';
 import {
 	HueEventsApi,
 	type EventStreamOptions,
 	type EventStreamState,
 	type EventStreamObserver
-} from '../src/events/events-api.js';
-import type { HttpClient, HttpRequest, HttpStreamResponse } from '../src/http.js';
-import type { HueEvent } from '../src/types/event.js';
+} from '../src/events/events-api';
+import type { HttpClient, HttpRequest, HttpStreamResponse } from '../src/http';
+import type { HueEvent } from '../src/types/event';
 
 class FakeBody implements AsyncIterable<string> {
 	finished = false;

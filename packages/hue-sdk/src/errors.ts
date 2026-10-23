@@ -1,4 +1,4 @@
-import type { ApiError } from './types/common.js';
+import type { ApiError } from './types/common';
 
 export class HueError extends Error {
 	override name = 'HueError';

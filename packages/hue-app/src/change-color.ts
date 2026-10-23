@@ -1,7 +1,7 @@
-import type { XyColor } from './color.js';
-import { InvalidColorError, LightNotColorCapableError } from './errors.js';
-import type { Light } from './light.js';
-import type { LightLaneRegistry } from './light-lanes.js';
+import type { XyColor } from './color';
+import { InvalidColorError, LightNotColorCapableError } from './errors';
+import type { Light } from './light';
+import type { LightLaneRegistry } from './light-lanes';
 
 export class ChangeColor {
 	private readonly lanes: LightLaneRegistry;

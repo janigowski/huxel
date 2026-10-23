@@ -1,4 +1,4 @@
-import type { BridgeLight, HueGateway, LightChangeObserver, XyColor } from '../src/index.js';
+import type { BridgeLight, HueGateway, LightChangeObserver, XyColor } from '../src/index';
 
 export interface Deferred<T> {
 	readonly promise: Promise<T>;

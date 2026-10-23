@@ -1,4 +1,4 @@
-import type { DeltaAction, EmptyObject, ResourceIdentifier, XYColor } from './common.js';
+import type { DeltaAction, EmptyObject, ResourceIdentifier, XYColor } from './common';
 import type {
 	AlertPut,
 	ColorFeatureBasicPut,
@@ -11,7 +11,7 @@ import type {
 	OnFeaturePut,
 	SignalingPut,
 	SignalType
-} from './light.js';
+} from './light';
 
 export interface GroupedLightDimmingGet {
 	/** Brightness percentage. Value 0 is the lowest possible brightness. maximum: 100 */

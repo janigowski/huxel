@@ -5,7 +5,7 @@ import type {
 	Position3D,
 	ResourceIdentifier,
 	XYColor
-} from './common.js';
+} from './common';
 
 export type LightArchetype =
 	| 'unknown_archetype'

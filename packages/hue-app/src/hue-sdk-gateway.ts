@@ -7,14 +7,14 @@ import type {
 	LightPut,
 	ResourceIdentifierResponse
 } from 'hue-sdk';
-import type { XyColor } from './color.js';
+import type { XyColor } from './color';
 import type {
 	BridgeLight,
 	HueAppConnection,
 	HueGateway,
 	LightChange,
 	LightChangeObserver
-} from './gateway.js';
+} from './gateway';
 
 const PARTIAL_SUCCESS_STATUS = 207;
 
@@ -32,27 +32,27 @@ const CONNECTION_STATES: Record<EventStreamState, HueAppConnection> = {
  * a command with another request's response and drop its outcome.
  */
 export class HueSdkGateway implements HueGateway {
-	readonly #client: HueClient;
+	private readonly client: HueClient;
 
 	constructor(client: HueClient) {
-		this.#client = client;
+		this.client = client;
 	}
 
 	async listLights(): Promise<BridgeLight[]> {
-		const response = await this.#client.lights.list();
+		const response = await this.client.lights.list();
 		return response.data.map(toBridgeLight);
 	}
 
 	async setPower(lightId: string, isOn: boolean): Promise<void> {
-		await this.#update(lightId, { on: { on: isOn } });
+		await this.update(lightId, { on: { on: isOn } });
 	}
 
 	async setBrightness(lightId: string, brightness: number): Promise<void> {
-		await this.#update(lightId, { dimming: { brightness } });
+		await this.update(lightId, { dimming: { brightness } });
 	}
 
 	async setColor(lightId: string, color: XyColor): Promise<void> {
-		await this.#update(lightId, { color: { xy: { x: color.x, y: color.y } } });
+		await this.update(lightId, { color: { xy: { x: color.x, y: color.y } } });
 	}
 
 	watch(observer: LightChangeObserver): () => void {
@@ -62,7 +62,7 @@ export class HueSdkGateway implements HueGateway {
 		const fetchAdded = async (id: string, updates: LightUpdate[]): Promise<void> => {
 			let light: LightGet | undefined;
 			try {
-				[light] = (await this.#client.lights.get(id)).data;
+				[light] = (await this.client.lights.get(id)).data;
 			} catch {
 				light = undefined;
 			}
@@ -83,7 +83,7 @@ export class HueSdkGateway implements HueGateway {
 			}
 		};
 
-		const subscription = this.#client.events.subscribe({
+		const subscription = this.client.events.subscribe({
 			onEvents: (events) => {
 				if (!active) {
 					return;
@@ -148,8 +148,8 @@ export class HueSdkGateway implements HueGateway {
 		};
 	}
 
-	async #update(lightId: string, body: LightPut): Promise<void> {
-		const response = await this.#client.lights.update(lightId, body);
+	private async update(lightId: string, body: LightPut): Promise<void> {
+		const response = await this.client.lights.update(lightId, body);
 		assertApplied(lightId, response);
 	}
 }

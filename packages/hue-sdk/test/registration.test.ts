@@ -7,9 +7,9 @@ import {
 	HueRateLimitError,
 	HueRegistrationError,
 	HueResponseError
-} from '../src/errors.js';
-import { registerApplication } from '../src/registration.js';
-import { failingHttpClient, mockHttpClient, parseBody } from './mock-http.js';
+} from '../src/errors';
+import { registerApplication } from '../src/registration';
+import { failingHttpClient, mockHttpClient, parseBody } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 const USERNAME = 'secret-username-1028d66426293e821ecfd9ef1a0731df';

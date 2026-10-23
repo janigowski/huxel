@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../types/common.js';
-import type { ZoneGet, ZonePost, ZonePut } from '../types/zone.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse, ResourceIdentifierResponse } from '../types/common';
+import type { ZoneGet, ZonePost, ZonePut } from '../types/zone';
 
 export interface ZonesApi {
 	/** `GET /resource/zone` */

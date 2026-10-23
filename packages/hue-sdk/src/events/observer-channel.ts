@@ -1,5 +1,5 @@
-import type { HueEvent } from '../types/event.js';
-import type { EventStreamObserver, EventStreamState } from './events-api.js';
+import type { HueEvent } from '../types/event';
+import type { EventStreamObserver, EventStreamState } from './events-api';
 
 export class ObserverChannel {
 	private closed = false;

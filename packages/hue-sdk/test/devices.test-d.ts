@@ -1,9 +1,9 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createDevicesApi, type DevicesApi } from '../src/resources/devices.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common.js';
-import type { DeviceGet, DevicePut } from '../src/types/device.js';
-import { mockHttpClient } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createDevicesApi, type DevicesApi } from '../src/resources/devices';
+import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common';
+import type { DeviceGet, DevicePut } from '../src/types/device';
+import { mockHttpClient } from './mock-http';
 
 const devices = createDevicesApi(
 	createHueProtocol({ baseUrl: 'https://bridge', appKey: 'key', httpClient: mockHttpClient() })

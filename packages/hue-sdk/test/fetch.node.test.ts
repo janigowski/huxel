@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import type { IncomingHttpHeaders, IncomingMessage, Server, ServerResponse } from 'node:http';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
-import { createFetchHttpClient } from '../src/fetch.js';
+import { createFetchHttpClient } from '../src/fetch';
 
 interface ReceivedRequest {
 	method: string;

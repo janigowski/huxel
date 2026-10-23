@@ -1,9 +1,9 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
-import { createHueProtocol } from '../src/protocol.js';
-import { createRoomsApi, type RoomsApi } from '../src/resources/rooms.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common.js';
-import type { RoomGet, RoomPost, RoomPut } from '../src/types/room.js';
-import { mockHttpClient } from './mock-http.js';
+import { createHueProtocol } from '../src/protocol';
+import { createRoomsApi, type RoomsApi } from '../src/resources/rooms';
+import type { ApiResponse, ResourceIdentifierResponse } from '../src/types/common';
+import type { RoomGet, RoomPost, RoomPut } from '../src/types/room';
+import { mockHttpClient } from './mock-http';
 
 const rooms = createRoomsApi(
 	createHueProtocol({ baseUrl: 'https://bridge', appKey: 'key', httpClient: mockHttpClient() })

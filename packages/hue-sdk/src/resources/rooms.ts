@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../types/common.js';
-import type { RoomGet, RoomPost, RoomPut } from '../types/room.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse, ResourceIdentifierResponse } from '../types/common';
+import type { RoomGet, RoomPost, RoomPut } from '../types/room';
 
 export interface RoomsApi {
 	/** `GET /resource/room` */

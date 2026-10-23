@@ -1,4 +1,4 @@
-import type { ResourceIdentifier } from './common.js';
+import type { ResourceIdentifier } from './common';
 
 export interface BridgeTimeZoneGet {
 	/** Time zone where the user's home is located (as Olson ID). */

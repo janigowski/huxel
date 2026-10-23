@@ -1,4 +1,4 @@
-import type { XyColor } from './color.js';
+import type { XyColor } from './color';
 
 /** Light state as reported by the bridge, in domain terms. */
 export interface BridgeLight {

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
-import { createHueClient } from '../src/index.js';
-import { envelope, mockHttpClient, parseBody } from './mock-http.js';
+import { createHueClient } from '../src/index';
+import { envelope, mockHttpClient, parseBody } from './mock-http';
 
 const BASE_URL = 'https://192.168.1.100';
 

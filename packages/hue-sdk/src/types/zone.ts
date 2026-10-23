@@ -1,4 +1,4 @@
-import type { AreaArchetype, ResourceIdentifier } from './common.js';
+import type { AreaArchetype, ResourceIdentifier } from './common';
 
 export type ZoneArchetype = AreaArchetype;
 

@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../types/common.js';
-import type { SceneGet, ScenePost, ScenePut } from '../types/scene.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse, ResourceIdentifierResponse } from '../types/common';
+import type { SceneGet, ScenePost, ScenePut } from '../types/scene';
 
 export interface ScenesApi {
 	/** `GET /resource/scene` */

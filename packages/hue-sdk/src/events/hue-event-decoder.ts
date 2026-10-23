@@ -1,6 +1,6 @@
-import { HueResponseError } from '../errors.js';
-import { excerpt, isRecord, parseJsonBody } from '../protocol.js';
-import type { HueEvent, HueEventResource, HueEventType } from '../types/event.js';
+import { HueResponseError } from '../errors';
+import { excerpt, isRecord, parseJsonBody } from '../protocol';
+import type { HueEvent, HueEventResource, HueEventType } from '../types/event';
 
 export interface DecodedEvents {
 	events: HueEvent[];

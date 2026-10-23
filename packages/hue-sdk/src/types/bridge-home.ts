@@ -1,4 +1,4 @@
-import type { ResourceIdentifier } from './common.js';
+import type { ResourceIdentifier } from './common';
 
 export interface BridgeHomeGet {
 	/** Unique identifier representing a specific resource instance. Pattern: `^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$` */

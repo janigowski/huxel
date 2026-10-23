@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse, ResourceIdentifierResponse } from '../types/common.js';
-import type { DeviceGet, DevicePut } from '../types/device.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse, ResourceIdentifierResponse } from '../types/common';
+import type { DeviceGet, DevicePut } from '../types/device';
 
 export interface DevicesApi {
 	/** `GET /resource/device` */

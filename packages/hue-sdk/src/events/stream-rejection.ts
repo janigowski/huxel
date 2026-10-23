@@ -1,6 +1,6 @@
-import type { HueApiError } from '../errors.js';
-import type { HttpStreamResponse } from '../http.js';
-import { createApiError, parseJsonBody, readErrors } from '../protocol.js';
+import type { HueApiError } from '../errors';
+import type { HttpStreamResponse } from '../http';
+import { createApiError, parseJsonBody, readErrors } from '../protocol';
 
 const MAX_BODY_LENGTH = 1000;
 const BODY_TIMEOUT = 2000;

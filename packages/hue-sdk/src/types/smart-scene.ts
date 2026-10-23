@@ -1,4 +1,4 @@
-import type { ResourceIdentifier } from './common.js';
+import type { ResourceIdentifier } from './common';
 
 export type WeekDay =
 	| 'monday'

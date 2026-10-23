@@ -1,7 +1,7 @@
-import { createFetchHttpClient } from './fetch.js';
-import { HueLinkButtonNotPressedError, HueRegistrationError, HueResponseError } from './errors.js';
-import type { RegistrationErrorDetail } from './errors.js';
-import type { HttpClient, HttpRequest } from './http.js';
+import { createFetchHttpClient } from './fetch';
+import { HueLinkButtonNotPressedError, HueRegistrationError, HueResponseError } from './errors';
+import type { RegistrationErrorDetail } from './errors';
+import type { HttpClient, HttpRequest } from './http';
 import {
 	createApiError,
 	isRecord,
@@ -9,7 +9,7 @@ import {
 	parseJsonBody,
 	sendRequest,
 	trimTrailingSlashes
-} from './protocol.js';
+} from './protocol';
 
 const LINK_BUTTON_NOT_PRESSED = 101;
 

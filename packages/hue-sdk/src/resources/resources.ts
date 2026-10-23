@@ -1,6 +1,6 @@
-import type { HueProtocol, RequestOptions } from '../protocol.js';
-import type { ApiResponse } from '../types/common.js';
-import type { AnyResourceGet, ResourceListParams } from '../types/resource.js';
+import type { HueProtocol, RequestOptions } from '../protocol';
+import type { ApiResponse } from '../types/common';
+import type { AnyResourceGet, ResourceListParams } from '../types/resource';
 
 export interface ResourcesApi {
 	/** `GET /resource` */
