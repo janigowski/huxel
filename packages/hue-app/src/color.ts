@@ -61,6 +61,30 @@ export function freezeColor(color: XyColor | null): XyColor | null {
 	return color === null ? null : Object.freeze({ x: color.x, y: color.y });
 }
 
+export function isXyColor(color: unknown): color is XyColor {
+	if (typeof color !== 'object' || color === null) {
+		return false;
+	}
+
+	const { x, y } = color as XyColor;
+
+	return isUnit(x) && isUnit(y);
+}
+
+export function xyColorFrom(
+	xy: { readonly x?: unknown; readonly y?: unknown } | null | undefined
+): XyColor | null {
+	if (typeof xy?.x !== 'number' || typeof xy.y !== 'number') {
+		return null;
+	}
+
+	return { x: xy.x, y: xy.y };
+}
+
+function isUnit(value: unknown): value is number {
+	return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;
+}
+
 function linearChannel(digits: string, offset: number): number {
 	const channel = parseInt(digits.slice(offset, offset + 2), 16) / 255;
 

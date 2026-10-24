@@ -24,10 +24,50 @@ export type LightChange =
 	| { kind: 'added'; light: BridgeLight }
 	| { kind: 'removed'; id: string };
 
+export type AreaKind = 'room' | 'zone';
+
+/** Room or zone state joined with its grouped light, in domain terms. */
+export interface BridgeArea {
+	id: string;
+	name: string;
+	serviceId: string;
+	isOn: boolean;
+	/** Normalized 0–100, or `null` when the group cannot be dimmed. */
+	brightness: number | null;
+	color: XyColor | null;
+}
+
+export interface AreaFields {
+	name?: string;
+	isOn?: boolean;
+	brightness?: number | null;
+	color?: XyColor | null;
+	serviceId?: string;
+}
+
+export type AreaChange =
+	| ({ kind: 'updated'; resource: AreaKind; id: string } & AreaFields)
+	| { kind: 'added'; resource: AreaKind; area: BridgeArea }
+	| { kind: 'removed'; resource: AreaKind; id: string }
+	| ({ kind: 'service-updated'; serviceId: string } & Pick<
+			AreaFields,
+			'isOn' | 'brightness' | 'color'
+	  >)
+	| { kind: 'service-removed'; serviceId: string };
+
 export interface LightChangeObserver {
 	onChanges(changes: LightChange[]): void;
 	onConnected(): void;
 	onConnectionChange(state: HueAppConnection): void;
+	onAreaChanges?(changes: AreaChange[]): void;
+}
+
+export interface AreaGateway {
+	listAreas(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }>;
+	setAreaPower(serviceId: string, isOn: boolean): Promise<void>;
+	/** `brightness` is normalized 0–100. */
+	setAreaBrightness(serviceId: string, brightness: number): Promise<void>;
+	setAreaColor(serviceId: string, color: XyColor): Promise<void>;
 }
 
 /** The bridge operations HueApp needs. Implementations reject when the bridge does not apply a command. */
@@ -38,4 +78,9 @@ export interface HueGateway {
 	setBrightness(lightId: string, brightness: number): Promise<void>;
 	setColor(lightId: string, color: XyColor): Promise<void>;
 	watch?(observer: LightChangeObserver): () => void;
+	listAreas?(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }>;
+	setAreaPower?(serviceId: string, isOn: boolean): Promise<void>;
+	/** `brightness` is normalized 0–100. */
+	setAreaBrightness?(serviceId: string, brightness: number): Promise<void>;
+	setAreaColor?(serviceId: string, color: XyColor): Promise<void>;
 }

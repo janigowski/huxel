@@ -1,14 +1,19 @@
 import { HueApiError } from 'hue-sdk';
 import type {
 	EventStreamState,
+	GroupedLightPut,
 	HueClient,
 	LightEventResource,
 	LightGet,
 	LightPut,
 	ResourceIdentifierResponse
 } from 'hue-sdk';
-import type { XyColor } from './color';
+import { AreaCatalog } from './area-catalog';
+import { AreaEventSession } from './area-event-session';
+import { xyColorFrom, type XyColor } from './color';
 import type {
+	AreaChange,
+	BridgeArea,
 	BridgeLight,
 	HueAppConnection,
 	HueGateway,
@@ -33,6 +38,7 @@ const CONNECTION_STATES: Record<EventStreamState, HueAppConnection> = {
  */
 export class HueSdkGateway implements HueGateway {
 	private readonly client: HueClient;
+	private readonly catalog = new AreaCatalog();
 
 	constructor(client: HueClient) {
 		this.client = client;
@@ -55,9 +61,41 @@ export class HueSdkGateway implements HueGateway {
 		await this.update(lightId, { color: { xy: { x: color.x, y: color.y } } });
 	}
 
+	async listAreas(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }> {
+		const [rooms, zones, groupedLights] = await Promise.all([
+			this.client.rooms.list(),
+			this.client.zones.list(),
+			this.client.groupedLights.list()
+		]);
+
+		return {
+			rooms: this.catalog.join(rooms.data, groupedLights.data),
+			zones: this.catalog.join(zones.data, groupedLights.data)
+		};
+	}
+
+	async setAreaPower(serviceId: string, isOn: boolean): Promise<void> {
+		await this.updateArea(serviceId, { on: { on: isOn } });
+	}
+
+	async setAreaBrightness(serviceId: string, brightness: number): Promise<void> {
+		await this.updateArea(serviceId, { dimming: { brightness } });
+	}
+
+	async setAreaColor(serviceId: string, color: XyColor): Promise<void> {
+		await this.updateArea(serviceId, { color: { xy: { x: color.x, y: color.y } } });
+	}
+
 	watch(observer: LightChangeObserver): () => void {
 		let active = true;
 		const additions = new Map<string, LightUpdate[]>();
+		const areas = observer.onAreaChanges
+			? new AreaEventSession(this.client, (changes) => {
+					if (active && changes.length > 0) {
+						observer.onAreaChanges?.(changes);
+					}
+				})
+			: undefined;
 
 		const fetchAdded = async (id: string, updates: LightUpdate[]): Promise<void> => {
 			let light: LightGet | undefined;
@@ -90,10 +128,14 @@ export class HueSdkGateway implements HueGateway {
 				}
 
 				const changes: LightChange[] = [];
+				const areaChanges: AreaChange[] = [];
 
 				for (const event of events) {
 					for (const resource of event.data) {
 						if (resource.type !== 'light') {
+							if (areas) {
+								areaChanges.push(...areas.handle(event.type, resource));
+							}
 							continue;
 						}
 
@@ -125,6 +167,9 @@ export class HueSdkGateway implements HueGateway {
 				if (changes.length > 0) {
 					observer.onChanges(changes);
 				}
+				if (areaChanges.length > 0) {
+					observer.onAreaChanges?.(areaChanges);
+				}
 			},
 			onStateChange: (state) => {
 				if (active) {
@@ -144,13 +189,19 @@ export class HueSdkGateway implements HueGateway {
 			}
 			active = false;
 			additions.clear();
+			areas?.stop();
 			subscription.close();
 		};
 	}
 
 	private async update(lightId: string, body: LightPut): Promise<void> {
 		const response = await this.client.lights.update(lightId, body);
-		assertApplied(lightId, response);
+		assertApplied(`light ${lightId}`, response);
+	}
+
+	private async updateArea(serviceId: string, body: GroupedLightPut): Promise<void> {
+		const response = await this.client.groupedLights.update(serviceId, body);
+		assertApplied(`grouped light ${serviceId}`, response);
 	}
 }
 
@@ -166,7 +217,7 @@ function fromEventResource(resource: LightEventResource): BridgeLight | undefine
 		name,
 		isOn,
 		brightness: typeof brightness === 'number' ? brightness : null,
-		color: toXyColor(resource.color?.xy)
+		color: xyColorFrom(resource.color?.xy)
 	};
 }
 
@@ -174,7 +225,7 @@ function toLightUpdate(resource: LightEventResource): LightUpdate | undefined {
 	const change: LightUpdate = { kind: 'updated', id: resource.id };
 	const isOn = resource.on?.on;
 	const brightness = resource.dimming?.brightness;
-	const color = toXyColor(resource.color?.xy);
+	const color = xyColorFrom(resource.color?.xy);
 	const name = resource.metadata?.name;
 	if (typeof isOn === 'boolean') {
 		change.isOn = isOn;
@@ -197,25 +248,15 @@ function toBridgeLight(light: LightGet): BridgeLight {
 		name: light.metadata.name,
 		isOn: light.on.on,
 		brightness: light.dimming?.brightness ?? null,
-		color: toXyColor(light.color?.xy)
+		color: xyColorFrom(light.color?.xy)
 	};
 }
 
-function toXyColor(xy: Partial<XyColor> | undefined): XyColor | null {
-	const x = xy?.x;
-	const y = xy?.y;
-	if (typeof x !== 'number' || typeof y !== 'number') {
-		return null;
-	}
-
-	return { x, y };
-}
-
-function assertApplied(lightId: string, response: ResourceIdentifierResponse): void {
+function assertApplied(target: string, response: ResourceIdentifierResponse): void {
 	const [first] = response.errors;
 	if (first) {
 		throw new HueApiError(
-			`Hue bridge did not apply the update to light ${lightId}: ${first.description}`,
+			`Hue bridge did not apply the update to ${target}: ${first.description}`,
 			PARTIAL_SUCCESS_STATUS,
 			response.errors
 		);

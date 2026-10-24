@@ -46,6 +46,21 @@ function fakeClient() {
 				gets.push({ id, result });
 				return result.promise;
 			}
+		},
+		rooms: {
+			async list() {
+				return { errors: [], data: [] };
+			}
+		},
+		zones: {
+			async list() {
+				return { errors: [], data: [] };
+			}
+		},
+		groupedLights: {
+			async list() {
+				return { errors: [], data: [] };
+			}
 		}
 	} as unknown as HueClient;
 
