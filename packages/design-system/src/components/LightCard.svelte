@@ -6,8 +6,12 @@
 	import Label from './Label.svelte';
 	import PowerIcon from './icons/PowerIcon.svelte';
 
+	interface CardLight extends SvelteLight {
+		readonly colors?: readonly string[];
+	}
+
 	interface Props {
-		light: SvelteLight;
+		light: CardLight;
 		index: number;
 		ontoggle: () => void;
 		ondim: (brightness: number) => void;
@@ -20,9 +24,21 @@
 	const level = $derived(light.isOn ? Math.round(light.brightness ?? 100) : 0);
 	const paletteColor = $derived(findPaletteColor(light.color));
 	const colorName = $derived(paletteColor?.name ?? 'Custom');
+	const colors = $derived(light.colors ?? []);
+	const combined = $derived(colors.length > 0);
+	const stops = $derived(colors.join(', '));
+	const restOpacity = $derived.by(() => {
+		const brightness = Math.min(100, Math.max(0, light.brightness ?? 100));
+
+		return Math.round((0.05 + (brightness / 100) * 0.95) * 1000) / 1000;
+	});
 </script>
 
-<article class="card" class:on={light.isOn}>
+<article
+	class={['card', { on: light.isOn, combined }]}
+	style:--combined-stops={stops}
+	style:--combined-opacity={restOpacity}
+>
 	<button class="toggle" aria-pressed={light.isOn} onclick={ontoggle}>
 		<span class="top">
 			<span class="icon"><PowerIcon /></span>
@@ -81,6 +97,34 @@
 	.card.on {
 		background: var(--color-orange);
 		color: var(--color-ink);
+	}
+
+	.card.combined,
+	.card.on.combined {
+		position: relative;
+		color: var(--color-orange);
+		background: var(--color-background);
+	}
+
+	.card.combined::before {
+		content: '';
+		position: absolute;
+		z-index: 0;
+		inset: 0;
+		pointer-events: none;
+		background: linear-gradient(to bottom, var(--combined-stops));
+		mask-image: linear-gradient(
+			to bottom,
+			#000 0%,
+			rgb(0 0 0 / calc(var(--combined-opacity) + (1 - var(--combined-opacity)) * 0.92)) 15%,
+			rgb(0 0 0 / calc(var(--combined-opacity) + (1 - var(--combined-opacity)) * 0.45)) 55%,
+			rgb(0 0 0 / var(--combined-opacity)) 100%
+		);
+	}
+
+	.card.combined > * {
+		position: relative;
+		z-index: 1;
 	}
 
 	.toggle {

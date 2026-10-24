@@ -28,23 +28,25 @@
 	<Hero title="Home Lights" subtitle="Bridge {bridge.id}" />
 
 	{#if hue}
-		<LightsSection {hue} />
-		<GroupsSection
-			title="Rooms"
-			groups={hue.rooms.all}
-			loading={hue.status === 'idle' || hue.status === 'loading'}
-			ontoggle={(id) => hue.toggleRoom(id)}
-			ondim={(id, brightness) => hue.dimRoom(id, brightness)}
-			onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
-		/>
-		<GroupsSection
-			title="Zones"
-			groups={hue.zones.all}
-			loading={hue.status === 'idle' || hue.status === 'loading'}
-			ontoggle={(id) => hue.toggleZone(id)}
-			ondim={(id, brightness) => hue.dimZone(id, brightness)}
-			onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
-		/>
+		<div class="sections">
+			<GroupsSection
+				title="Rooms"
+				groups={hue.rooms.all}
+				loading={hue.status === 'idle' || hue.status === 'loading'}
+				ontoggle={(id) => hue.toggleRoom(id)}
+				ondim={(id, brightness) => hue.dimRoom(id, brightness)}
+				onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
+			/>
+			<GroupsSection
+				title="Zones"
+				groups={hue.zones.all}
+				loading={hue.status === 'idle' || hue.status === 'loading'}
+				ontoggle={(id) => hue.toggleZone(id)}
+				ondim={(id, brightness) => hue.dimZone(id, brightness)}
+				onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
+			/>
+			<LightsSection {hue} />
+		</div>
 	{:else}
 		<ConnectPanel
 			connecting={connection.connecting}
@@ -59,5 +61,11 @@
 		max-width: var(--page-width);
 		margin-inline: auto;
 		padding: var(--space-8) var(--page-gutter) var(--space-16);
+	}
+
+	.sections {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-12);
 	}
 </style>

@@ -8,7 +8,9 @@ import LightGrid from '../src/components/LightGrid.svelte';
 const red = palette.find((entry) => entry.name === 'Red')!;
 const blue = palette.find((entry) => entry.name === 'Blue')!;
 
-function light(overrides: Partial<SvelteLight> = {}): SvelteLight {
+function light(
+	overrides: Partial<SvelteLight> & { colors?: readonly string[] } = {}
+): SvelteLight & { colors?: readonly string[] } {
 	return { id: 'desk', name: 'Desk', isOn: true, brightness: 50, color: red.xy, ...overrides };
 }
 
@@ -21,6 +23,29 @@ async function renderGrid(lights: SvelteLight[]) {
 }
 
 describe('LightGrid color editing', () => {
+	it('paints combined colors as a top-to-bottom gradient faded by brightness', async () => {
+		await renderGrid([
+			light({ brightness: 100, colors: ['#00ff00'] }),
+			light({ id: 'lamp', name: 'Lamp', brightness: 0, colors: ['#ff0000', '#0000ff'] })
+		]);
+
+		const full = page.getByRole('button', { name: /Desk$/ }).locator('..');
+		const dim = page.getByRole('button', { name: /Lamp$/ }).locator('..');
+
+		expect(full.element().style.getPropertyValue('--combined-opacity')).toBe('1');
+		expect(full.element().style.getPropertyValue('--combined-stops')).toBe('#00ff00');
+		expect(dim.element().style.getPropertyValue('--combined-opacity')).toBe('0.05');
+		expect(dim.element().style.getPropertyValue('--combined-stops')).toBe('#ff0000, #0000ff');
+
+		const wash = getComputedStyle(dim.element(), '::before');
+		const mask = wash.getPropertyValue('mask-image') || wash.getPropertyValue('-webkit-mask-image');
+
+		expect(wash.backgroundImage).toContain('rgb(255, 0, 0)');
+		expect(wash.backgroundImage).toContain('rgb(0, 0, 255)');
+		expect(mask.match(/15%/g)).toHaveLength(1);
+		expect(mask).toContain('100%');
+	});
+
 	it('opens a modal for the clicked light and changes its color', async () => {
 		const { onchangecolor } = await renderGrid([
 			light(),

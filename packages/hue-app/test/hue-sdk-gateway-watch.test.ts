@@ -61,6 +61,11 @@ function fakeClient() {
 			async list() {
 				return { errors: [], data: [] };
 			}
+		},
+		devices: {
+			async list() {
+				return { errors: [], data: [] };
+			}
 		}
 	} as unknown as HueClient;
 

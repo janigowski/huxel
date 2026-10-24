@@ -93,7 +93,7 @@ The `gateway` option accepts any `HueGateway` implementation (`listLights`, `set
 
 `initialize()` loads rooms and zones alongside lights and controls them through the grouped light service each one owns. `app.state.rooms` and `app.state.zones` are sorted by name. The React adapter does not expose the actions. A lights-only gateway makes no area requests, and `toggleRoom` rejects with `AreasUnsupportedError`.
 
-`app.state.rooms` and `app.state.zones` use the same fields as lights. `isOn` is true when any light in the group is on. Brightness is the bridge average for the lights that are on, or `null` when the group cannot be dimmed. Commands use the same optimistic lanes as lights and never rewrite the individual light objects; those update from their own events.
+`app.state.rooms` and `app.state.zones` use the same fields as lights, plus `colors`. `isOn` is true when any light in the group is on. Brightness is the bridge average for the lights that are on, or `null` when the group cannot be dimmed. `colors` is a `ReadonlySignal<readonly string[]>` of `#rrggbb` values, one per child light that has a color, in child order. Room children that are devices are resolved to their light services. The list follows those lights' colors. Commands use the same optimistic lanes as lights and never rewrite the individual light objects; those update from their own events.
 
 Unknown ids reject with `RoomNotFoundError` or `ZoneNotFoundError`.
 

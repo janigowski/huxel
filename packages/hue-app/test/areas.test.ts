@@ -18,7 +18,8 @@ const living: BridgeArea = {
 	serviceId: 'living-light',
 	isOn: false,
 	brightness: 40,
-	color: { x: 0.4, y: 0.4 }
+	color: { x: 0.4, y: 0.4 },
+	children: []
 };
 
 const downstairs: BridgeArea = {
@@ -27,7 +28,8 @@ const downstairs: BridgeArea = {
 	serviceId: 'downstairs-light',
 	isOn: true,
 	brightness: null,
-	color: null
+	color: null,
+	children: []
 };
 
 interface AreaCall<T> {
@@ -68,12 +70,13 @@ class AreasGateway extends FakeGateway {
 }
 
 async function setup(
-	areas: { rooms: BridgeArea[]; zones: BridgeArea[] } = { rooms: [living], zones: [downstairs] }
+	areas: { rooms: BridgeArea[]; zones: BridgeArea[] } = { rooms: [living], zones: [downstairs] },
+	lights = [bridgeLight()]
 ) {
 	const gateway = new AreasGateway();
 	const app = createHueApp({ gateway, settleMs: 0 });
 	const initialization = app.initialize();
-	gateway.listCalls[0]?.resolve([bridgeLight()]);
+	gateway.listCalls[0]?.resolve(lights);
 	gateway.areaLists[0]?.resolve(areas);
 	await initialization;
 	return { app, gateway };
@@ -98,6 +101,34 @@ describe('rooms and zones', () => {
 		expect(app.state.rooms.value).toEqual([]);
 		expect(app.state.zones.value).toEqual([]);
 		await expect(app.toggleRoom('living')).rejects.toBeInstanceOf(AreasUnsupportedError);
+	});
+
+	it('builds a room palette from its child light colors', async () => {
+		const { app, gateway } = await setup(
+			{
+				rooms: [{ ...living, children: ['desk', 'lamp', 'plug'] }],
+				zones: [{ ...downstairs, children: ['lamp'] }]
+			},
+			[
+				bridgeLight({ color: { x: 0.64, y: 0.33 } }),
+				bridgeLight({ id: 'lamp', name: 'Lamp', color: null }),
+				bridgeLight({ id: 'plug', name: 'Plug', color: { x: 0.15, y: 0.06 } })
+			]
+		);
+
+		expect(app.state.rooms.get('living')?.colors.value).toEqual(['#ff0000', '#0000ff']);
+		expect(app.state.zones.get('downstairs')?.colors.value).toEqual([]);
+
+		gateway.observer.onChanges([{ kind: 'updated', id: 'lamp', color: { x: 0.3, y: 0.6 } }]);
+
+		expect(app.state.rooms.get('living')?.colors.value).toEqual(['#ff0000', '#00ff00', '#0000ff']);
+		expect(app.state.zones.get('downstairs')?.colors.value).toEqual(['#00ff00']);
+
+		gateway.observer.onAreaChanges?.([
+			{ kind: 'updated', resource: 'room', id: 'living', children: ['plug'] }
+		]);
+
+		expect(app.state.rooms.get('living')?.colors.value).toEqual(['#0000ff']);
 	});
 
 	it('loads rooms and zones alongside lights', async () => {
@@ -248,7 +279,8 @@ describe('rooms and zones', () => {
 			name: 'Downstairs',
 			isOn: true,
 			brightness: null,
-			color: null
+			color: null,
+			colors: []
 		});
 
 		const command = hue.toggleRoom('living');

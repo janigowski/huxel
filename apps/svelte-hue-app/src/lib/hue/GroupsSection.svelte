@@ -30,7 +30,7 @@
 	}
 </script>
 
-<section class="groups">
+<section>
 	<SectionHeader {title} active={onCount} total={groups.length} />
 
 	{#if commandError}
@@ -48,9 +48,3 @@
 		/>
 	{/if}
 </section>
-
-<style>
-	.groups {
-		margin-block-start: var(--space-12);
-	}
-</style>

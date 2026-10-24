@@ -1,5 +1,6 @@
 import type { GroupedLightGet, HueClient, HueEventType } from 'hue-sdk';
 import { AreaCatalog, type AreaControl, type AreaGroup } from './area-catalog';
+import type { ChildLights, ResourceRef } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';
 import type { AreaChange, AreaKind } from './gateway';
 
@@ -23,10 +24,12 @@ export class AreaEventSession {
 	private readonly catalog = new AreaCatalog();
 	private readonly client: AreaClient;
 	private readonly emit: (changes: AreaChange[]) => void;
+	private readonly childLights: ChildLights;
 
-	constructor(client: AreaClient, emit: (changes: AreaChange[]) => void) {
+	constructor(client: AreaClient, emit: (changes: AreaChange[]) => void, childLights: ChildLights) {
 		this.client = client;
 		this.emit = emit;
+		this.childLights = childLights;
 	}
 
 	handle(type: HueEventType, resource: EventResource): AreaChange[] {
@@ -68,17 +71,28 @@ export class AreaEventSession {
 			return [];
 		}
 
-		const name = new GroupEvent(resource, this.catalog).name;
-		if (name === undefined) {
+		const event = new GroupEvent(resource, this.catalog, this.childLights);
+		const name = event.name;
+		const children = event.childIds;
+
+		if (name === undefined && children === undefined) {
 			return [];
 		}
 
 		const pending = this.pendingAdds.get(key);
-		if (pending) {
+		if (pending && name !== undefined) {
 			pending.name = name;
 		}
 
-		return [{ kind: 'updated', resource: kind, id: resource.id, name }];
+		return [
+			{
+				kind: 'updated',
+				resource: kind,
+				id: resource.id,
+				...(name !== undefined ? { name } : {}),
+				...(children !== undefined ? { children } : {})
+			}
+		];
 	}
 
 	private handleGroupedLight(type: HueEventType, resource: EventResource): AreaChange[] {
@@ -125,7 +139,7 @@ export class AreaEventSession {
 		token: object
 	): Promise<void> {
 		const key = pendingKey(kind, id);
-		const event = new GroupEvent(resource, this.catalog);
+		const event = new GroupEvent(resource, this.catalog, this.childLights);
 		let name = event.name;
 		let serviceId = event.serviceId;
 
@@ -166,7 +180,14 @@ export class AreaEventSession {
 			{
 				kind: 'added',
 				resource: kind,
-				area: this.catalog.fromGroupedLight(id, resolvedName, serviceId, light, overlay)
+				area: this.catalog.fromGroupedLight(
+					id,
+					resolvedName,
+					serviceId,
+					light,
+					event.childIds ?? [],
+					overlay
+				)
 			}
 		]);
 	}
@@ -200,10 +221,12 @@ function pendingKey(kind: AreaKind, id: string): string {
 class GroupEvent {
 	private readonly resource: EventResource;
 	private readonly catalog: AreaCatalog;
+	private readonly childLights: ChildLights;
 
-	constructor(resource: EventResource, catalog: AreaCatalog) {
+	constructor(resource: EventResource, catalog: AreaCatalog, childLights: ChildLights) {
 		this.resource = resource;
 		this.catalog = catalog;
+		this.childLights = childLights;
 	}
 
 	get name(): string | undefined {
@@ -217,24 +240,52 @@ class GroupEvent {
 		return typeof name === 'string' ? name : undefined;
 	}
 
+	get childIds(): readonly string[] | undefined {
+		const children = this.children;
+
+		if (!children) {
+			return undefined;
+		}
+
+		return this.childLights.ids(children);
+	}
+
 	get serviceId(): string | undefined {
 		const services = this.resource.services;
 		if (!Array.isArray(services)) {
 			return undefined;
 		}
 
-		return this.catalog.groupedLightId(
-			services.filter((service): service is { rid: string; rtype: string } => {
-				if (typeof service !== 'object' || service === null) {
-					return false;
-				}
-
-				const record = service as { rid?: unknown; rtype?: unknown };
-
-				return typeof record.rid === 'string' && typeof record.rtype === 'string';
-			})
-		);
+		return this.catalog.groupedLightId(refs(services));
 	}
+
+	private get children(): readonly ResourceRef[] | undefined {
+		const children = this.resource.children;
+
+		if (!Array.isArray(children)) {
+			return undefined;
+		}
+
+		return refs(children);
+	}
+}
+
+function refs(value: readonly unknown[]): ResourceRef[] {
+	const children: ResourceRef[] = [];
+
+	for (const child of value) {
+		if (typeof child !== 'object' || child === null) {
+			continue;
+		}
+
+		const record = child as { rid?: unknown; rtype?: unknown };
+
+		if (typeof record.rid === 'string' && typeof record.rtype === 'string') {
+			children.push({ rid: record.rid, rtype: record.rtype });
+		}
+	}
+
+	return children;
 }
 
 class GroupedLightEvent {

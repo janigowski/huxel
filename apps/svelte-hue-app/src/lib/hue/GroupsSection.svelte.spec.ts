@@ -8,7 +8,8 @@ const living = {
 	name: 'Living room',
 	isOn: true,
 	brightness: 40,
-	color: { x: 0.64, y: 0.33 }
+	color: { x: 0.64, y: 0.33 },
+	colors: ['#ff0000']
 };
 
 describe('GroupsSection', () => {

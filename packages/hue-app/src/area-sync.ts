@@ -2,6 +2,7 @@ import { batch, type Signal } from '@preact/signals-core';
 import { Area } from './area';
 import type { AreaLaneRegistry } from './area-lanes';
 import type { AreaChange, AreaFields, AreaGateway, AreaKind, BridgeArea } from './gateway';
+import type { Light } from './light';
 
 interface KindResync {
 	readonly overrides: Map<string, AreaFields>;
@@ -20,6 +21,7 @@ export class AreaSync {
 	private readonly rooms: Signal<ReadonlyMap<string, Area>>;
 	private readonly zones: Signal<ReadonlyMap<string, Area>>;
 	private readonly lanes: AreaLaneRegistry;
+	private readonly lights: Signal<ReadonlyMap<string, Light>>;
 	private resyncState: Resync | undefined;
 	private disposed = false;
 
@@ -27,12 +29,14 @@ export class AreaSync {
 		gateway: AreaGateway,
 		rooms: Signal<ReadonlyMap<string, Area>>,
 		zones: Signal<ReadonlyMap<string, Area>>,
-		lanes: AreaLaneRegistry
+		lanes: AreaLaneRegistry,
+		lights: Signal<ReadonlyMap<string, Light>>
 	) {
 		this.gateway = gateway;
 		this.rooms = rooms;
 		this.zones = zones;
 		this.lanes = lanes;
+		this.lights = lights;
 	}
 
 	dispose(): void {
@@ -90,7 +94,7 @@ export class AreaSync {
 						if (area) {
 							this.apply(area, fields);
 						} else {
-							editable(change.resource).set(id, new Area(change.area));
+							editable(change.resource).set(id, new Area(change.area, this.lights));
 						}
 						break;
 					}
@@ -223,7 +227,7 @@ export class AreaSync {
 				continue;
 			}
 
-			next.set(id, new Area({ ...state, ...overridesFor(state, bucket, resync) }));
+			next.set(id, new Area({ ...state, ...overridesFor(state, bucket, resync) }, this.lights));
 		}
 
 		if (!sameEntries(current, next)) {
@@ -247,6 +251,9 @@ export class AreaSync {
 		if (fields.color !== undefined) {
 			this.lanes.get(area).color.reconcile(fields.color);
 		}
+		if (fields.children !== undefined) {
+			area.setChildren(fields.children);
+		}
 	}
 }
 
@@ -267,6 +274,9 @@ function updatedFields(change: AreaFields): AreaFields {
 	if (change.serviceId !== undefined) {
 		fields.serviceId = change.serviceId;
 	}
+	if (change.children !== undefined) {
+		fields.children = change.children;
+	}
 	return fields;
 }
 
@@ -284,7 +294,8 @@ function withoutFields(state: BridgeArea, overrides: AreaFields): AreaFields {
 		isOn: state.isOn,
 		brightness: state.brightness,
 		color: state.color,
-		serviceId: state.serviceId
+		serviceId: state.serviceId,
+		children: state.children
 	};
 	for (const key of Object.keys(overrides) as (keyof AreaFields)[]) {
 		delete fields[key];

@@ -35,6 +35,8 @@ export interface BridgeArea {
 	/** Normalized 0–100, or `null` when the group cannot be dimmed. */
 	brightness: number | null;
 	color: XyColor | null;
+	/** Light ids that contribute to `colors`, in child order. */
+	children: readonly string[];
 }
 
 export interface AreaFields {
@@ -43,6 +45,7 @@ export interface AreaFields {
 	brightness?: number | null;
 	color?: XyColor | null;
 	serviceId?: string;
+	children?: readonly string[];
 }
 
 export type AreaChange =

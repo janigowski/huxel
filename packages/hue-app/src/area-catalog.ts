@@ -1,4 +1,5 @@
 import type { GroupedLightGet } from 'hue-sdk';
+import type { ChildLights, ResourceRef } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';
 import type { BridgeArea } from './gateway';
 
@@ -6,6 +7,7 @@ export interface AreaGroup {
 	id: string;
 	metadata: { name: string };
 	services: readonly { rid: string; rtype: string }[];
+	children: readonly ResourceRef[];
 }
 
 export interface AreaControl {
@@ -15,7 +17,11 @@ export interface AreaControl {
 }
 
 export class AreaCatalog {
-	join(groups: readonly AreaGroup[], lights: readonly GroupedLightGet[]): BridgeArea[] {
+	join(
+		groups: readonly AreaGroup[],
+		lights: readonly GroupedLightGet[],
+		children: ChildLights
+	): BridgeArea[] {
 		const grouped = new Map(lights.map((light) => [light.id, light]));
 		const areas: BridgeArea[] = [];
 
@@ -26,7 +32,15 @@ export class AreaCatalog {
 				continue;
 			}
 
-			areas.push(this.fromGroupedLight(group.id, group.metadata.name, serviceId, light));
+			areas.push(
+				this.fromGroupedLight(
+					group.id,
+					group.metadata.name,
+					serviceId,
+					light,
+					children.ids(group.children)
+				)
+			);
 		}
 
 		return areas;
@@ -41,6 +55,7 @@ export class AreaCatalog {
 		name: string,
 		serviceId: string,
 		light: GroupedLightGet,
+		children: readonly string[],
 		overlay?: AreaControl
 	): BridgeArea {
 		const area: BridgeArea = {
@@ -49,7 +64,8 @@ export class AreaCatalog {
 			serviceId,
 			isOn: light.on?.on ?? false,
 			brightness: typeof light.dimming?.brightness === 'number' ? light.dimming.brightness : null,
-			color: xyColorFrom(light.color?.xy)
+			color: xyColorFrom(light.color?.xy),
+			children
 		};
 
 		return overlay ? { ...area, ...overlay } : area;

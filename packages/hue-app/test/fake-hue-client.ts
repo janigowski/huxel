@@ -14,6 +14,7 @@ export interface FakeHueFixtures {
 	zones?: readonly ZoneGet[];
 	groupedLights?: readonly GroupedLightGet[];
 	groupedLight?: (id: string) => GroupedLightGet | undefined;
+	devices?: readonly { id: string; services: readonly { rid: string; rtype: string }[] }[];
 }
 
 export interface GroupedLightUpdate {
@@ -62,6 +63,14 @@ export class FakeHueClient {
 			return { errors: [], data: [...(this.fixtures.zones ?? [])] };
 		},
 		get: async () => ({ errors: [], data: [] as ZoneGet[] })
+	};
+
+	readonly devices = {
+		list: async () => {
+			this.lists.push('devices');
+
+			return { errors: [], data: [...(this.fixtures.devices ?? [])] };
+		}
 	};
 
 	readonly groupedLights = {

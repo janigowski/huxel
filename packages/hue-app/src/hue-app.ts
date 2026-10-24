@@ -107,7 +107,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		this.changeAreaColorState = this.areaLanes ? new ChangeAreaColor(this.areaLanes) : undefined;
 		const areaSync =
 			this.areaGateway && this.areaLanes && options.live !== false && gateway.watch
-				? new AreaSync(this.areaGateway, this.rooms, this.zones, this.areaLanes)
+				? new AreaSync(this.areaGateway, this.rooms, this.zones, this.areaLanes, this.lights)
 				: undefined;
 		this.liveSync =
 			options.live !== false && gateway.watch
@@ -190,8 +190,8 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		batch(() => {
 			this.lights.value = new Map(bridgeLights.map((state) => [state.id, new Light(state)]));
 			if (this.areaGateway) {
-				this.rooms.value = new Map(rooms.map((state) => [state.id, new Area(state)]));
-				this.zones.value = new Map(zones.map((state) => [state.id, new Area(state)]));
+				this.rooms.value = new Map(rooms.map((state) => [state.id, new Area(state, this.lights)]));
+				this.zones.value = new Map(zones.map((state) => [state.id, new Area(state, this.lights)]));
 			}
 			this.status.value = 'ready';
 		});

@@ -82,23 +82,53 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 	};
 }
 
+function createSvelteArea(area: ReadonlyArea): SvelteArea {
+	const name = reader(area.name);
+	const isOn = reader(area.isOn);
+	const brightness = reader(area.brightness);
+	const color = reader(area.color);
+	const colors = reader(area.colors);
+
+	return {
+		id: area.id,
+		get name() {
+			return name();
+		},
+		get isOn() {
+			return isOn();
+		},
+		get brightness() {
+			return brightness();
+		},
+		get color() {
+			return color();
+		},
+		get colors() {
+			return colors();
+		}
+	};
+}
+
 function createSvelteLightCollection(lights: LightCollection): SvelteLightCollection {
-	return createSvelteCollection(lights);
+	return createSvelteCollection(lights, createSvelteLight);
 }
 
 function createSvelteAreaCollection(areas: AreaCollection): SvelteAreaCollection {
-	return createSvelteCollection(areas);
+	return createSvelteCollection(areas, createSvelteArea);
 }
 
-function createSvelteCollection(source: LightCollection | AreaCollection): SvelteLightCollection {
+function createSvelteCollection<TEntity extends object, TView extends { id: string }>(
+	source: LightCollection | AreaCollection,
+	createView: (entity: TEntity) => TView
+): { readonly all: readonly TView[]; get(id: string): TView | undefined } {
 	const subscribe = track(source);
-	const wrappers = new WeakMap<ReadonlyLight | ReadonlyArea, SvelteLight>();
-	const lists = new WeakMap<readonly (ReadonlyLight | ReadonlyArea)[], readonly SvelteLight[]>();
+	const wrappers = new WeakMap<TEntity, TView>();
+	const lists = new WeakMap<readonly TEntity[], readonly TView[]>();
 
-	function wrap(entity: ReadonlyLight | ReadonlyArea): SvelteLight {
+	function wrap(entity: TEntity): TView {
 		let wrapper = wrappers.get(entity);
 		if (!wrapper) {
-			wrapper = createSvelteLight(entity);
+			wrapper = createView(entity);
 			wrappers.set(entity, wrapper);
 		}
 		return wrapper;
@@ -107,7 +137,7 @@ function createSvelteCollection(source: LightCollection | AreaCollection): Svelt
 	return {
 		get all() {
 			subscribe();
-			const current = source.value;
+			const current = source.value as readonly TEntity[];
 			let list = lists.get(current);
 			if (!list) {
 				list = Object.freeze(current.map(wrap));
@@ -117,7 +147,7 @@ function createSvelteCollection(source: LightCollection | AreaCollection): Svelt
 		},
 		get(id) {
 			subscribe();
-			const entity = source.get(id);
+			const entity = source.get(id) as TEntity | undefined;
 			return entity ? wrap(entity) : undefined;
 		}
 	};

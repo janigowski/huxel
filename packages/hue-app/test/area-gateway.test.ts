@@ -58,12 +58,56 @@ describe('HueSdkGateway areas', () => {
 					serviceId: 'gl-kitchen',
 					isOn: true,
 					brightness: 25,
-					color: { x: 0.5, y: 0.4 }
+					color: { x: 0.5, y: 0.4 },
+					children: []
 				}
 			],
 			zones: []
 		});
-		expect(fake.lists).toEqual(['rooms', 'zones', 'groupedLights']);
+		expect(fake.lists).toEqual(['rooms', 'zones', 'groupedLights', 'devices']);
+	});
+
+	it('resolves device children and light children to light ids', async () => {
+		const fake = new FakeHueClient({
+			rooms: [
+				{
+					...kitchen,
+					children: [{ rid: 'device-1', rtype: 'device' }]
+				}
+			],
+			zones: [
+				{
+					...downstairs,
+					children: [
+						{ rid: 'light-z', rtype: 'light' },
+						{ rid: 'device-1', rtype: 'device' }
+					]
+				}
+			],
+			groupedLights: [
+				kitchenLight,
+				{
+					...kitchenLight,
+					id: 'gl-down',
+					owner: { rid: 'zone-1', rtype: 'zone' }
+				}
+			],
+			devices: [
+				{
+					id: 'device-1',
+					services: [
+						{ rid: 'light-a', rtype: 'light' },
+						{ rid: 'button', rtype: 'button' }
+					]
+				}
+			]
+		});
+		const gateway = new HueSdkGateway(fake.client);
+
+		await expect(gateway.listAreas()).resolves.toMatchObject({
+			rooms: [{ id: 'room-1', children: ['light-a'] }],
+			zones: [{ id: 'zone-1', children: ['light-z', 'light-a'] }]
+		});
 	});
 
 	it('sends room and zone commands to the grouped light', async () => {
@@ -156,7 +200,8 @@ describe('HueSdkGateway areas', () => {
 					serviceId: 'gl-kitchen',
 					isOn: true,
 					brightness: 80,
-					color: null
+					color: null,
+					children: []
 				}
 			}
 		]);

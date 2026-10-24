@@ -10,6 +10,7 @@ import type {
 } from 'hue-sdk';
 import { AreaCatalog } from './area-catalog';
 import { AreaEventSession } from './area-event-session';
+import { ChildLights } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';
 import type {
 	AreaChange,
@@ -39,6 +40,7 @@ const CONNECTION_STATES: Record<EventStreamState, HueAppConnection> = {
 export class HueSdkGateway implements HueGateway {
 	private readonly client: HueClient;
 	private readonly catalog = new AreaCatalog();
+	private readonly childLights = new ChildLights();
 
 	constructor(client: HueClient) {
 		this.client = client;
@@ -62,15 +64,18 @@ export class HueSdkGateway implements HueGateway {
 	}
 
 	async listAreas(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }> {
-		const [rooms, zones, groupedLights] = await Promise.all([
+		const [rooms, zones, groupedLights, devices] = await Promise.all([
 			this.client.rooms.list(),
 			this.client.zones.list(),
-			this.client.groupedLights.list()
+			this.client.groupedLights.list(),
+			this.client.devices.list()
 		]);
 
+		this.childLights.replace(devices.data);
+
 		return {
-			rooms: this.catalog.join(rooms.data, groupedLights.data),
-			zones: this.catalog.join(zones.data, groupedLights.data)
+			rooms: this.catalog.join(rooms.data, groupedLights.data, this.childLights),
+			zones: this.catalog.join(zones.data, groupedLights.data, this.childLights)
 		};
 	}
 
@@ -90,11 +95,15 @@ export class HueSdkGateway implements HueGateway {
 		let active = true;
 		const additions = new Map<string, LightUpdate[]>();
 		const areas = observer.onAreaChanges
-			? new AreaEventSession(this.client, (changes) => {
-					if (active && changes.length > 0) {
-						observer.onAreaChanges?.(changes);
-					}
-				})
+			? new AreaEventSession(
+					this.client,
+					(changes) => {
+						if (active && changes.length > 0) {
+							observer.onAreaChanges?.(changes);
+						}
+					},
+					this.childLights
+				)
 			: undefined;
 
 		const fetchAdded = async (id: string, updates: LightUpdate[]): Promise<void> => {
