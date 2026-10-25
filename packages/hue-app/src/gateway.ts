@@ -1,4 +1,5 @@
 import type { XyColor } from './color';
+import type { ColorTemperature } from './temperature';
 
 /** Light state as reported by the bridge, in domain terms. */
 export interface BridgeLight {
@@ -8,6 +9,8 @@ export interface BridgeLight {
 	/** Normalized 0–100, or `null` when the light cannot be dimmed. */
 	brightness: number | null;
 	color: XyColor | null;
+	/** `null` when the light has no color temperature. */
+	temperature: ColorTemperature | null;
 }
 
 export type HueAppConnection = 'offline' | 'connecting' | 'live' | 'reconnecting';
@@ -19,6 +22,7 @@ export type LightChange =
 			isOn?: boolean;
 			brightness?: number;
 			color?: XyColor;
+			temperature?: ColorTemperature;
 			name?: string;
 	  }
 	| { kind: 'added'; light: BridgeLight }
@@ -35,6 +39,8 @@ export interface BridgeArea {
 	/** Normalized 0–100, or `null` when the group cannot be dimmed. */
 	brightness: number | null;
 	color: XyColor | null;
+	/** `null` when the grouped light has no color temperature. */
+	temperature: ColorTemperature | null;
 	/** Light ids that contribute to `colors`, in child order. */
 	children: readonly string[];
 }
@@ -44,6 +50,7 @@ export interface AreaFields {
 	isOn?: boolean;
 	brightness?: number | null;
 	color?: XyColor | null;
+	temperature?: ColorTemperature | null;
 	serviceId?: string;
 	children?: readonly string[];
 }
@@ -54,7 +61,7 @@ export type AreaChange =
 	| { kind: 'removed'; resource: AreaKind; id: string }
 	| ({ kind: 'service-updated'; serviceId: string } & Pick<
 			AreaFields,
-			'isOn' | 'brightness' | 'color'
+			'isOn' | 'brightness' | 'color' | 'temperature'
 	  >)
 	| { kind: 'service-removed'; serviceId: string };
 
@@ -71,6 +78,7 @@ export interface AreaGateway {
 	/** `brightness` is normalized 0–100. */
 	setAreaBrightness(serviceId: string, brightness: number): Promise<void>;
 	setAreaColor(serviceId: string, color: XyColor): Promise<void>;
+	setAreaTemperature(serviceId: string, mirek: number): Promise<void>;
 }
 
 /** The bridge operations HueApp needs. Implementations reject when the bridge does not apply a command. */
@@ -80,10 +88,12 @@ export interface HueGateway {
 	/** `brightness` is normalized 0–100. */
 	setBrightness(lightId: string, brightness: number): Promise<void>;
 	setColor(lightId: string, color: XyColor): Promise<void>;
+	setTemperature(lightId: string, mirek: number): Promise<void>;
 	watch?(observer: LightChangeObserver): () => void;
 	listAreas?(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }>;
 	setAreaPower?(serviceId: string, isOn: boolean): Promise<void>;
 	/** `brightness` is normalized 0–100. */
 	setAreaBrightness?(serviceId: string, brightness: number): Promise<void>;
 	setAreaColor?(serviceId: string, color: XyColor): Promise<void>;
+	setAreaTemperature?(serviceId: string, mirek: number): Promise<void>;
 }

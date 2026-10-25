@@ -64,14 +64,37 @@ describe('HueSdkGateway', () => {
 					errors: [],
 					data: [
 						lightFixture('a', 'Desk', true, { brightness: 54.7 }, { x: 0.4573, y: 0.41 }),
-						lightFixture('b', 'Plug', false)
+						{
+							...lightFixture('b', 'Warm', false, { brightness: 80 }),
+							color_temperature: {
+								mirek: 447,
+								mirek_valid: true,
+								mirek_schema: { mirek_minimum: 153, mirek_maximum: 500 }
+							}
+						},
+						lightFixture('c', 'Plug', false)
 					]
 				}
 			});
 
 			await expect(gateway.listLights()).resolves.toEqual([
-				{ id: 'a', name: 'Desk', isOn: true, brightness: 54.7, color: { x: 0.4573, y: 0.41 } },
-				{ id: 'b', name: 'Plug', isOn: false, brightness: null, color: null }
+				{
+					id: 'a',
+					name: 'Desk',
+					isOn: true,
+					brightness: 54.7,
+					color: { x: 0.4573, y: 0.41 },
+					temperature: null
+				},
+				{
+					id: 'b',
+					name: 'Warm',
+					isOn: false,
+					brightness: 80,
+					color: null,
+					temperature: { mirek: 447 }
+				},
+				{ id: 'c', name: 'Plug', isOn: false, brightness: null, color: null, temperature: null }
 			]);
 			expect(requests[0]).toMatchObject({
 				method: 'GET',
@@ -164,6 +187,17 @@ describe('HueSdkGateway', () => {
 			});
 
 			await expect(gateway.setBrightness('light-1', 10)).rejects.toBeInstanceOf(HueApiError);
+		});
+	});
+
+	describe('setTemperature', () => {
+		it('sends only the mirek value', async () => {
+			const { gateway, requests } = setup(ok);
+
+			await gateway.setTemperature('light-1', 366);
+
+			expect(requests).toHaveLength(1);
+			expect(JSON.parse(requests[0]?.body ?? '')).toEqual({ color_temperature: { mirek: 366 } });
 		});
 	});
 

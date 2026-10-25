@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { xyToHex } from 'hue-app';
+	import { findAreaPreset, xyToHex } from 'hue-app';
 	import type { SvelteLight } from 'hue-app/svelte';
 	import { findPaletteColor } from 'design-system';
 	import ControlCard from './ControlCard.svelte';
@@ -9,16 +9,23 @@
 		ontoggle: () => void;
 		ondim: (brightness: number) => void;
 		oneditcolor: () => void;
+		oneditpresets?: () => void;
 	}
 
-	let { light, ontoggle, ondim, oneditcolor }: Props = $props();
+	let { light, ontoggle, ondim, oneditcolor, oneditpresets }: Props = $props();
 
 	const paletteColor = $derived(findPaletteColor(light.color));
 	const colorName = $derived(paletteColor?.name ?? 'Custom');
 	const swatch = $derived(
 		light.color === null ? null : (paletteColor?.hex ?? xyToHex(light.color))
 	);
-	const colors = $derived(swatch ? [swatch] : []);
+	const colors = $derived(swatch ? [swatch] : light.colors);
+	const temperatureOnly = $derived(light.color === null && light.temperature !== null);
+	const presetName = $derived(
+		temperatureOnly
+			? (findAreaPreset(null, light.brightness, light.temperature?.mirek ?? null)?.name ?? 'Custom')
+			: undefined
+	);
 </script>
 
 <ControlCard
@@ -28,8 +35,10 @@
 	{colors}
 	{swatch}
 	{colorName}
+	{presetName}
 	showBar="color"
 	{ontoggle}
 	{ondim}
 	{oneditcolor}
+	{oneditpresets}
 />

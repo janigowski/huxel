@@ -5,8 +5,11 @@ import { AreaCollection } from './area-collection';
 import { AreaLaneRegistry } from './area-lanes';
 import { AreaSync } from './area-sync';
 import { ApplyAreaPreset } from './apply-area-preset';
+import { ApplyLightPreset } from './apply-light-preset';
 import { ChangeAreaColor } from './change-area-color';
+import { ChangeAreaTemperature } from './change-area-temperature';
 import { ChangeColor } from './change-color';
+import { ChangeTemperature } from './change-temperature';
 import type { XyColor } from './color';
 import { DimArea } from './dim-area';
 import { DimLight } from './dim-light';
@@ -56,6 +59,8 @@ export interface HueAppActions {
 	toggleLight(lightId: string): Promise<void>;
 	dimLight(lightId: string, brightness: number): Promise<void>;
 	changeColor(lightId: string, color: XyColor): Promise<void>;
+	changeTemperature(lightId: string, mirek: number): Promise<void>;
+	applyLightPreset(lightId: string, preset: PresetId): Promise<void>;
 	dispose(): void;
 }
 
@@ -63,10 +68,12 @@ export interface RoomZoneActions {
 	toggleRoom(roomId: string): Promise<void>;
 	dimRoom(roomId: string, brightness: number): Promise<void>;
 	changeRoomColor(roomId: string, color: XyColor): Promise<void>;
+	changeRoomTemperature(roomId: string, mirek: number): Promise<void>;
 	applyRoomPreset(roomId: string, preset: PresetId): Promise<void>;
 	toggleZone(zoneId: string): Promise<void>;
 	dimZone(zoneId: string, brightness: number): Promise<void>;
 	changeZoneColor(zoneId: string, color: XyColor): Promise<void>;
+	changeZoneTemperature(zoneId: string, mirek: number): Promise<void>;
 	applyZonePreset(zoneId: string, preset: PresetId): Promise<void>;
 }
 
@@ -88,9 +95,12 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 	private readonly toggleLightState: ToggleLight;
 	private readonly dimLightState: DimLight;
 	private readonly changeColorState: ChangeColor;
+	private readonly changeTemperatureState: ChangeTemperature;
+	private readonly applyLightPresetState: ApplyLightPreset;
 	private readonly toggleAreaState: ToggleArea | undefined;
 	private readonly dimAreaState: DimArea | undefined;
 	private readonly changeAreaColorState: ChangeAreaColor | undefined;
+	private readonly changeAreaTemperatureState: ChangeAreaTemperature | undefined;
 	private readonly applyAreaPresetState: ApplyAreaPreset | undefined;
 	private readonly liveSync: LiveSync | undefined;
 	private initialization: Promise<void> | undefined;
@@ -107,9 +117,14 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		this.toggleLightState = new ToggleLight(this.lanes);
 		this.dimLightState = new DimLight(this.lanes);
 		this.changeColorState = new ChangeColor(this.lanes);
+		this.changeTemperatureState = new ChangeTemperature(this.lanes);
+		this.applyLightPresetState = new ApplyLightPreset(this.lanes);
 		this.toggleAreaState = this.areaLanes ? new ToggleArea(this.areaLanes) : undefined;
 		this.dimAreaState = this.areaLanes ? new DimArea(this.areaLanes) : undefined;
 		this.changeAreaColorState = this.areaLanes ? new ChangeAreaColor(this.areaLanes) : undefined;
+		this.changeAreaTemperatureState = this.areaLanes
+			? new ChangeAreaTemperature(this.areaLanes)
+			: undefined;
 		this.applyAreaPresetState = this.areaLanes ? new ApplyAreaPreset(this.areaLanes) : undefined;
 		const areaSync =
 			this.areaGateway && this.areaLanes && options.live !== false && gateway.watch
@@ -218,6 +233,14 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		return this.changeColorState.execute(this.find(lightId), color);
 	}
 
+	async changeTemperature(lightId: string, mirek: number): Promise<void> {
+		return this.changeTemperatureState.execute(this.find(lightId), mirek);
+	}
+
+	async applyLightPreset(lightId: string, preset: PresetId): Promise<void> {
+		return this.applyLightPresetState.execute(this.find(lightId), preset);
+	}
+
 	async toggleRoom(roomId: string): Promise<void> {
 		return this.areas().toggle.execute(this.findRoom(roomId));
 	}
@@ -228,6 +251,10 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 
 	async changeRoomColor(roomId: string, color: XyColor): Promise<void> {
 		return this.areas().color.execute(this.findRoom(roomId), color, 'room');
+	}
+
+	async changeRoomTemperature(roomId: string, mirek: number): Promise<void> {
+		return this.areas().temperature.execute(this.findRoom(roomId), mirek, 'room');
 	}
 
 	async applyRoomPreset(roomId: string, preset: PresetId): Promise<void> {
@@ -246,6 +273,10 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		return this.areas().color.execute(this.findZone(zoneId), color, 'zone');
 	}
 
+	async changeZoneTemperature(zoneId: string, mirek: number): Promise<void> {
+		return this.areas().temperature.execute(this.findZone(zoneId), mirek, 'zone');
+	}
+
 	async applyZonePreset(zoneId: string, preset: PresetId): Promise<void> {
 		return this.areas().preset.execute(this.findZone(zoneId), preset);
 	}
@@ -254,12 +285,14 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		toggle: ToggleArea;
 		dim: DimArea;
 		color: ChangeAreaColor;
+		temperature: ChangeAreaTemperature;
 		preset: ApplyAreaPreset;
 	} {
 		if (
 			!this.toggleAreaState ||
 			!this.dimAreaState ||
 			!this.changeAreaColorState ||
+			!this.changeAreaTemperatureState ||
 			!this.applyAreaPresetState
 		) {
 			throw new AreasUnsupportedError();
@@ -269,6 +302,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 			toggle: this.toggleAreaState,
 			dim: this.dimAreaState,
 			color: this.changeAreaColorState,
+			temperature: this.changeAreaTemperatureState,
 			preset: this.applyAreaPresetState
 		};
 	}
@@ -339,7 +373,8 @@ function asAreaGateway(gateway: HueGateway): AreaGateway | undefined {
 		!gateway.listAreas ||
 		!gateway.setAreaPower ||
 		!gateway.setAreaBrightness ||
-		!gateway.setAreaColor
+		!gateway.setAreaColor ||
+		!gateway.setAreaTemperature
 	) {
 		return undefined;
 	}
@@ -353,6 +388,8 @@ export function bindActions(app: HueApp): HueAppActions {
 		toggleLight: (lightId) => app.toggleLight(lightId),
 		dimLight: (lightId, brightness) => app.dimLight(lightId, brightness),
 		changeColor: (lightId, color) => app.changeColor(lightId, color),
+		changeTemperature: (lightId, mirek) => app.changeTemperature(lightId, mirek),
+		applyLightPreset: (lightId, preset) => app.applyLightPreset(lightId, preset),
 		dispose: () => app.dispose()
 	};
 }

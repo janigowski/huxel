@@ -1,15 +1,22 @@
 import './tokens.css';
-import { areaPresets } from 'hue-app';
+import { areaPresets, mirekToHex, xyToHex } from 'hue-app';
 import { page, userEvent } from 'vite-plus/test/browser';
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
 import ZoneRoomView from './ZoneRoomView.svelte';
 
+function rgb(hex: string): string {
+	const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16));
+
+	return `rgb(${channels.join(', ')})`;
+}
+
 async function renderView(
 	preset: 'bright' | 'relax' | 'energize' | null = 'relax',
-	onchange = vi.fn()
+	onchange = vi.fn(),
+	temperature = false
 ) {
-	await render(ZoneRoomView, { open: true, name: 'Living room', preset, onchange });
+	await render(ZoneRoomView, { open: true, name: 'Living room', preset, temperature, onchange });
 
 	return onchange;
 }
@@ -54,6 +61,25 @@ describe('ZoneRoomView', () => {
 		await page.getByRole('button', { name: 'Close' }).click();
 
 		await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+	});
+
+	it('paints temperature presets from mirek instead of xy', async () => {
+		await renderView(null, vi.fn(), true);
+
+		const bright = areaPresets.find((preset) => preset.id === 'bright')!;
+		const swatch = page
+			.getByRole('radio', { name: 'Bright' })
+			.element()
+			.closest('label')
+			?.querySelector('.swatch');
+
+		expect(swatch).toBeInstanceOf(HTMLElement);
+		expect(getComputedStyle(swatch as HTMLElement).backgroundColor).toBe(
+			rgb(mirekToHex(bright.mirek))
+		);
+		expect(getComputedStyle(swatch as HTMLElement).backgroundColor).not.toBe(
+			rgb(xyToHex(bright.color))
+		);
 	});
 
 	it('closes on Escape', async () => {

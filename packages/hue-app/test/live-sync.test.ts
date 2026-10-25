@@ -876,7 +876,8 @@ describe('live sync lifecycle', () => {
 			listLights: () => fake.listLights(),
 			setPower: (id, isOn) => fake.setPower(id, isOn),
 			setBrightness: (id, brightness) => fake.setBrightness(id, brightness),
-			setColor: (id, color) => fake.setColor(id, color)
+			setColor: (id, color) => fake.setColor(id, color),
+			setTemperature: (id, mirek) => fake.setTemperature(id, mirek)
 		};
 		const app = createHueApp({ gateway });
 		const initialization = app.initialize();

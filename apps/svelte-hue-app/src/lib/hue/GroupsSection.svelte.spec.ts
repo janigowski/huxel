@@ -9,6 +9,7 @@ const living = {
 	isOn: true,
 	brightness: 40,
 	color: { x: 0.64, y: 0.33 },
+	temperature: null,
 	colors: ['#ff0000']
 };
 

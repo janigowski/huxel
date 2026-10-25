@@ -32,10 +32,12 @@ export interface SvelteHueApp extends HueAppActions {
 	toggleRoom(roomId: string): Promise<void>;
 	dimRoom(roomId: string, brightness: number): Promise<void>;
 	changeRoomColor(roomId: string, color: XyColor): Promise<void>;
+	changeRoomTemperature(roomId: string, mirek: number): Promise<void>;
 	applyRoomPreset(roomId: string, preset: PresetId): Promise<void>;
 	toggleZone(zoneId: string): Promise<void>;
 	dimZone(zoneId: string, brightness: number): Promise<void>;
 	changeZoneColor(zoneId: string, color: XyColor): Promise<void>;
+	changeZoneTemperature(zoneId: string, mirek: number): Promise<void>;
 	applyZonePreset(zoneId: string, preset: PresetId): Promise<void>;
 }
 
@@ -67,6 +69,8 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 	const isOn = reader(light.isOn);
 	const brightness = reader(light.brightness);
 	const color = reader(light.color);
+	const temperature = reader(light.temperature);
+	const colors = reader(light.colors);
 
 	return {
 		id: light.id,
@@ -81,6 +85,12 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 		},
 		get color() {
 			return color();
+		},
+		get temperature() {
+			return temperature();
+		},
+		get colors() {
+			return colors();
 		}
 	};
 }
@@ -90,6 +100,7 @@ function createSvelteArea(area: ReadonlyArea): SvelteArea {
 	const isOn = reader(area.isOn);
 	const brightness = reader(area.brightness);
 	const color = reader(area.color);
+	const temperature = reader(area.temperature);
 	const colors = reader(area.colors);
 
 	return {
@@ -105,6 +116,9 @@ function createSvelteArea(area: ReadonlyArea): SvelteArea {
 		},
 		get color() {
 			return color();
+		},
+		get temperature() {
+			return temperature();
 		},
 		get colors() {
 			return colors();
@@ -178,10 +192,12 @@ export function createSvelteHueApp(app: HueApp): SvelteHueApp {
 		toggleRoom: (roomId) => app.toggleRoom(roomId),
 		dimRoom: (roomId, brightness) => app.dimRoom(roomId, brightness),
 		changeRoomColor: (roomId, color) => app.changeRoomColor(roomId, color),
+		changeRoomTemperature: (roomId, mirek) => app.changeRoomTemperature(roomId, mirek),
 		applyRoomPreset: (roomId, preset) => app.applyRoomPreset(roomId, preset),
 		toggleZone: (zoneId) => app.toggleZone(zoneId),
 		dimZone: (zoneId, brightness) => app.dimZone(zoneId, brightness),
 		changeZoneColor: (zoneId, color) => app.changeZoneColor(zoneId, color),
+		changeZoneTemperature: (zoneId, mirek) => app.changeZoneTemperature(zoneId, mirek),
 		applyZonePreset: (zoneId, preset) => app.applyZonePreset(zoneId, preset)
 	};
 }

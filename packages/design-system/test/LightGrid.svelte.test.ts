@@ -8,10 +8,27 @@ import LightGrid from '../src/components/LightGrid.svelte';
 const red = palette.find((entry) => entry.name === 'Red')!;
 const blue = palette.find((entry) => entry.name === 'Blue')!;
 
-function light(
-	overrides: Partial<SvelteLight> & { colors?: readonly string[] } = {}
-): SvelteLight & { colors?: readonly string[] } {
-	return { id: 'desk', name: 'Desk', isOn: true, brightness: 50, color: red.xy, ...overrides };
+function light(overrides: Partial<SvelteLight> = {}): SvelteLight {
+	return {
+		id: 'desk',
+		name: 'Desk',
+		isOn: true,
+		brightness: 50,
+		color: red.xy,
+		temperature: null,
+		colors: [],
+		...overrides
+	};
+}
+
+function card(name: RegExp): HTMLElement {
+	const parent = page.getByRole('button', { name }).element().parentElement;
+
+	if (!parent) {
+		throw new Error(`Missing card for ${name}`);
+	}
+
+	return parent;
 }
 
 async function renderGrid(lights: SvelteLight[]) {
@@ -29,15 +46,15 @@ describe('LightGrid color editing', () => {
 			light({ id: 'lamp', name: 'Lamp', brightness: 0, colors: ['#ff0000', '#0000ff'] })
 		]);
 
-		const full = page.getByRole('button', { name: /Desk$/ }).locator('..');
-		const dim = page.getByRole('button', { name: /Lamp$/ }).locator('..');
+		const full = card(/Desk$/);
+		const dim = card(/Lamp$/);
 
-		expect(full.element().style.getPropertyValue('--combined-opacity')).toBe('1');
-		expect(full.element().style.getPropertyValue('--combined-stops')).toBe('#00ff00');
-		expect(dim.element().style.getPropertyValue('--combined-opacity')).toBe('0.05');
-		expect(dim.element().style.getPropertyValue('--combined-stops')).toBe('#ff0000, #0000ff');
+		expect(full.style.getPropertyValue('--combined-opacity')).toBe('1');
+		expect(full.style.getPropertyValue('--combined-stops')).toBe('#00ff00');
+		expect(dim.style.getPropertyValue('--combined-opacity')).toBe('0.05');
+		expect(dim.style.getPropertyValue('--combined-stops')).toBe('#ff0000, #0000ff');
 
-		const wash = getComputedStyle(dim.element(), '::before');
+		const wash = getComputedStyle(dim, '::before');
 		const mask = wash.getPropertyValue('mask-image') || wash.getPropertyValue('-webkit-mask-image');
 
 		expect(wash.backgroundImage).toContain('rgb(255, 0, 0)');

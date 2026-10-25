@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { areaPresets, xyToHex, type PresetId } from 'hue-app';
+	import { areaPresets, mirekToHex, xyToHex, type PresetId } from 'hue-app';
 	import ColorSwatch from './ColorSwatch.svelte';
 
 	interface Props {
 		open?: boolean;
 		name: string;
 		preset: PresetId | null;
+		temperature?: boolean;
 		onchange: (preset: PresetId) => void;
 	}
 
-	let { open = $bindable(false), name, preset, onchange }: Props = $props();
+	let { open = $bindable(false), name, preset, temperature = false, onchange }: Props = $props();
 
 	const id = $props.id();
 
@@ -63,7 +64,10 @@
 					onchange={() => onchange(entry.id)}
 				/>
 				<span class="block">
-					<ColorSwatch hex={xyToHex(entry.color)} size="large" />
+					<ColorSwatch
+						hex={temperature ? mirekToHex(entry.mirek) : xyToHex(entry.color)}
+						size="large"
+					/>
 					<svg class="check" viewBox="0 0 24 24" aria-hidden="true">
 						<path
 							d="M5 12l5 5 9-10"

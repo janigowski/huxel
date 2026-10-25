@@ -43,6 +43,10 @@ export class SimulatedGateway implements HueGateway {
 		await this.update(lightId, { color });
 	}
 
+	async setTemperature(lightId: string, mirek: number): Promise<void> {
+		await this.update(lightId, { temperature: { mirek } });
+	}
+
 	watch(observer: LightChangeObserver): () => void {
 		this.observers.add(observer);
 
@@ -60,7 +64,7 @@ export class SimulatedGateway implements HueGateway {
 
 	private async update(
 		lightId: string,
-		change: Partial<Pick<BridgeLight, 'isOn' | 'brightness' | 'color'>>
+		change: Partial<Pick<BridgeLight, 'isOn' | 'brightness' | 'color' | 'temperature'>>
 	): Promise<void> {
 		await this.delay();
 
@@ -79,7 +83,8 @@ export class SimulatedGateway implements HueGateway {
 					id: lightId,
 					isOn: change.isOn,
 					brightness: change.brightness ?? undefined,
-					color: change.color ?? undefined
+					color: change.color ?? undefined,
+					temperature: change.temperature ?? undefined
 				}
 			]);
 		}

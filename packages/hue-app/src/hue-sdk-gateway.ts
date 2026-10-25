@@ -12,6 +12,7 @@ import { AreaCatalog } from './area-catalog';
 import { AreaEventSession } from './area-event-session';
 import { ChildLights } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';
+import { temperatureFrom, temperatureOf } from './temperature';
 import type {
 	AreaChange,
 	BridgeArea,
@@ -63,6 +64,10 @@ export class HueSdkGateway implements HueGateway {
 		await this.update(lightId, { color: { xy: { x: color.x, y: color.y } } });
 	}
 
+	async setTemperature(lightId: string, mirek: number): Promise<void> {
+		await this.update(lightId, { color_temperature: { mirek } });
+	}
+
 	async listAreas(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }> {
 		const [rooms, zones, groupedLights, devices] = await Promise.all([
 			this.client.rooms.list(),
@@ -89,6 +94,10 @@ export class HueSdkGateway implements HueGateway {
 
 	async setAreaColor(serviceId: string, color: XyColor): Promise<void> {
 		await this.updateArea(serviceId, { color: { xy: { x: color.x, y: color.y } } });
+	}
+
+	async setAreaTemperature(serviceId: string, mirek: number): Promise<void> {
+		await this.updateArea(serviceId, { color_temperature: { mirek } });
 	}
 
 	watch(observer: LightChangeObserver): () => void {
@@ -226,7 +235,8 @@ function fromEventResource(resource: LightEventResource): BridgeLight | undefine
 		name,
 		isOn,
 		brightness: typeof brightness === 'number' ? brightness : null,
-		color: xyColorFrom(resource.color?.xy)
+		color: xyColorFrom(resource.color?.xy),
+		temperature: temperatureOf(resource.color_temperature)
 	};
 }
 
@@ -235,6 +245,8 @@ function toLightUpdate(resource: LightEventResource): LightUpdate | undefined {
 	const isOn = resource.on?.on;
 	const brightness = resource.dimming?.brightness;
 	const color = xyColorFrom(resource.color?.xy);
+	const temperature =
+		'color_temperature' in resource ? temperatureFrom(resource.color_temperature) : undefined;
 	const name = resource.metadata?.name;
 	if (typeof isOn === 'boolean') {
 		change.isOn = isOn;
@@ -244,6 +256,9 @@ function toLightUpdate(resource: LightEventResource): LightUpdate | undefined {
 	}
 	if (color) {
 		change.color = color;
+	}
+	if (temperature) {
+		change.temperature = temperature;
 	}
 	if (typeof name === 'string') {
 		change.name = name;
@@ -257,7 +272,8 @@ function toBridgeLight(light: LightGet): BridgeLight {
 		name: light.metadata.name,
 		isOn: light.on.on,
 		brightness: light.dimming?.brightness ?? null,
-		color: xyColorFrom(light.color?.xy)
+		color: xyColorFrom(light.color?.xy),
+		temperature: temperatureOf(light.color_temperature)
 	};
 }
 

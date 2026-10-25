@@ -44,6 +44,22 @@ export class LightNotColorCapableError extends HueAppError {
 	}
 }
 
+export class LightNotTemperatureCapableError extends HueAppError {
+	override name = 'LightNotTemperatureCapableError';
+
+	constructor(public readonly lightId: string) {
+		super(`Light "${lightId}" does not support color temperature`);
+	}
+}
+
+export class InvalidMirekError extends HueAppError {
+	override name = 'InvalidMirekError';
+
+	constructor(public readonly mirek: number) {
+		super(`Color temperature must be an integer mirek from 50 to 1000, received ${mirek}`);
+	}
+}
+
 export class AreasUnsupportedError extends HueAppError {
 	override name = 'AreasUnsupportedError';
 
@@ -87,6 +103,17 @@ export class AreaNotColorCapableError extends HueAppError {
 		public readonly id: string
 	) {
 		super(`${kind === 'room' ? 'Room' : 'Zone'} "${id}" does not support color`);
+	}
+}
+
+export class AreaNotTemperatureCapableError extends HueAppError {
+	override name = 'AreaNotTemperatureCapableError';
+
+	constructor(
+		public readonly kind: 'room' | 'zone',
+		public readonly id: string
+	) {
+		super(`${kind === 'room' ? 'Room' : 'Zone'} "${id}" does not support color temperature`);
 	}
 }
 

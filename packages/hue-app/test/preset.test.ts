@@ -21,4 +21,13 @@ describe('area presets', () => {
 		expect(findAreaPreset(null, bright.brightness)).toBeUndefined();
 		expect(findAreaPreset(bright.color, null)).toBeUndefined();
 	});
+
+	it('matches a temperature-only preset by mirek and brightness', () => {
+		expect(findAreaPreset(null, bright.brightness, bright.mirek)).toBe(bright);
+		expect(findAreaPreset(null, relax.brightness, relax.mirek)).toBe(relax);
+		expect(findAreaPreset(null, energize.brightness - 0.4, energize.mirek)).toBe(energize);
+		expect(findAreaPreset(null, relax.brightness, bright.mirek)).toBeUndefined();
+		expect(findAreaPreset(null, bright.brightness, bright.mirek + 1)).toBeUndefined();
+		expect(findAreaPreset(bright.color, relax.brightness, relax.mirek)).toBeUndefined();
+	});
 });

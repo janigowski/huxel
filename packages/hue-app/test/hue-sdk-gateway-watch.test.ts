@@ -182,11 +182,25 @@ describe('HueSdkGateway.watch', () => {
 				{ kind: 'updated', id: 'b', isOn: true, color: { x: 0.15, y: 0.06 } },
 				{
 					kind: 'added',
-					light: { id: 'd', name: 'Strip', isOn: true, brightness: 50, color: { x: 0.3, y: 0.6 } }
+					light: {
+						id: 'd',
+						name: 'Strip',
+						isOn: true,
+						brightness: 50,
+						color: { x: 0.3, y: 0.6 },
+						temperature: null
+					}
 				},
 				{
 					kind: 'added',
-					light: { id: 'e', name: 'Plug', isOn: false, brightness: null, color: null }
+					light: {
+						id: 'e',
+						name: 'Plug',
+						isOn: false,
+						brightness: null,
+						color: null,
+						temperature: null
+					}
 				}
 			]
 		]);
@@ -206,7 +220,14 @@ describe('HueSdkGateway.watch', () => {
 			[
 				{
 					kind: 'added',
-					light: { id: 'a', name: 'Lamp', isOn: true, brightness: 70, color: { x: 0.5, y: 0.4 } }
+					light: {
+						id: 'a',
+						name: 'Lamp',
+						isOn: true,
+						brightness: 70,
+						color: { x: 0.5, y: 0.4 },
+						temperature: null
+					}
 				}
 			]
 		]);
@@ -232,7 +253,8 @@ describe('HueSdkGateway.watch', () => {
 			[
 				{ kind: 'updated', id: 'a', isOn: true },
 				{ kind: 'removed', id: 'b' }
-			]
+			],
+			[{ kind: 'updated', id: 'a', temperature: { mirek: 300 } }]
 		]);
 	});
 
@@ -269,11 +291,25 @@ describe('HueSdkGateway.watch', () => {
 				{ kind: 'updated', id: 'a', isOn: false },
 				{
 					kind: 'added',
-					light: { id: 'b', name: 'Lamp', isOn: true, brightness: 35, color: null }
+					light: {
+						id: 'b',
+						name: 'Lamp',
+						isOn: true,
+						brightness: 35,
+						color: null,
+						temperature: null
+					}
 				},
 				{
 					kind: 'added',
-					light: { id: 'c', name: 'Plug', isOn: false, brightness: null, color: null }
+					light: {
+						id: 'c',
+						name: 'Plug',
+						isOn: false,
+						brightness: null,
+						color: null,
+						temperature: null
+					}
 				},
 				{ kind: 'updated', id: 'b', brightness: 50 }
 			]
@@ -297,7 +333,10 @@ describe('HueSdkGateway.watch', () => {
 		await flushMicrotasks();
 
 		expect(changes.at(-1)).toEqual([
-			{ kind: 'added', light: { id: 'a', name: 'Lamp', isOn: true, brightness: 10, color: null } },
+			{
+				kind: 'added',
+				light: { id: 'a', name: 'Lamp', isOn: true, brightness: 10, color: null, temperature: null }
+			},
 			{ kind: 'updated', id: 'a', brightness: 90 },
 			{ kind: 'updated', id: 'a', isOn: false }
 		]);
@@ -319,7 +358,14 @@ describe('HueSdkGateway.watch', () => {
 			[
 				{
 					kind: 'added',
-					light: { id: 'a', name: 'Fresh', isOn: true, brightness: 60, color: null }
+					light: {
+						id: 'a',
+						name: 'Fresh',
+						isOn: true,
+						brightness: 60,
+						color: null,
+						temperature: null
+					}
 				}
 			]
 		]);
@@ -336,7 +382,19 @@ describe('HueSdkGateway.watch', () => {
 		await flushMicrotasks();
 
 		expect(changes).toEqual([
-			[{ kind: 'added', light: { id: 'a', name: 'Lamp', isOn: true, brightness: 70, color: null } }]
+			[
+				{
+					kind: 'added',
+					light: {
+						id: 'a',
+						name: 'Lamp',
+						isOn: true,
+						brightness: 70,
+						color: null,
+						temperature: null
+					}
+				}
+			]
 		]);
 	});
 
@@ -353,7 +411,14 @@ describe('HueSdkGateway.watch', () => {
 			[
 				{
 					kind: 'added',
-					light: { id: 'a', name: 'Plug', isOn: false, brightness: null, color: null }
+					light: {
+						id: 'a',
+						name: 'Plug',
+						isOn: false,
+						brightness: null,
+						color: null,
+						temperature: null
+					}
 				}
 			]
 		]);
@@ -395,7 +460,14 @@ describe('HueSdkGateway.watch', () => {
 			[
 				{
 					kind: 'added',
-					light: { id: 'a', name: 'Newer', isOn: true, brightness: null, color: null }
+					light: {
+						id: 'a',
+						name: 'Newer',
+						isOn: true,
+						brightness: null,
+						color: null,
+						temperature: null
+					}
 				}
 			]
 		]);

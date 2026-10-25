@@ -251,6 +251,9 @@ export class AreaSync {
 		if (fields.color !== undefined) {
 			this.lanes.get(area).color.reconcile(fields.color);
 		}
+		if (fields.temperature !== undefined) {
+			this.lanes.get(area).temperature.reconcile(fields.temperature);
+		}
 		if (fields.children !== undefined) {
 			area.setChildren(fields.children);
 		}
@@ -270,6 +273,9 @@ function updatedFields(change: AreaFields): AreaFields {
 	}
 	if (change.color !== undefined) {
 		fields.color = change.color;
+	}
+	if (change.temperature !== undefined) {
+		fields.temperature = change.temperature;
 	}
 	if (change.serviceId !== undefined) {
 		fields.serviceId = change.serviceId;
@@ -294,6 +300,7 @@ function withoutFields(state: BridgeArea, overrides: AreaFields): AreaFields {
 		isOn: state.isOn,
 		brightness: state.brightness,
 		color: state.color,
+		temperature: state.temperature,
 		serviceId: state.serviceId,
 		children: state.children
 	};

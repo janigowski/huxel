@@ -1,5 +1,4 @@
 import { computed, signal, type ReadonlySignal, type Signal } from '@preact/signals-core';
-import { xyToHex } from './color';
 import type { Light } from './light';
 
 /** Hex colors of a room or zone, taken from its child lights in child order. */
@@ -34,10 +33,10 @@ export class CombinedColor {
 		const hexes: string[] = [];
 
 		for (const id of this.childIds.value) {
-			const color = lights.get(id)?.color.value;
+			const colors = lights.get(id)?.colors.value;
 
-			if (color) {
-				hexes.push(xyToHex(color));
+			if (colors) {
+				hexes.push(...colors);
 			}
 		}
 

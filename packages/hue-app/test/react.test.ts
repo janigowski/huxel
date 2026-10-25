@@ -2,7 +2,7 @@
 import { Signal } from '@preact/signals-core';
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vite-plus/test';
-import { createHueApp } from '../src/index';
+import { createHueApp, xyToHex } from '../src/index';
 import { useHueApp, type ReactHueApp, type ReactLight } from '../src/react/index';
 import { at, desk, FakeGateway, lamp } from './fake-gateway';
 
@@ -59,8 +59,24 @@ describe('useHueApp', () => {
 		expect(hue.status).toBe('ready');
 		expect(hue.error).toBeUndefined();
 		expect(hue.lights).toEqual([
-			{ id: 'desk', name: 'Desk', isOn: false, brightness: 40, color: { x: 0.3, y: 0.3 } },
-			{ id: 'lamp', name: 'Lamp', isOn: true, brightness: null, color: null }
+			{
+				id: 'desk',
+				name: 'Desk',
+				isOn: false,
+				brightness: 40,
+				color: { x: 0.3, y: 0.3 },
+				temperature: null,
+				colors: [xyToHex({ x: 0.3, y: 0.3 })]
+			},
+			{
+				id: 'lamp',
+				name: 'Lamp',
+				isOn: true,
+				brightness: null,
+				color: null,
+				temperature: null,
+				colors: []
+			}
 		]);
 		expect(Object.isFrozen(hue.lights)).toBe(true);
 		expect(Object.isFrozen(light(hue, 'desk'))).toBe(true);

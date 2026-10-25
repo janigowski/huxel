@@ -18,7 +18,12 @@ export class ApplyAreaPreset {
 		}
 
 		const lanes = this.lanes.get(area);
-		const commands = [lanes.color.submit(definition.color)];
+		const temperatureOnly = area.color.peek() === null && area.temperature.peek() !== null;
+		const commands = [
+			temperatureOnly
+				? lanes.temperature.submit(Object.freeze({ mirek: definition.mirek }))
+				: lanes.color.submit(definition.color)
+		];
 
 		if (area.brightness.peek() !== null) {
 			commands.push(lanes.brightness.submit(definition.brightness));

@@ -11,11 +11,39 @@ export const PREVIEW_BRIDGE = {
 };
 
 export const PREVIEW_LIGHTS: readonly BridgeLight[] = [
-	{ id: 'desk', name: 'Desk', isOn: true, brightness: 80, color: hexToXy('#ffbf00') },
-	{ id: 'sofa', name: 'Sofa', isOn: false, brightness: 45, color: hexToXy('#2f6bff') },
-	{ id: 'hall', name: 'Hallway', isOn: true, brightness: 30, color: null },
-	{ id: 'kitchen', name: 'Kitchen', isOn: false, brightness: null, color: null },
-	{ id: 'bed', name: 'Bedside', isOn: true, brightness: 15, color: hexToXy('#ff8a1f') }
+	{
+		id: 'desk',
+		name: 'Desk',
+		isOn: true,
+		brightness: 80,
+		color: hexToXy('#ffbf00'),
+		temperature: null
+	},
+	{
+		id: 'sofa',
+		name: 'Sofa',
+		isOn: false,
+		brightness: 45,
+		color: hexToXy('#2f6bff'),
+		temperature: null
+	},
+	{
+		id: 'hall',
+		name: 'Hallway',
+		isOn: true,
+		brightness: 30,
+		color: null,
+		temperature: { mirek: 370 }
+	},
+	{ id: 'kitchen', name: 'Kitchen', isOn: false, brightness: null, color: null, temperature: null },
+	{
+		id: 'bed',
+		name: 'Bedside',
+		isOn: true,
+		brightness: 15,
+		color: hexToXy('#ff8a1f'),
+		temperature: null
+	}
 ];
 
 const LATENCY_MS = 400;
