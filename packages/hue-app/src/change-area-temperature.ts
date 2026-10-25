@@ -20,6 +20,13 @@ export class ChangeAreaTemperature {
 			throw new AreaNotTemperatureCapableError(kind, area.id);
 		}
 
-		return this.lanes.get(area).temperature.submit(Object.freeze({ mirek }));
+		const restoreChildren = area.previewChildTemperatures(mirek);
+
+		try {
+			await this.lanes.get(area).temperature.submit(Object.freeze({ mirek }));
+		} catch (error) {
+			restoreChildren();
+			throw error;
+		}
 	}
 }

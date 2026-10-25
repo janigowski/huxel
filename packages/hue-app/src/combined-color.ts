@@ -15,6 +15,21 @@ export class CombinedColor {
 		Object.freeze(this);
 	}
 
+	temperatureOnly(): Light[] {
+		const lights = this.lights.peek();
+		const found: Light[] = [];
+
+		for (const id of this.childIds.peek()) {
+			const light = lights.get(id);
+
+			if (light && light.color.peek() === null && light.temperature.peek() !== null) {
+				found.push(light);
+			}
+		}
+
+		return found;
+	}
+
 	setChildren(childIds: readonly string[]): void {
 		const current = this.childIds.peek();
 

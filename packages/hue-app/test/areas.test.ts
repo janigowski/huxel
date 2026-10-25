@@ -363,6 +363,49 @@ describe('rooms and zones', () => {
 		expect(app.state.rooms.get('living')?.brightness.value).toBe(40);
 	});
 
+	it('paints temperature-only child lights when a room preset is applied and restores them if it fails', async () => {
+		const relax = areaPresets.find((preset) => preset.id === 'relax')!;
+		const warm = bridgeLight({
+			id: 'warm',
+			name: 'Warm',
+			color: null,
+			temperature: { mirek: 250 }
+		});
+		const colored = bridgeLight({
+			id: 'both',
+			name: 'Both',
+			color: { x: 0.64, y: 0.33 },
+			temperature: { mirek: 250 }
+		});
+		const room: BridgeArea = {
+			...living,
+			color: null,
+			temperature: { mirek: 250 },
+			brightness: 40,
+			isOn: true,
+			children: ['warm', 'both']
+		};
+		const { app, gateway } = await setup({ rooms: [room], zones: [] }, [warm, colored]);
+		const command = app.applyRoomPreset('living', 'relax');
+
+		expect(app.state.lights.get('warm')?.colors.value).toEqual([mirekToHex(relax.mirek)]);
+		expect(app.state.lights.get('both')?.colors.value).toEqual(['#ff0000']);
+		expect(app.state.rooms.get('living')?.colors.value).toEqual([
+			mirekToHex(relax.mirek),
+			'#ff0000'
+		]);
+		expect(gateway.temperatureCalls).toHaveLength(0);
+
+		const error = new Error('rejected');
+		const rejection = expect(command).rejects.toBe(error);
+		gateway.areaTemperature[0]?.result.reject(error);
+		gateway.areaBrightness[0]?.result.reject(error);
+		await rejection;
+
+		expect(app.state.lights.get('warm')?.temperature.value).toEqual({ mirek: 250 });
+		expect(app.state.rooms.get('living')?.colors.value).toEqual([mirekToHex(250), '#ff0000']);
+	});
+
 	it('sets a preset color on a zone that cannot be dimmed', async () => {
 		const bright = areaPresets.find((preset) => preset.id === 'bright');
 		const { app, gateway } = await setup();

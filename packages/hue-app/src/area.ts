@@ -89,6 +89,23 @@ export class Area {
 		this.combined.setChildren(children);
 	}
 
+	previewChildTemperatures(mirek: number): () => void {
+		const previous = this.combined.temperatureOnly().map((light) => ({
+			light,
+			temperature: light.temperature.peek()
+		}));
+
+		for (const entry of previous) {
+			entry.light.setTemperature({ mirek });
+		}
+
+		return () => {
+			for (const entry of previous) {
+				entry.light.setTemperature(entry.temperature);
+			}
+		};
+	}
+
 	private palette(): readonly string[] {
 		const fromChildren = this.combined.colors.value;
 

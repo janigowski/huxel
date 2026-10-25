@@ -24,6 +24,8 @@ class FakeGateway implements HueGateway {
 	}
 
 	async setColor() {}
+
+	async setTemperature() {}
 }
 
 let setup: Awaited<ReturnType<typeof testRender>> | undefined;
@@ -66,9 +68,16 @@ function row(frame: string, name: string) {
 
 function lights(deskBrightness = 80) {
 	return new FakeGateway([
-		{ id: 'b', name: 'Kitchen', isOn: false, brightness: 40, color: null },
-		{ id: 'a', name: 'Desk', isOn: true, brightness: deskBrightness, color: null },
-		{ id: 'c', name: 'Plug', isOn: true, brightness: null, color: null }
+		{ id: 'b', name: 'Kitchen', isOn: false, brightness: 40, color: null, temperature: null },
+		{
+			id: 'a',
+			name: 'Desk',
+			isOn: true,
+			brightness: deskBrightness,
+			color: null,
+			temperature: null
+		},
+		{ id: 'c', name: 'Plug', isOn: true, brightness: null, color: null, temperature: null }
 	]);
 }
 
@@ -137,7 +146,8 @@ describe('LightsScreen', () => {
 				name: `Light ${String(index + 1).padStart(2, '0')}`,
 				isOn: true,
 				brightness: 50,
-				color: null
+				color: null,
+				temperature: null
 			}))
 		);
 		const { captureCharFrame, waitForFrame } = await renderLights(gateway, 'Light 01', 80, 12);
