@@ -1,12 +1,36 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
-@import '@fontsource-variable/inter';
-@import 'design-system/tokens.css';
+@import '@fontsource-variable/syne';
+@import '@fontsource/share-tech-mono';
+@import '../lib/deck/tokens.css';
+
+html {
+	background: var(--color-background);
+}
 
 body {
+	margin: 0;
 	background: var(--color-background);
-	color: var(--color-mint);
-	font-family: var(--font-sans);
+	color: var(--color-paper);
+	font-family: var(--font-display);
 	font-size: var(--text-body);
+	line-height: var(--leading-body);
 	-webkit-font-smoothing: antialiased;
+	color-scheme: dark;
+}
+
+:focus-visible {
+	outline: var(--rule) solid var(--focus, var(--color-paper));
+	outline-offset: var(--focus-offset);
+}
+
+::selection {
+	background: var(--color-paper);
+	color: var(--color-ink);
+}
+
+button,
+input {
+	font: inherit;
+	color: inherit;
 }

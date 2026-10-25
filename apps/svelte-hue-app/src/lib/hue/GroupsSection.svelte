@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { LightGrid, Notice, SectionHeader } from 'design-system';
+	import AreaList from '$lib/deck/AreaList.svelte';
+	import Notice from '$lib/deck/Notice.svelte';
+	import SectionBar from '$lib/deck/SectionBar.svelte';
 	import { describeError, type XyColor } from 'hue-app';
 	import type { SvelteArea } from 'hue-app/svelte';
 
@@ -18,20 +20,21 @@
 
 	const onCount = $derived(groups.filter((group) => group.isOn).length);
 	const loadingLabel = $derived(`Loading ${title.toLowerCase()}…`);
+	const emptyLabel = $derived(`No ${title.toLowerCase()}`);
 
 	async function run(command: Promise<void>) {
 		commandError = null;
 
 		try {
 			await command;
-		} catch (error) {
-			commandError = describeError(error);
+		} catch (caught) {
+			commandError = describeError(caught);
 		}
 	}
 </script>
 
-<section>
-	<SectionHeader {title} active={onCount} total={groups.length} />
+<section class="group">
+	<SectionBar {title} active={onCount} total={groups.length} />
 
 	{#if commandError}
 		<Notice>{commandError}</Notice>
@@ -39,12 +42,23 @@
 
 	{#if loading && groups.length === 0}
 		<Notice tone="muted">{loadingLabel}</Notice>
+	{:else if groups.length === 0}
+		<Notice tone="muted">{emptyLabel}</Notice>
 	{:else}
-		<LightGrid
-			lights={groups}
+		<AreaList
+			areas={groups}
 			ontoggle={(id) => run(ontoggle(id))}
 			ondim={(id, brightness) => run(ondim(id, brightness))}
 			onchangecolor={(id, color) => run(onchangecolor(id, color))}
 		/>
 	{/if}
 </section>
+
+<style>
+	.group {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		min-width: 0;
+	}
+</style>
