@@ -54,6 +54,7 @@
 					ontoggle={(id) => hue.toggleRoom(id)}
 					ondim={(id, brightness) => hue.dimRoom(id, brightness)}
 					onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
+					onapplypreset={(id, preset) => hue.applyRoomPreset(id, preset)}
 				/>
 				<GroupsSection
 					title="Zones"
@@ -62,6 +63,7 @@
 					ontoggle={(id) => hue.toggleZone(id)}
 					ondim={(id, brightness) => hue.dimZone(id, brightness)}
 					onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
+					onapplypreset={(id, preset) => hue.applyZonePreset(id, preset)}
 				/>
 			{/snippet}
 			{#snippet sources()}

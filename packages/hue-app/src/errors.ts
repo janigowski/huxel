@@ -97,3 +97,11 @@ export class InvalidColorError extends HueAppError {
 		super(`Color x and y must be numbers between 0 and 1, received x=${color?.x}, y=${color?.y}`);
 	}
 }
+
+export class InvalidPresetError extends HueAppError {
+	override name = 'InvalidPresetError';
+
+	constructor(public readonly preset: string) {
+		super(`Preset must be bright, relax, or energize, received ${preset}`);
+	}
+}

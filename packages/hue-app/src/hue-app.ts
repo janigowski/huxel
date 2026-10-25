@@ -4,6 +4,7 @@ import { Area } from './area';
 import { AreaCollection } from './area-collection';
 import { AreaLaneRegistry } from './area-lanes';
 import { AreaSync } from './area-sync';
+import { ApplyAreaPreset } from './apply-area-preset';
 import { ChangeAreaColor } from './change-area-color';
 import { ChangeColor } from './change-color';
 import type { XyColor } from './color';
@@ -16,6 +17,7 @@ import {
 	RoomNotFoundError,
 	ZoneNotFoundError
 } from './errors';
+import type { PresetId } from './preset';
 import type { AreaGateway, BridgeArea, HueAppConnection, HueGateway } from './gateway';
 import { HueSdkGateway } from './hue-sdk-gateway';
 import { Light } from './light';
@@ -61,9 +63,11 @@ export interface RoomZoneActions {
 	toggleRoom(roomId: string): Promise<void>;
 	dimRoom(roomId: string, brightness: number): Promise<void>;
 	changeRoomColor(roomId: string, color: XyColor): Promise<void>;
+	applyRoomPreset(roomId: string, preset: PresetId): Promise<void>;
 	toggleZone(zoneId: string): Promise<void>;
 	dimZone(zoneId: string, brightness: number): Promise<void>;
 	changeZoneColor(zoneId: string, color: XyColor): Promise<void>;
+	applyZonePreset(zoneId: string, preset: PresetId): Promise<void>;
 }
 
 const DEFAULT_SETTLE_MS = 1500;
@@ -87,6 +91,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 	private readonly toggleAreaState: ToggleArea | undefined;
 	private readonly dimAreaState: DimArea | undefined;
 	private readonly changeAreaColorState: ChangeAreaColor | undefined;
+	private readonly applyAreaPresetState: ApplyAreaPreset | undefined;
 	private readonly liveSync: LiveSync | undefined;
 	private initialization: Promise<void> | undefined;
 	private disposed = false;
@@ -105,6 +110,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		this.toggleAreaState = this.areaLanes ? new ToggleArea(this.areaLanes) : undefined;
 		this.dimAreaState = this.areaLanes ? new DimArea(this.areaLanes) : undefined;
 		this.changeAreaColorState = this.areaLanes ? new ChangeAreaColor(this.areaLanes) : undefined;
+		this.applyAreaPresetState = this.areaLanes ? new ApplyAreaPreset(this.areaLanes) : undefined;
 		const areaSync =
 			this.areaGateway && this.areaLanes && options.live !== false && gateway.watch
 				? new AreaSync(this.areaGateway, this.rooms, this.zones, this.areaLanes, this.lights)
@@ -224,6 +230,10 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		return this.areas().color.execute(this.findRoom(roomId), color, 'room');
 	}
 
+	async applyRoomPreset(roomId: string, preset: PresetId): Promise<void> {
+		return this.areas().preset.execute(this.findRoom(roomId), preset);
+	}
+
 	async toggleZone(zoneId: string): Promise<void> {
 		return this.areas().toggle.execute(this.findZone(zoneId));
 	}
@@ -236,15 +246,30 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		return this.areas().color.execute(this.findZone(zoneId), color, 'zone');
 	}
 
-	private areas(): { toggle: ToggleArea; dim: DimArea; color: ChangeAreaColor } {
-		if (!this.toggleAreaState || !this.dimAreaState || !this.changeAreaColorState) {
+	async applyZonePreset(zoneId: string, preset: PresetId): Promise<void> {
+		return this.areas().preset.execute(this.findZone(zoneId), preset);
+	}
+
+	private areas(): {
+		toggle: ToggleArea;
+		dim: DimArea;
+		color: ChangeAreaColor;
+		preset: ApplyAreaPreset;
+	} {
+		if (
+			!this.toggleAreaState ||
+			!this.dimAreaState ||
+			!this.changeAreaColorState ||
+			!this.applyAreaPresetState
+		) {
 			throw new AreasUnsupportedError();
 		}
 
 		return {
 			toggle: this.toggleAreaState,
 			dim: this.dimAreaState,
-			color: this.changeAreaColorState
+			color: this.changeAreaColorState,
+			preset: this.applyAreaPresetState
 		};
 	}
 

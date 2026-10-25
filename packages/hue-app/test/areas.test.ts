@@ -5,11 +5,15 @@ import {
 	HueAppDisposedError,
 	InvalidBrightnessError,
 	InvalidColorError,
+	InvalidPresetError,
 	RoomNotFoundError,
 	ZoneNotFoundError,
-	createHueApp
+	areaPresets,
+	createHueApp,
+	type Area,
+	type BridgeArea,
+	type PresetId
 } from '../src/index';
-import type { Area, BridgeArea } from '../src/index';
 import { FakeGateway, bridgeLight, deferred, flushMicrotasks, type Deferred } from './fakes';
 
 const living: BridgeArea = {
@@ -101,6 +105,9 @@ describe('rooms and zones', () => {
 		expect(app.state.rooms.value).toEqual([]);
 		expect(app.state.zones.value).toEqual([]);
 		await expect(app.toggleRoom('living')).rejects.toBeInstanceOf(AreasUnsupportedError);
+		await expect(app.applyRoomPreset('living', 'bright')).rejects.toBeInstanceOf(
+			AreasUnsupportedError
+		);
 	});
 
 	it('builds a room palette from its child light colors', async () => {
@@ -209,6 +216,90 @@ describe('rooms and zones', () => {
 		);
 		await expect(app.toggleRoom('missing')).rejects.toBeInstanceOf(RoomNotFoundError);
 		await expect(app.toggleZone('missing')).rejects.toBeInstanceOf(ZoneNotFoundError);
+		await expect(app.applyRoomPreset('missing', 'bright')).rejects.toBeInstanceOf(
+			RoomNotFoundError
+		);
+		await expect(app.applyZonePreset('missing', 'relax')).rejects.toBeInstanceOf(ZoneNotFoundError);
+		await expect(app.applyRoomPreset('living', 'nightlight' as PresetId)).rejects.toBeInstanceOf(
+			InvalidPresetError
+		);
+	});
+
+	it('applies a room preset as color and brightness and reverts both when the bridge rejects them', async () => {
+		const relax = areaPresets.find((preset) => preset.id === 'relax');
+		const { app, gateway } = await setup();
+		const command = app.applyRoomPreset('living', 'relax');
+
+		expect(app.state.rooms.get('living')?.color.value).toEqual(relax?.color);
+		expect(app.state.rooms.get('living')?.brightness.value).toBe(relax?.brightness);
+		expect(gateway.areaColor[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: relax?.color
+		});
+		expect(gateway.areaBrightness[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: relax?.brightness
+		});
+
+		const error = new Error('unreachable');
+		const rejection = expect(command).rejects.toBe(error);
+		gateway.areaColor[0]?.result.reject(error);
+		gateway.areaBrightness[0]?.result.reject(error);
+		await rejection;
+
+		expect(app.state.rooms.get('living')?.color.value).toEqual({ x: 0.4, y: 0.4 });
+		expect(app.state.rooms.get('living')?.brightness.value).toBe(40);
+	});
+
+	it('applies a preset when the grouped light reports brightness but no color', async () => {
+		const bright = areaPresets.find((preset) => preset.id === 'bright');
+		const room: BridgeArea = { ...living, color: null, brightness: 100, isOn: true };
+		const { app, gateway } = await setup({ rooms: [room], zones: [] });
+		const command = app.applyRoomPreset('living', 'bright');
+
+		expect(app.state.rooms.get('living')?.color.value).toEqual(bright?.color);
+		expect(app.state.rooms.get('living')?.brightness.value).toBe(bright?.brightness);
+		expect(gateway.areaColor[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: bright?.color
+		});
+		expect(gateway.areaBrightness[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: bright?.brightness
+		});
+		gateway.areaColor[0]?.result.resolve();
+		gateway.areaBrightness[0]?.result.resolve();
+		await command;
+	});
+
+	it('sets a preset color on a zone that cannot be dimmed', async () => {
+		const bright = areaPresets.find((preset) => preset.id === 'bright');
+		const { app, gateway } = await setup();
+		const command = app.applyZonePreset('downstairs', 'bright');
+
+		expect(app.state.zones.get('downstairs')?.color.value).toEqual(bright?.color);
+		expect(app.state.zones.get('downstairs')?.brightness.value).toBeNull();
+		expect(gateway.areaBrightness).toHaveLength(0);
+		expect(gateway.areaColor[0]).toMatchObject({
+			serviceId: 'downstairs-light',
+			value: bright?.color
+		});
+		gateway.areaColor[0]?.result.resolve();
+		await command;
+	});
+
+	it('applies a zone preset through the svelte adapter', async () => {
+		const energize = areaPresets.find((preset) => preset.id === 'energize');
+		const zone: BridgeArea = { ...downstairs, color: { x: 0.2, y: 0.2 }, brightness: 10 };
+		const { app, gateway } = await setup({ rooms: [], zones: [zone] });
+		const hue = createSvelteHueApp(app);
+		const command = hue.applyZonePreset('downstairs', 'energize');
+
+		expect(hue.zones.get('downstairs')?.color).toEqual(energize?.color);
+		expect(hue.zones.get('downstairs')?.brightness).toBe(energize?.brightness);
+		gateway.areaColor[0]?.result.resolve();
+		gateway.areaBrightness[0]?.result.resolve();
+		await command;
 	});
 
 	it('changes a zone color through its grouped light', async () => {

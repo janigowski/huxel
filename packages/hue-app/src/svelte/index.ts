@@ -3,6 +3,7 @@ import { createSubscriber } from 'svelte/reactivity';
 import type { AreaCollection } from '../area-collection';
 import type { AreaSnapshot, ReadonlyArea } from '../area';
 import type { XyColor } from '../color';
+import type { PresetId } from '../preset';
 import type { HueAppConnection } from '../gateway';
 import { bindActions, type HueApp, type HueAppActions, type HueAppStatus } from '../hue-app';
 import type { LightCollection } from '../light-collection';
@@ -31,9 +32,11 @@ export interface SvelteHueApp extends HueAppActions {
 	toggleRoom(roomId: string): Promise<void>;
 	dimRoom(roomId: string, brightness: number): Promise<void>;
 	changeRoomColor(roomId: string, color: XyColor): Promise<void>;
+	applyRoomPreset(roomId: string, preset: PresetId): Promise<void>;
 	toggleZone(zoneId: string): Promise<void>;
 	dimZone(zoneId: string, brightness: number): Promise<void>;
 	changeZoneColor(zoneId: string, color: XyColor): Promise<void>;
+	applyZonePreset(zoneId: string, preset: PresetId): Promise<void>;
 }
 
 type Subscribable = Pick<ReadonlySignal<unknown>, 'subscribe'>;
@@ -175,8 +178,10 @@ export function createSvelteHueApp(app: HueApp): SvelteHueApp {
 		toggleRoom: (roomId) => app.toggleRoom(roomId),
 		dimRoom: (roomId, brightness) => app.dimRoom(roomId, brightness),
 		changeRoomColor: (roomId, color) => app.changeRoomColor(roomId, color),
+		applyRoomPreset: (roomId, preset) => app.applyRoomPreset(roomId, preset),
 		toggleZone: (zoneId) => app.toggleZone(zoneId),
 		dimZone: (zoneId, brightness) => app.dimZone(zoneId, brightness),
-		changeZoneColor: (zoneId, color) => app.changeZoneColor(zoneId, color)
+		changeZoneColor: (zoneId, color) => app.changeZoneColor(zoneId, color),
+		applyZonePreset: (zoneId, preset) => app.applyZonePreset(zoneId, preset)
 	};
 }

@@ -16,6 +16,8 @@
 		ontoggle: () => void;
 		ondim: (brightness: number) => void;
 		oneditcolor: () => void;
+		presetName?: string;
+		oneditpresets?: () => void;
 	}
 
 	let {
@@ -28,7 +30,9 @@
 		showBar,
 		ontoggle,
 		ondim,
-		oneditcolor
+		oneditcolor,
+		presetName,
+		oneditpresets
 	}: Props = $props();
 
 	const nameId = $props.id();
@@ -36,7 +40,9 @@
 	const stateLabel = $derived(isOn ? 'On' : 'Off');
 	const opacity = $derived(gradientOpacity(isOn, brightness));
 	const showGradient = $derived(showBar === 'always' || colors.length > 0);
-	const adjustable = $derived(swatch !== null || brightness !== null);
+	const adjustable = $derived(
+		swatch !== null || brightness !== null || oneditpresets !== undefined
+	);
 </script>
 
 <article class={['card', { lit: isOn }]} aria-labelledby={nameId}>
@@ -86,6 +92,25 @@
 						<span class="color-copy">
 							<span class="meta">Color</span>
 							<span class="color-name">{colorName}</span>
+						</span>
+					</button>
+				{/if}
+
+				{#if presetName && oneditpresets}
+					<button
+						class="preset"
+						type="button"
+						aria-haspopup="dialog"
+						aria-label="{name} presets, {presetName}"
+						disabled={!isOn}
+						onclick={oneditpresets}
+					>
+						{#if swatch}
+							<ColorSwatch hex={swatch} />
+						{/if}
+						<span class="color-copy">
+							<span class="meta">Presets</span>
+							<span class="color-name">{presetName}</span>
 						</span>
 					</button>
 				{/if}
@@ -198,7 +223,8 @@
 		line-height: 1;
 	}
 
-	.color {
+	.color,
+	.preset {
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
@@ -213,6 +239,7 @@
 	}
 
 	.color:disabled,
+	.preset:disabled,
 	.power:disabled {
 		opacity: 0.45;
 		cursor: not-allowed;
@@ -245,7 +272,8 @@
 			color: var(--color-paper);
 		}
 
-		.color:hover:not(:disabled) {
+		.color:hover:not(:disabled),
+		.preset:hover:not(:disabled) {
 			border-color: var(--color-paper);
 		}
 	}

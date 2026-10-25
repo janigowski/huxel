@@ -1,5 +1,6 @@
 import './tokens.css';
 import { palette } from 'design-system';
+import type { SvelteArea } from 'hue-app/svelte';
 import { page } from 'vite-plus/test/browser';
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';
@@ -17,12 +18,13 @@ const living = {
 	colors: ['#ff0000', '#0000ff']
 };
 
-async function renderCard(area = living) {
+async function renderCard(area: SvelteArea = living) {
 	await render(AreaCard, {
 		area,
 		ontoggle: vi.fn(),
 		ondim: vi.fn(),
-		oneditcolor: vi.fn()
+		oneditcolor: vi.fn(),
+		oneditpresets: vi.fn()
 	});
 
 	const article = page.getByRole('article').element();
@@ -50,6 +52,22 @@ describe('AreaCard', () => {
 
 		expect(getComputedStyle(bar).height).toBe('14px');
 		expect(bar.style.opacity).toBe(String(gradientOpacity(false, 10)));
+	});
+
+	it('offers presets when the room can take color and brightness', async () => {
+		await renderCard();
+
+		await expect
+			.element(page.getByRole('button', { name: 'Living room presets, Custom' }))
+			.toBeVisible();
+	});
+
+	it('offers presets when the room has no grouped color', async () => {
+		await renderCard({ ...living, color: null, colors: ['#ffe94d'] });
+
+		await expect
+			.element(page.getByRole('button', { name: 'Living room presets, Custom' }))
+			.toBeVisible();
 	});
 
 	it('hatches the bar when the room has no child colors', async () => {
