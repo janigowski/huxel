@@ -10,6 +10,7 @@ Libraries and apps for controlling Philips Hue lights over the CLIP API v2.
 | [`apps/svelte-hue-app`](./apps/svelte-hue-app)       | SvelteKit web dashboard                                           |
 | [`apps/extension-hue-app`](./apps/extension-hue-app) | Browser extension for Arc and other Chromium browsers             |
 | [`apps/tui-hue-app`](./apps/tui-hue-app)             | Terminal remote built with OpenTUI and React                      |
+| [`apps/hue-mcp`](./apps/hue-mcp)                     | Local stdio MCP server for an agent on the same network           |
 
 Libraries in `packages/` are meant to be published to npm, except the private `design-system`. Apps in `apps/` are private.
 
