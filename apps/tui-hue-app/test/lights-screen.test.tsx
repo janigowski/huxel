@@ -186,6 +186,7 @@ const attic: BridgeArea = {
 	isOn: true,
 	brightness: 40,
 	color: { x: 0.4, y: 0.4 },
+	temperature: null,
 	children: []
 };
 
@@ -196,6 +197,7 @@ const kitchen: BridgeArea = {
 	isOn: false,
 	brightness: 20,
 	color: null,
+	temperature: null,
 	children: []
 };
 
@@ -206,6 +208,7 @@ const hall: BridgeArea = {
 	isOn: true,
 	brightness: null,
 	color: null,
+	temperature: null,
 	children: []
 };
 
@@ -214,7 +217,8 @@ const deskLight: BridgeLight = {
 	name: 'Desk',
 	isOn: true,
 	brightness: 50,
-	color: null
+	color: null,
+	temperature: null
 };
 
 class AreaGateway extends FakeGateway {
@@ -258,6 +262,8 @@ class AreaGateway extends FakeGateway {
 	async setAreaColor(serviceId: string, color: { x: number; y: number }) {
 		this.areaColor.push([serviceId, color]);
 	}
+
+	async setAreaTemperature() {}
 }
 
 class PendingGateway implements HueGateway {
@@ -270,6 +276,8 @@ class PendingGateway implements HueGateway {
 	async setBrightness() {}
 
 	async setColor() {}
+
+	async setTemperature() {}
 }
 
 function home(atticBrightness = attic.brightness) {
