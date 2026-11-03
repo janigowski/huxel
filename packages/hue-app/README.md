@@ -91,7 +91,7 @@ The `gateway` option accepts any `HueGateway` implementation (`listLights`, `set
 
 ## Rooms and zones
 
-`initialize()` loads rooms and zones alongside lights and controls them through the grouped light service each one owns. `app.state.rooms` and `app.state.zones` are sorted by name. The React adapter does not expose the actions. A lights-only gateway makes no area requests, and `toggleRoom` rejects with `AreasUnsupportedError`.
+`initialize()` loads rooms and zones alongside lights and controls them through the grouped light service each one owns. `app.state.rooms` and `app.state.zones` are sorted by name. The React adapter exposes `rooms`, `zones`, and the same room and zone actions as the Svelte adapter. A lights-only gateway makes no area requests, and `toggleRoom` rejects with `AreasUnsupportedError`.
 
 `app.state.rooms` and `app.state.zones` use the same fields as lights, plus `colors`. `isOn` is true when any light in the group is on. Brightness is the bridge average for the lights that are on, or `null` when the group cannot be dimmed. `colors` is a `ReadonlySignal<readonly string[]>` of `#rrggbb` values, one per child light that has a color, in child order. Room children that are devices are resolved to their light services. The list follows those lights' colors. Commands use the same optimistic lanes as lights and never rewrite the individual light objects; those update from their own events.
 
@@ -217,7 +217,7 @@ export function Lights({ app }: { app: HueApp }) {
 }
 ```
 
-`useHueApp` subscribes with `useSyncExternalStore` and returns an immutable snapshot of the core state: `lights` in collection order, `status`, `error`, `connection`, and the `initialize`, `toggleLight`, `dimLight`, `changeColor` and `dispose` actions. Each light snapshot includes `color`. Snapshots are derived once per app and shared by every component using it. The `lights` array and each light object keep their identity until they change, so `memo` rows re-render only when their own light changes, and the actions are stable per app. Optimistic updates and rollbacks show up on the next render. Requires React 18 or newer.
+`useHueApp` subscribes with `useSyncExternalStore` and returns an immutable snapshot of the core state: `lights` in collection order, `rooms` and `zones` sorted by name, `status`, `error`, `connection`, and the light, room, and zone actions. Each light snapshot includes `color`, `temperature`, and `colors`. Each room and zone snapshot includes `color`, `temperature`, and `colors`. Snapshots are derived once per app and shared by every component using it. The `lights`, `rooms`, and `zones` arrays and each item keep their identity until they change, so `memo` rows re-render only when their own item changes, and the actions are stable per app. Optimistic updates and rollbacks show up on the next render. Requires React 18 or newer.
 
 ## Scripts
 
