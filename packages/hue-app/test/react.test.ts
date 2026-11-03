@@ -2,11 +2,56 @@
 import { Signal } from '@preact/signals-core';
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vite-plus/test';
-import { createHueApp, xyToHex } from '../src/index';
+import { createHueApp, xyToHex, type BridgeArea } from '../src/index';
 import { useHueApp, type ReactHueApp, type ReactLight } from '../src/react/index';
 import { at, desk, FakeGateway, lamp } from './fake-gateway';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+class AreasGateway extends FakeGateway {
+	readonly areaPower: [string, boolean][] = [];
+
+	constructor(private readonly areas: { rooms: BridgeArea[]; zones: BridgeArea[] }) {
+		super();
+	}
+
+	async listAreas() {
+		return this.areas;
+	}
+
+	setAreaPower(serviceId: string, isOn: boolean) {
+		this.areaPower.push([serviceId, isOn]);
+		return Promise.resolve();
+	}
+
+	async setAreaBrightness() {}
+
+	async setAreaColor() {}
+
+	async setAreaTemperature() {}
+}
+
+const bedroom: BridgeArea = {
+	id: 'bed',
+	name: 'Bedroom',
+	serviceId: 'bed-light',
+	isOn: true,
+	brightness: 10,
+	color: null,
+	temperature: null,
+	children: []
+};
+
+const living: BridgeArea = {
+	id: 'living',
+	name: 'Living room',
+	serviceId: 'living-light',
+	isOn: false,
+	brightness: 40,
+	color: { x: 0.4, y: 0.4 },
+	temperature: null,
+	children: ['desk']
+};
 
 async function setup() {
 	const gateway = new FakeGateway();
@@ -58,6 +103,10 @@ describe('useHueApp', () => {
 
 		expect(hue.status).toBe('ready');
 		expect(hue.error).toBeUndefined();
+		expect(hue.rooms).toEqual([]);
+		expect(hue.zones).toEqual([]);
+		expect(Object.isFrozen(hue.rooms)).toBe(true);
+		expect(Object.isFrozen(hue.zones)).toBe(true);
 		expect(hue.lights).toEqual([
 			{
 				id: 'desk',
@@ -196,10 +245,23 @@ describe('useHueApp', () => {
 		expect(after.lights).not.toBe(before.lights);
 		expect(light(after, 'desk')).not.toBe(light(before, 'desk'));
 		expect(light(after, 'lamp')).toBe(light(before, 'lamp'));
+		expect(after.rooms).toBe(before.rooms);
+		expect(after.zones).toBe(before.zones);
 		expect(after.initialize).toBe(before.initialize);
 		expect(after.toggleLight).toBe(before.toggleLight);
 		expect(after.dimLight).toBe(before.dimLight);
 		expect(after.changeColor).toBe(before.changeColor);
+		expect(after.changeTemperature).toBe(before.changeTemperature);
+		expect(after.toggleRoom).toBe(before.toggleRoom);
+		expect(after.dimRoom).toBe(before.dimRoom);
+		expect(after.changeRoomColor).toBe(before.changeRoomColor);
+		expect(after.changeRoomTemperature).toBe(before.changeRoomTemperature);
+		expect(after.applyRoomPreset).toBe(before.applyRoomPreset);
+		expect(after.toggleZone).toBe(before.toggleZone);
+		expect(after.dimZone).toBe(before.dimZone);
+		expect(after.changeZoneColor).toBe(before.changeZoneColor);
+		expect(after.changeZoneTemperature).toBe(before.changeZoneTemperature);
+		expect(after.applyZonePreset).toBe(before.applyZonePreset);
 
 		await act(async () => {
 			at(gateway.commands, 0).resolve();
@@ -247,5 +309,60 @@ describe('useHueApp', () => {
 		expect(light(first.result.current, 'desk').isOn).toBe(false);
 		at(gateway.commands, 0).resolve();
 		await toggled;
+	});
+
+	test('lists rooms and zones by name and toggles a room optimistically', async () => {
+		const gateway = new AreasGateway({
+			rooms: [living, bedroom],
+			zones: [
+				{
+					id: 'down',
+					name: 'Downstairs',
+					serviceId: 'down-light',
+					isOn: true,
+					brightness: null,
+					color: null,
+					temperature: null,
+					children: []
+				}
+			]
+		});
+		const app = createHueApp({ gateway, settleMs: 0 });
+		const ready = app.initialize();
+		at(gateway.listCalls, 0).resolve([{ ...desk }]);
+		await ready;
+
+		const hook = renderHook(() => useHueApp(app));
+		const before = hook.result.current;
+		const listedBedroom = before.rooms.find((room) => room.id === 'bed');
+
+		expect(before.rooms.map((room) => room.name)).toEqual(['Bedroom', 'Living room']);
+		expect(before.zones.map((zone) => zone.name)).toEqual(['Downstairs']);
+		expect(before.rooms.find((room) => room.id === 'living')).toMatchObject({
+			isOn: false,
+			brightness: 40,
+			color: { x: 0.4, y: 0.4 },
+			colors: desk.color ? [xyToHex(desk.color)] : []
+		});
+		expect(Object.isFrozen(listedBedroom)).toBe(true);
+		expect(Object.isFrozen(listedBedroom?.colors)).toBe(true);
+
+		let toggled!: Promise<void>;
+		act(() => {
+			toggled = before.toggleRoom('living');
+		});
+
+		const after = hook.result.current;
+
+		expect(after.rooms.find((room) => room.id === 'living')?.isOn).toBe(true);
+		expect(after.rooms.find((room) => room.id === 'bed')).toBe(listedBedroom);
+		expect(after.zones).toBe(before.zones);
+		expect(after.toggleRoom).toBe(before.toggleRoom);
+		expect(gateway.areaPower).toEqual([['living-light', true]]);
+
+		await act(async () => {
+			await toggled;
+		});
+		expect(hook.result.current.rooms.find((room) => room.id === 'living')?.isOn).toBe(true);
 	});
 });

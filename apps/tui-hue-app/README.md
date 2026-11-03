@@ -1,6 +1,6 @@
 # tui-hue-app
 
-Terminal remote for Philips Hue lights: link to a bridge, list all lights, toggle and dim them. Built with [OpenTUI](https://opentui.com) and React on top of [`hue-app`](../../packages/hue-app) and [`hue-sdk`](../../packages/hue-sdk). Requires [Bun](https://bun.sh).
+Terminal remote for Philips Hue lights, rooms, and zones: link to a bridge, then toggle and dim any of them. Rooms and zones also take the same presets and palette colors as the web remote. Built with [OpenTUI](https://opentui.com) and React on top of [`hue-app`](../../packages/hue-app) and [`hue-sdk`](../../packages/hue-sdk). Requires [Bun](https://bun.sh).
 
 ## Setup
 
@@ -32,12 +32,17 @@ On first run the app asks you to press the link button on the bridge and then En
 
 ## Keys
 
-| Key                | Action                    |
-| ------------------ | ------------------------- |
-| `↑` `↓` / `k` `j`  | Select light              |
-| `space` / `enter`  | Toggle selected light     |
-| `←` `→` / `h` `l`  | Dim selected light by 10% |
-| `q` / `esc` / `^C` | Quit                      |
+Rooms, zones, and lights are listed in that order. Rooms and zones are sorted by name. `p` and `c` open presets and colors for the selected room or zone while it is on. Color is available when that group has a color.
+
+| Key               | Action                                  |
+| ----------------- | --------------------------------------- |
+| `↑` `↓` / `k` `j` | Select a room, zone, or light           |
+| `space` / `enter` | Toggle the selection, or apply a choice |
+| `←` `→` / `h` `l` | Dim the selection by 10%                |
+| `p`               | Presets for the selected room or zone   |
+| `c`               | Colors for the selected room or zone    |
+| `esc`             | Close presets or colors, or quit        |
+| `q` / `^C`        | Quit                                    |
 
 ## Config
 

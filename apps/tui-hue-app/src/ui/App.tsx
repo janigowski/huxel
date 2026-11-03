@@ -50,7 +50,12 @@ export function App({ connection, onQuit }: AppProps) {
 	}, [connection]);
 
 	useKeyboard((key) => {
-		if (key.name === 'q' || key.name === 'escape' || (key.ctrl && key.name === 'c')) {
+		if (key.name === 'q' || (key.ctrl && key.name === 'c')) {
+			onQuit();
+			return;
+		}
+
+		if (key.name === 'escape' && screen.kind !== 'lights') {
 			onQuit();
 		}
 	});
@@ -82,6 +87,7 @@ export function App({ connection, onQuit }: AppProps) {
 				<LightsScreen
 					app={screen.app}
 					onError={(error) => initializeFailed(screen.bridge, error)}
+					onQuit={onQuit}
 				/>
 			) : null}
 		</box>
