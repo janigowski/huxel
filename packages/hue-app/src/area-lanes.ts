@@ -2,11 +2,13 @@ import type { XyColor } from './color';
 import { CommandLane } from './command-lane';
 import type { AreaGateway } from './gateway';
 import type { Area } from './area';
+import type { ColorTemperature } from './temperature';
 
 export interface AreaLanes {
 	readonly power: CommandLane<boolean>;
 	readonly brightness: CommandLane<number | null>;
 	readonly color: CommandLane<XyColor | null>;
+	readonly temperature: CommandLane<ColorTemperature | null>;
 }
 
 export class AreaLaneRegistry {
@@ -66,6 +68,15 @@ export class AreaLaneRegistry {
 				(color) => area.setColor(color),
 				(color) => (color ? this.gateway.setAreaColor(area.serviceId, color) : Promise.resolve()),
 				this.settleMs
+			),
+			temperature: new CommandLane<ColorTemperature | null>(
+				() => area.temperature.peek(),
+				(temperature) => area.setTemperature(temperature),
+				(temperature) =>
+					typeof temperature?.mirek === 'number'
+						? this.gateway.setAreaTemperature(area.serviceId, temperature.mirek)
+						: Promise.resolve(),
+				this.settleMs
 			)
 		};
 	}
@@ -75,4 +86,5 @@ function disposeLanes(lanes: AreaLanes): void {
 	lanes.power.dispose();
 	lanes.brightness.dispose();
 	lanes.color.dispose();
+	lanes.temperature.dispose();
 }

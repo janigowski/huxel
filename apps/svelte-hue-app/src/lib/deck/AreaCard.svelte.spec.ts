@@ -15,6 +15,7 @@ const living = {
 	isOn: true,
 	brightness: 80,
 	color: red.xy,
+	temperature: null,
 	colors: ['#ff0000', '#0000ff']
 };
 
@@ -59,6 +60,20 @@ describe('AreaCard', () => {
 
 		await expect
 			.element(page.getByRole('button', { name: 'Living room presets, Custom' }))
+			.toBeVisible();
+	});
+
+	it('names the active preset from mirek when the room has no xy color', async () => {
+		await renderCard({
+			...living,
+			color: null,
+			brightness: 57,
+			temperature: { mirek: 447 },
+			colors: ['#ff942b']
+		});
+
+		await expect
+			.element(page.getByRole('button', { name: 'Living room presets, Relax' }))
 			.toBeVisible();
 	});
 

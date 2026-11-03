@@ -11,6 +11,8 @@ export type {
 export { describeError } from './describe-error';
 export { hexToXy, xyToHex } from './color';
 export type { XyColor } from './color';
+export { mirekToHex } from './temperature';
+export type { ColorTemperature } from './temperature';
 export { areaPresets, findAreaPreset } from './preset';
 export type { AreaPreset, PresetId } from './preset';
 export type { AreaCollection } from './area-collection';

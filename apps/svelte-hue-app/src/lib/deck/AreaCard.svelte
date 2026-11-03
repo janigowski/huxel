@@ -17,7 +17,9 @@
 	const paletteColor = $derived(findPaletteColor(area.color));
 	const colorName = $derived(paletteColor?.name ?? 'Custom');
 	const swatch = $derived(area.color === null ? null : (paletteColor?.hex ?? xyToHex(area.color)));
-	const presetName = $derived(findAreaPreset(area.color, area.brightness)?.name ?? 'Custom');
+	const presetName = $derived(
+		findAreaPreset(area.color, area.brightness, area.temperature?.mirek ?? null)?.name ?? 'Custom'
+	);
 </script>
 
 <ControlCard

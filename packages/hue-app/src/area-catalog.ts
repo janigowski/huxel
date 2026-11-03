@@ -2,6 +2,7 @@ import type { GroupedLightGet } from 'hue-sdk';
 import type { ChildLights, ResourceRef } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';
 import type { BridgeArea } from './gateway';
+import { temperatureOf, type ColorTemperature } from './temperature';
 
 export interface AreaGroup {
 	id: string;
@@ -14,6 +15,7 @@ export interface AreaControl {
 	isOn?: boolean;
 	brightness?: number;
 	color?: XyColor;
+	temperature?: ColorTemperature;
 }
 
 export class AreaCatalog {
@@ -65,6 +67,7 @@ export class AreaCatalog {
 			isOn: light.on?.on ?? false,
 			brightness: typeof light.dimming?.brightness === 'number' ? light.dimming.brightness : null,
 			color: xyColorFrom(light.color?.xy),
+			temperature: temperatureOf(light.color_temperature),
 			children
 		};
 

@@ -1,22 +1,37 @@
 <script lang="ts">
-	import type { XyColor } from 'hue-app';
+	import { findAreaPreset, type PresetId, type XyColor } from 'hue-app';
 	import type { SvelteLight } from 'hue-app/svelte';
 	import ColorDialog from './ColorDialog.svelte';
 	import LightCard from './LightCard.svelte';
+	import ZoneRoomView from './ZoneRoomView.svelte';
 
 	interface Props {
 		lights: readonly SvelteLight[];
 		ontoggle: (id: string) => void;
 		ondim: (id: string, brightness: number) => void;
 		onchangecolor: (id: string, color: XyColor) => void;
+		onapplypreset: (id: string, preset: PresetId) => void;
 	}
 
-	let { lights, ontoggle, ondim, onchangecolor }: Props = $props();
+	let { lights, ontoggle, ondim, onchangecolor, onapplypreset }: Props = $props();
 
 	let editingId = $state<string | null>(null);
+	let presetId = $state<string | null>(null);
 
 	const editing = $derived(
 		lights.find((light) => light.id === editingId && light.isOn && light.color !== null)
+	);
+	const editingPreset = $derived(
+		lights.find(
+			(light) =>
+				light.id === presetId && light.isOn && light.color === null && light.temperature !== null
+		)
+	);
+	const selectedPreset = $derived(
+		editingPreset
+			? (findAreaPreset(null, editingPreset.brightness, editingPreset.temperature?.mirek ?? null)
+					?.id ?? null)
+			: null
 	);
 </script>
 
@@ -28,6 +43,7 @@
 				ontoggle={() => ontoggle(light.id)}
 				ondim={(brightness) => ondim(light.id, brightness)}
 				oneditcolor={() => (editingId = light.id)}
+				oneditpresets={() => (presetId = light.id)}
 			/>
 		</li>
 	{/each}
@@ -47,6 +63,25 @@
 	onchange={(color) => {
 		if (editing) {
 			onchangecolor(editing.id, color);
+		}
+	}}
+/>
+
+<ZoneRoomView
+	bind:open={
+		() => editingPreset !== undefined,
+		(open) => {
+			if (!open) {
+				presetId = null;
+			}
+		}
+	}
+	name={editingPreset?.name ?? ''}
+	preset={selectedPreset}
+	temperature
+	onchange={(preset) => {
+		if (editingPreset) {
+			onapplypreset(editingPreset.id, preset);
 		}
 	}}
 />

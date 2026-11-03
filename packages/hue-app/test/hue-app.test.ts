@@ -4,9 +4,13 @@ import {
 	HueAppDisposedError,
 	InvalidBrightnessError,
 	InvalidColorError,
+	InvalidMirekError,
 	LightNotColorCapableError,
+	LightNotTemperatureCapableError,
 	LightNotDimmableError,
-	LightNotFoundError
+	LightNotFoundError,
+	areaPresets,
+	mirekToHex
 } from '../src/index';
 import type { BridgeLight, Light, XyColor } from '../src/index';
 import { bridgeLight, FakeGateway } from './fakes';
@@ -370,6 +374,62 @@ describe('changeColor', () => {
 		gateway.brightnessCalls[0]!.result.resolve();
 		await Promise.all([toggle, dim]);
 		expect(light.color.value).toEqual({ x: 0.3, y: 0.3 });
+	});
+});
+
+describe('changeTemperature', () => {
+	it('updates a temperature-only light and reverts when the bridge rejects it', async () => {
+		const { app, gateway } = await setup([
+			bridgeLight({ color: null, temperature: { mirek: 250 } })
+		]);
+		const light = app.state.lights.get('desk')!;
+		const change = app.changeTemperature('desk', 447);
+
+		expect(light.temperature.value).toEqual({ mirek: 447 });
+		expect(light.color.value).toBeNull();
+		expect(light.colors.value).toEqual([mirekToHex(447)]);
+		expect(gateway.calls.slice(1)).toEqual([
+			{ method: 'setTemperature', lightId: 'desk', value: 447 }
+		]);
+
+		const error = new Error('unreachable');
+		const rejection = expect(change).rejects.toBe(error);
+		gateway.temperatureCalls[0]!.result.reject(error);
+		await rejection;
+
+		expect(light.temperature.value).toEqual({ mirek: 250 });
+		expect(light.colors.value).toEqual([mirekToHex(250)]);
+	});
+
+	it('rejects lights without color temperature and invalid mirek without a gateway call', async () => {
+		const { app, gateway } = await setup();
+
+		await expect(app.changeTemperature('desk', 447)).rejects.toBeInstanceOf(
+			LightNotTemperatureCapableError
+		);
+		await expect(app.changeTemperature('desk', 12.5)).rejects.toBeInstanceOf(InvalidMirekError);
+		expect(gateway.temperatureCalls).toHaveLength(0);
+	});
+
+	it('applies a mirek preset without sending xy color', async () => {
+		const relax = areaPresets.find((preset) => preset.id === 'relax')!;
+		const { app, gateway } = await setup([
+			bridgeLight({ color: null, temperature: { mirek: 200 }, brightness: 40, isOn: true })
+		]);
+		const command = app.applyLightPreset('desk', 'relax');
+
+		expect(app.state.lights.get('desk')?.temperature.value).toEqual({ mirek: relax.mirek });
+		expect(app.state.lights.get('desk')?.brightness.value).toBe(relax.brightness);
+		expect(gateway.colorCalls).toHaveLength(0);
+		expect(gateway.temperatureCalls[0]).toMatchObject({ lightId: 'desk', mirek: relax.mirek });
+		expect(gateway.brightnessCalls[0]).toMatchObject({
+			lightId: 'desk',
+			brightness: relax.brightness
+		});
+
+		gateway.temperatureCalls[0]!.result.resolve();
+		gateway.brightnessCalls[0]!.result.resolve();
+		await command;
 	});
 });
 

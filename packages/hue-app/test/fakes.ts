@@ -40,16 +40,24 @@ export interface ColorCall {
 	readonly result: Deferred<void>;
 }
 
+export interface TemperatureCall {
+	readonly lightId: string;
+	readonly mirek: number;
+	readonly result: Deferred<void>;
+}
+
 export class FakeGateway implements HueGateway {
 	readonly listCalls: Deferred<BridgeLight[]>[] = [];
 	readonly powerCalls: PowerCall[] = [];
 	readonly brightnessCalls: BrightnessCall[] = [];
 	readonly colorCalls: ColorCall[] = [];
+	readonly temperatureCalls: TemperatureCall[] = [];
 	readonly calls: Array<
 		| { readonly method: 'listLights' }
 		| { readonly method: 'setPower'; readonly lightId: string; readonly value: boolean }
 		| { readonly method: 'setBrightness'; readonly lightId: string; readonly value: number }
 		| { readonly method: 'setColor'; readonly lightId: string; readonly value: XyColor }
+		| { readonly method: 'setTemperature'; readonly lightId: string; readonly value: number }
 	> = [];
 	readonly observers: LightChangeObserver[] = [];
 	unwatchCalls = 0;
@@ -90,6 +98,13 @@ export class FakeGateway implements HueGateway {
 		return result.promise;
 	}
 
+	setTemperature(lightId: string, mirek: number): Promise<void> {
+		const result = deferred<void>();
+		this.temperatureCalls.push({ lightId, mirek, result });
+		this.calls.push({ method: 'setTemperature', lightId, value: mirek });
+		return result.promise;
+	}
+
 	watch(observer: LightChangeObserver): () => void {
 		this.observers.push(observer);
 		return () => {
@@ -105,6 +120,7 @@ export function bridgeLight(overrides: Partial<BridgeLight> = {}): BridgeLight {
 		isOn: false,
 		brightness: 30,
 		color: { x: 0.3, y: 0.3 },
+		temperature: null,
 		...overrides
 	};
 }

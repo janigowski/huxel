@@ -3,6 +3,7 @@ import { AreaCatalog, type AreaControl, type AreaGroup } from './area-catalog';
 import type { ChildLights, ResourceRef } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';
 import type { AreaChange, AreaKind } from './gateway';
+import { temperatureFrom, type ColorTemperature } from './temperature';
 
 interface PendingAdd {
 	token: object;
@@ -300,6 +301,7 @@ class GroupedLightEvent {
 		const isOn = this.readOn(this.resource.on);
 		const brightness = this.readBrightness(this.resource.dimming);
 		const color = this.readColor(this.resource.color);
+		const temperature = this.readTemperature(this.resource.color_temperature);
 		if (isOn !== undefined) {
 			fields.isOn = isOn;
 		}
@@ -308,6 +310,9 @@ class GroupedLightEvent {
 		}
 		if (color) {
 			fields.color = color;
+		}
+		if (temperature) {
+			fields.temperature = temperature;
 		}
 
 		return Object.keys(fields).length > 0 ? fields : undefined;
@@ -331,6 +336,14 @@ class GroupedLightEvent {
 		const brightness = (value as { brightness?: unknown }).brightness;
 
 		return typeof brightness === 'number' ? brightness : undefined;
+	}
+
+	private readTemperature(value: unknown): ColorTemperature | undefined {
+		if (!('color_temperature' in this.resource)) {
+			return undefined;
+		}
+
+		return temperatureFrom(value);
 	}
 
 	private readColor(value: unknown): XyColor | null | undefined {

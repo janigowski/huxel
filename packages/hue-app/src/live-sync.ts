@@ -1,5 +1,6 @@
 import { batch, type Signal } from '@preact/signals-core';
 import type { XyColor } from './color';
+import type { ColorTemperature } from './temperature';
 import type {
 	AreaChange,
 	BridgeLight,
@@ -17,6 +18,7 @@ interface LightFields {
 	isOn?: boolean;
 	brightness?: number | null;
 	color?: XyColor | null;
+	temperature?: ColorTemperature | null;
 }
 
 interface Resync {
@@ -223,6 +225,9 @@ export class LiveSync {
 		if (fields.color !== undefined) {
 			this.target.lanes.get(light).color.reconcile(fields.color);
 		}
+		if (fields.temperature !== undefined) {
+			this.target.lanes.get(light).temperature.reconcile(fields.temperature);
+		}
 	}
 }
 
@@ -240,6 +245,9 @@ function updatedFields(change: Extract<LightChange, { kind: 'updated' }>): Light
 	if (change.color !== undefined) {
 		fields.color = change.color;
 	}
+	if (change.temperature !== undefined) {
+		fields.temperature = change.temperature;
+	}
 	return fields;
 }
 
@@ -248,7 +256,8 @@ function withoutFields(state: BridgeLight, overrides: LightFields | undefined): 
 		name: state.name,
 		isOn: state.isOn,
 		brightness: state.brightness,
-		color: state.color
+		color: state.color,
+		temperature: state.temperature
 	};
 	if (overrides) {
 		for (const key of Object.keys(overrides) as (keyof LightFields)[]) {

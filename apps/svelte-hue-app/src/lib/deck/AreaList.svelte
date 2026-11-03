@@ -22,9 +22,18 @@
 		areas.find((area) => area.id === editingId && area.isOn && area.color !== null)
 	);
 	const editingPreset = $derived(areas.find((area) => area.id === presetId && area.isOn));
+	const temperatureOnly = $derived(
+		editingPreset !== undefined &&
+			editingPreset.color === null &&
+			editingPreset.temperature !== null
+	);
 	const selectedPreset = $derived(
 		editingPreset
-			? (findAreaPreset(editingPreset.color, editingPreset.brightness)?.id ?? null)
+			? (findAreaPreset(
+					editingPreset.color,
+					editingPreset.brightness,
+					editingPreset.temperature?.mirek ?? null
+				)?.id ?? null)
 			: null
 	);
 </script>
@@ -72,6 +81,7 @@
 	}
 	name={editingPreset?.name ?? ''}
 	preset={selectedPreset}
+	temperature={temperatureOnly}
 	onchange={(preset) => {
 		if (editingPreset) {
 			onapplypreset(editingPreset.id, preset);

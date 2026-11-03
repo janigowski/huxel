@@ -6,12 +6,8 @@
 	import Label from './Label.svelte';
 	import PowerIcon from './icons/PowerIcon.svelte';
 
-	interface CardLight extends SvelteLight {
-		readonly colors?: readonly string[];
-	}
-
 	interface Props {
-		light: CardLight;
+		light: SvelteLight;
 		index: number;
 		ontoggle: () => void;
 		ondim: (brightness: number) => void;

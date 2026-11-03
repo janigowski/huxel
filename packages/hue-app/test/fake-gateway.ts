@@ -40,6 +40,10 @@ export class FakeGateway implements HueGateway {
 		return this.command();
 	}
 
+	setTemperature(): Promise<void> {
+		return this.command();
+	}
+
 	watch(observer: LightChangeObserver): () => void {
 		this.observers.push(observer);
 		return () => {
@@ -59,14 +63,16 @@ export const desk: BridgeLight = {
 	name: 'Desk',
 	isOn: false,
 	brightness: 40,
-	color: { x: 0.3, y: 0.3 }
+	color: { x: 0.3, y: 0.3 },
+	temperature: null
 };
 export const lamp: BridgeLight = {
 	id: 'lamp',
 	name: 'Lamp',
 	isOn: true,
 	brightness: null,
-	color: null
+	color: null,
+	temperature: null
 };
 
 export function at<T>(items: readonly T[], index: number): T {

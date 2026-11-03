@@ -59,6 +59,7 @@ describe('HueSdkGateway areas', () => {
 					isOn: true,
 					brightness: 25,
 					color: { x: 0.5, y: 0.4 },
+					temperature: null,
 					children: []
 				}
 			],
@@ -117,11 +118,13 @@ describe('HueSdkGateway areas', () => {
 		await gateway.setAreaPower('gl-kitchen', false);
 		await gateway.setAreaBrightness('gl-kitchen', 12);
 		await gateway.setAreaColor('gl-kitchen', { x: 0.1, y: 0.2 });
+		await gateway.setAreaTemperature('gl-kitchen', 447);
 
 		expect(fake.updates).toEqual([
 			{ id: 'gl-kitchen', body: { on: { on: false } } },
 			{ id: 'gl-kitchen', body: { dimming: { brightness: 12 } } },
-			{ id: 'gl-kitchen', body: { color: { xy: { x: 0.1, y: 0.2 } } } }
+			{ id: 'gl-kitchen', body: { color: { xy: { x: 0.1, y: 0.2 } } } },
+			{ id: 'gl-kitchen', body: { color_temperature: { mirek: 447 } } }
 		]);
 	});
 
@@ -201,6 +204,7 @@ describe('HueSdkGateway areas', () => {
 					isOn: true,
 					brightness: 80,
 					color: null,
+					temperature: null,
 					children: []
 				}
 			}

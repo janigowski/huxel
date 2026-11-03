@@ -2,7 +2,7 @@
 	import LightGrid from '$lib/deck/LightGrid.svelte';
 	import Notice from '$lib/deck/Notice.svelte';
 	import SectionBar from '$lib/deck/SectionBar.svelte';
-	import { describeError, type XyColor } from 'hue-app';
+	import { describeError, type PresetId, type XyColor } from 'hue-app';
 	import type { SvelteHueApp } from 'hue-app/svelte';
 
 	interface Props {
@@ -41,6 +41,10 @@
 	function changeColor(lightId: string, color: XyColor) {
 		return run(hue.changeColor(lightId, color));
 	}
+
+	function applyPreset(lightId: string, preset: PresetId) {
+		return run(hue.applyLightPreset(lightId, preset));
+	}
 </script>
 
 <section class="field">
@@ -55,7 +59,13 @@
 	{:else if lights.length === 0}
 		<Notice tone="muted">No lights</Notice>
 	{:else}
-		<LightGrid {lights} ontoggle={toggle} ondim={dim} onchangecolor={changeColor} />
+		<LightGrid
+			{lights}
+			ontoggle={toggle}
+			ondim={dim}
+			onchangecolor={changeColor}
+			onapplypreset={applyPreset}
+		/>
 	{/if}
 </section>
 

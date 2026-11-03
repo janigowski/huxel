@@ -18,7 +18,20 @@ export class ApplyAreaPreset {
 		}
 
 		const lanes = this.lanes.get(area);
-		const commands = [lanes.color.submit(definition.color)];
+		const temperatureOnly = area.color.peek() === null && area.temperature.peek() !== null;
+		const restoreChildren = temperatureOnly
+			? area.previewChildTemperatures(definition.mirek)
+			: undefined;
+		const commands = [
+			temperatureOnly
+				? lanes.temperature
+						.submit(Object.freeze({ mirek: definition.mirek }))
+						.catch((error: unknown) => {
+							restoreChildren?.();
+							throw error;
+						})
+				: lanes.color.submit(definition.color)
+		];
 
 		if (area.brightness.peek() !== null) {
 			commands.push(lanes.brightness.submit(definition.brightness));

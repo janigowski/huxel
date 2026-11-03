@@ -10,8 +10,8 @@ export const BRIDGE_ORIGIN = `https://${BRIDGE_HOST}`;
 export const BRIDGE_ID = '001788fffe7d45eb';
 
 export const LIGHTS: readonly BridgeLight[] = [
-	{ id: 'desk', name: 'Desk', isOn: false, brightness: 40, color: null },
-	{ id: 'lamp', name: 'Lamp', isOn: true, brightness: 80, color: null }
+	{ id: 'desk', name: 'Desk', isOn: false, brightness: 40, color: null, temperature: null },
+	{ id: 'lamp', name: 'Lamp', isOn: true, brightness: 80, color: null, temperature: null }
 ];
 
 export interface Deferred<T> {
@@ -63,6 +63,10 @@ export class UnreachableGateway implements HueGateway {
 	}
 
 	setColor(): Promise<void> {
+		return Promise.reject(networkError());
+	}
+
+	setTemperature(): Promise<void> {
 		return Promise.reject(networkError());
 	}
 }

@@ -3,13 +3,16 @@ import { createSvelteHueApp } from '../src/svelte/index';
 import {
 	AreasUnsupportedError,
 	HueAppDisposedError,
+	AreaNotTemperatureCapableError,
 	InvalidBrightnessError,
 	InvalidColorError,
+	InvalidMirekError,
 	InvalidPresetError,
 	RoomNotFoundError,
 	ZoneNotFoundError,
 	areaPresets,
 	createHueApp,
+	mirekToHex,
 	type Area,
 	type BridgeArea,
 	type PresetId
@@ -23,6 +26,7 @@ const living: BridgeArea = {
 	isOn: false,
 	brightness: 40,
 	color: { x: 0.4, y: 0.4 },
+	temperature: null,
 	children: []
 };
 
@@ -33,6 +37,7 @@ const downstairs: BridgeArea = {
 	isOn: true,
 	brightness: null,
 	color: null,
+	temperature: null,
 	children: []
 };
 
@@ -47,6 +52,7 @@ class AreasGateway extends FakeGateway {
 	readonly areaPower: AreaCall<boolean>[] = [];
 	readonly areaBrightness: AreaCall<number>[] = [];
 	readonly areaColor: AreaCall<{ x: number; y: number }>[] = [];
+	readonly areaTemperature: AreaCall<number>[] = [];
 
 	listAreas(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }> {
 		const result = deferred<{ rooms: BridgeArea[]; zones: BridgeArea[] }>();
@@ -64,6 +70,10 @@ class AreasGateway extends FakeGateway {
 
 	setAreaColor(serviceId: string, color: { x: number; y: number }): Promise<void> {
 		return this.areaCommand(this.areaColor, serviceId, color);
+	}
+
+	setAreaTemperature(serviceId: string, mirek: number): Promise<void> {
+		return this.areaCommand(this.areaTemperature, serviceId, mirek);
 	}
 
 	private areaCommand<T>(calls: AreaCall<T>[], serviceId: string, value: T): Promise<void> {
@@ -136,6 +146,46 @@ describe('rooms and zones', () => {
 		]);
 
 		expect(app.state.rooms.get('living')?.colors.value).toEqual(['#0000ff']);
+	});
+
+	it('builds a temperature-only palette from mirek and ignores xy when a light has both', async () => {
+		const warm = bridgeLight({
+			id: 'warm',
+			name: 'Warm',
+			color: null,
+			temperature: { mirek: 447 }
+		});
+		const colorAndTemperature = bridgeLight({
+			id: 'both',
+			name: 'Both',
+			color: { x: 0.64, y: 0.33 },
+			temperature: { mirek: 447 }
+		});
+		const { app, gateway } = await setup(
+			{
+				rooms: [
+					{ ...living, color: null, temperature: { mirek: 370 }, children: ['warm', 'both'] }
+				],
+				zones: [{ ...downstairs, temperature: { mirek: 156 }, children: [] }]
+			},
+			[warm, colorAndTemperature]
+		);
+
+		expect(app.state.rooms.get('living')?.colors.value).toEqual([mirekToHex(447), '#ff0000']);
+		expect(app.state.zones.get('downstairs')?.colors.value).toEqual([mirekToHex(156)]);
+
+		gateway.observer.onChanges([{ kind: 'updated', id: 'warm', temperature: { mirek: 156 } }]);
+		gateway.observer.onAreaChanges?.([
+			{
+				kind: 'service-updated',
+				serviceId: 'downstairs-light',
+				temperature: { mirek: 367 }
+			}
+		]);
+
+		expect(app.state.rooms.get('living')?.colors.value).toEqual([mirekToHex(156), '#ff0000']);
+		expect(app.state.zones.get('downstairs')?.colors.value).toEqual([mirekToHex(367)]);
+		expect(app.state.lights.get('both')?.colors.value).toEqual(['#ff0000']);
 	});
 
 	it('loads rooms and zones alongside lights', async () => {
@@ -214,6 +264,12 @@ describe('rooms and zones', () => {
 		await expect(app.changeZoneColor('downstairs', { x: 0.2, y: 0.2 })).rejects.toThrow(
 			'Zone "downstairs" does not support color'
 		);
+		await expect(app.changeRoomTemperature('living', 447)).rejects.toBeInstanceOf(
+			AreaNotTemperatureCapableError
+		);
+		await expect(app.changeZoneTemperature('downstairs', 12.5)).rejects.toBeInstanceOf(
+			InvalidMirekError
+		);
 		await expect(app.toggleRoom('missing')).rejects.toBeInstanceOf(RoomNotFoundError);
 		await expect(app.toggleZone('missing')).rejects.toBeInstanceOf(ZoneNotFoundError);
 		await expect(app.applyRoomPreset('missing', 'bright')).rejects.toBeInstanceOf(
@@ -270,6 +326,84 @@ describe('rooms and zones', () => {
 		gateway.areaColor[0]?.result.resolve();
 		gateway.areaBrightness[0]?.result.resolve();
 		await command;
+	});
+
+	it('applies a temperature preset as mirek when the grouped light has no color', async () => {
+		const relax = areaPresets.find((preset) => preset.id === 'relax');
+		const room: BridgeArea = {
+			...living,
+			color: null,
+			temperature: { mirek: 250 },
+			brightness: 40,
+			isOn: true
+		};
+		const { app, gateway } = await setup({ rooms: [room], zones: [] });
+		const command = app.applyRoomPreset('living', 'relax');
+
+		expect(app.state.rooms.get('living')?.color.value).toBeNull();
+		expect(app.state.rooms.get('living')?.temperature.value).toEqual({ mirek: relax?.mirek });
+		expect(app.state.rooms.get('living')?.brightness.value).toBe(relax?.brightness);
+		expect(gateway.areaColor).toHaveLength(0);
+		expect(gateway.areaTemperature[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: relax?.mirek
+		});
+		expect(gateway.areaBrightness[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: relax?.brightness
+		});
+
+		const error = new Error('Color feature not supported by grouped light resource');
+		const rejection = expect(command).rejects.toBe(error);
+		gateway.areaTemperature[0]?.result.reject(error);
+		gateway.areaBrightness[0]?.result.reject(error);
+		await rejection;
+
+		expect(app.state.rooms.get('living')?.temperature.value).toEqual({ mirek: 250 });
+		expect(app.state.rooms.get('living')?.brightness.value).toBe(40);
+	});
+
+	it('paints temperature-only child lights when a room preset is applied and restores them if it fails', async () => {
+		const relax = areaPresets.find((preset) => preset.id === 'relax')!;
+		const warm = bridgeLight({
+			id: 'warm',
+			name: 'Warm',
+			color: null,
+			temperature: { mirek: 250 }
+		});
+		const colored = bridgeLight({
+			id: 'both',
+			name: 'Both',
+			color: { x: 0.64, y: 0.33 },
+			temperature: { mirek: 250 }
+		});
+		const room: BridgeArea = {
+			...living,
+			color: null,
+			temperature: { mirek: 250 },
+			brightness: 40,
+			isOn: true,
+			children: ['warm', 'both']
+		};
+		const { app, gateway } = await setup({ rooms: [room], zones: [] }, [warm, colored]);
+		const command = app.applyRoomPreset('living', 'relax');
+
+		expect(app.state.lights.get('warm')?.colors.value).toEqual([mirekToHex(relax.mirek)]);
+		expect(app.state.lights.get('both')?.colors.value).toEqual(['#ff0000']);
+		expect(app.state.rooms.get('living')?.colors.value).toEqual([
+			mirekToHex(relax.mirek),
+			'#ff0000'
+		]);
+		expect(gateway.temperatureCalls).toHaveLength(0);
+
+		const error = new Error('rejected');
+		const rejection = expect(command).rejects.toBe(error);
+		gateway.areaTemperature[0]?.result.reject(error);
+		gateway.areaBrightness[0]?.result.reject(error);
+		await rejection;
+
+		expect(app.state.lights.get('warm')?.temperature.value).toEqual({ mirek: 250 });
+		expect(app.state.rooms.get('living')?.colors.value).toEqual([mirekToHex(250), '#ff0000']);
 	});
 
 	it('sets a preset color on a zone that cannot be dimmed', async () => {
