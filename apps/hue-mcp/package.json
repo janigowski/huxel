@@ -1,0 +1,26 @@
+{
+	"name": "hue-mcp",
+	"version": "0.1.0",
+	"description": "Local MCP server for Philips Hue",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"bin": {
+		"hue-mcp": "./src/index.ts"
+	},
+	"scripts": {
+		"start": "bun run src/index.ts",
+		"check": "tsc --noEmit",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.29.0",
+		"hue-app": "workspace:*",
+		"hue-sdk": "workspace:*",
+		"zod": "^4.1.12"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.4.3",
+		"typescript": "^5.9.3"
+	}
+}
