@@ -17,12 +17,12 @@ export default defineConfig({
 			'apps/svelte-app/project.inlang',
 			'apps/svelte-app/src/lib/paraglide',
 			'packages/design-system/.svelte-kit',
-			'apps/extension-hue-app/.e2e',
+			'apps/extension/.e2e',
 			'packages/client/docs/clip-v2'
 		],
 		overrides: [
 			{
-				files: ['packages/design-system/**', 'apps/extension-hue-app/**'],
+				files: ['packages/design-system/**', 'apps/extension/**'],
 				options: { svelte: true }
 			},
 			{

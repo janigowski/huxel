@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/inter';
-@import 'design-system/tokens.css';
+@import '@huxel/design-system/tokens.css';
 
 :root {
 	--popup-width: 30rem;

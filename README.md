@@ -42,7 +42,7 @@ Each app links to a bridge, keeps the application key, and talks to the lights t
 
 Web dashboard. List lights, rooms, and zones, then toggle, dim, and set color with live updates. Run it locally, or deploy it to a server.
 
-### [extension-hue-app](./apps/extension-hue-app)
+### [extension](./apps/extension)
 
 Chromium toolbar popup for Arc and Chrome. Control the lights on the local network from the browser. You load it unpacked from a local build.
 

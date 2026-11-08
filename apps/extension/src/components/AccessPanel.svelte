@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ActionButton, Label, Notice } from 'design-system';
+	import { ActionButton, Label, Notice } from '@huxel/design-system';
 	import type { Snippet } from 'svelte';
 
 	interface Props {

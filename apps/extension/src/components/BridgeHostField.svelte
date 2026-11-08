@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Label } from 'design-system';
+	import { Label } from '@huxel/design-system';
 
 	interface Props {
 		value: string;

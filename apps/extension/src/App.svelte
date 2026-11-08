@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ConnectPanel, DashboardBar, Hero, LightsSection, Notice } from 'design-system';
+	import { ConnectPanel, DashboardBar, Hero, LightsSection, Notice } from '@huxel/design-system';
 	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 	import { bridgeOrigin, parseBridgeHost } from './bridge/bridge-host';

@@ -1,6 +1,6 @@
-# extension-hue-app
+# extension
 
-Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge on the local network, then toggle, dim and recolor lights from the toolbar popup. It is a Svelte 5 + Vite app built from the shared [`design-system`](../../packages/design-system) components on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). The extension is not published to a store. You load it unpacked.
+Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge on the local network, then toggle, dim and recolor lights from the toolbar popup. It is a Svelte 5 + Vite app built from the shared [`@huxel/design-system`](../../packages/design-system) components on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). The extension is not published to a store. You load it unpacked.
 
 ## Setup
 
@@ -8,7 +8,7 @@ Workspace dependencies resolve to their `dist/` builds, so build them first from
 
 ```bash
 bun install
-bun run --filter @huxel/client --filter @huxel/app --filter design-system build
+bun run --filter @huxel/client --filter @huxel/app --filter @huxel/design-system build
 ```
 
 ## Mock preview
@@ -26,7 +26,7 @@ bun run watch
 ```
 
 1. Open `arc://extensions` (`chrome://extensions` in Chrome) and turn on **Developer mode**.
-2. Click **Load unpacked** and select `apps/extension-hue-app/dist`.
+2. Click **Load unpacked** and select `apps/extension/dist`.
 3. Pin **Hue Remote**. `watch` rebuilds on every change, and you see the result when you reopen the popup. Click reload on the extensions page only after changing `public/manifest.json`.
 
 To develop from several git worktrees without reloading the extension from a different folder each time, run `bun run watch:shared` instead and load `~/Documents/Extensions/hue-remote` once. It builds into that fixed folder from whichever worktree runs it, so run it in only one worktree at a time.
