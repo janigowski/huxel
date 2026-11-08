@@ -25,7 +25,7 @@ function targetSchema(noun: string) {
 }
 
 export function createHueMcpServer(control: HueControl): McpServer {
-	const server = new McpServer({ name: 'hue-mcp', version: '0.1.0' });
+	const server = new McpServer({ name: 'huxel-mcp', version: '0.1.0' });
 
 	server.registerTool(
 		'bridge_status',

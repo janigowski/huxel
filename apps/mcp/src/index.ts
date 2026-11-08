@@ -18,7 +18,7 @@ try {
 			JSON.stringify(await session.linkUntil(bridgeId === undefined ? {} : { bridgeId }))
 		);
 	} else {
-		console.error('Usage: hue-mcp [status | link [bridgeId]]');
+		console.error('Usage: huxel-mcp [status | link [bridgeId]]');
 		process.exitCode = 1;
 	}
 } catch (error) {

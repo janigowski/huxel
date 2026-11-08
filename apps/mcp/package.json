@@ -1,12 +1,12 @@
 {
-	"name": "hue-mcp",
+	"name": "@huxel/mcp",
 	"version": "0.1.0",
 	"description": "Local MCP server for Philips Hue",
 	"private": true,
 	"license": "MIT",
 	"type": "module",
 	"bin": {
-		"hue-mcp": "./src/index.ts"
+		"huxel-mcp": "./src/index.ts"
 	},
 	"scripts": {
 		"start": "bun run src/index.ts",

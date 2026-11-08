@@ -1,4 +1,4 @@
-# hue-mcp
+# @huxel/mcp
 
 Local [MCP](https://modelcontextprotocol.io) server for Philips Hue. It speaks stdio, links to a bridge on the same network, and exposes a few tools for an agent. [Hermes](https://hermes-agent.nousresearch.com/) can run it and reach it from Telegram. The server does not know about Telegram.
 
@@ -51,7 +51,7 @@ In `~/.hermes/config.yaml`:
 mcp_servers:
   hue:
     command: bun
-    args: ['run', '/absolute/path/to/apps/hue-mcp/src/index.ts']
+    args: ['run', '/absolute/path/to/apps/mcp/src/index.ts']
     cwd: /absolute/path/to/huxel
     timeout: 30
     supports_parallel_tool_calls: false

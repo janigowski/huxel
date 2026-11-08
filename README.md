@@ -50,7 +50,7 @@ Chromium toolbar popup for Arc and Chrome. Control the lights on the local netwo
 
 Terminal remote. Link a bridge, then toggle and dim lights, rooms, and zones, including the same presets as the web dashboard.
 
-### [hue-mcp](./apps/hue-mcp)
+### [@huxel/mcp](./apps/mcp)
 
 Local MCP server for an agent on the same network. It speaks stdio and can report status, link a bridge, read the home, and set a light, a room, a zone, or a scene. The application key stays in a config file and is never returned by a tool.
 
