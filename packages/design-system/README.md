@@ -1,12 +1,12 @@
-# design-system
+# @huxel/design-system
 
-Svelte 5 components and design tokens shared by [`svelte-hue-app`](../../apps/svelte-hue-app) and [`extension-hue-app`](../../apps/extension-hue-app). Light components render the state of [`@huxel/app`](../app)'s Svelte adapter.
+Svelte 5 components and design tokens shared by [`svelte-app`](../../apps/svelte-app) and [`extension`](../../apps/extension). Light components render the state of [`@huxel/app`](../app)'s Svelte adapter.
 
 ## Usage
 
 ```svelte
 <script lang="ts">
-	import { DashboardBar, Hero, LightsSection } from 'design-system';
+	import { DashboardBar, Hero, LightsSection } from '@huxel/design-system';
 	import type { SvelteHueApp } from '@huxel/app/svelte';
 
 	let { hue }: { hue: SvelteHueApp } = $props();
@@ -22,7 +22,7 @@ Import the tokens once in the app stylesheet, after a CSS reset such as Tailwind
 ```css
 @import 'tailwindcss';
 @import '@fontsource-variable/inter';
-@import 'design-system/tokens.css';
+@import '@huxel/design-system/tokens.css';
 ```
 
 Components are styled only through the custom properties in `tokens.css`, so an app adapts the layout by overriding them, for example `--page-gutter` or `--text-title` in a narrow popup.

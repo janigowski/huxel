@@ -30,7 +30,7 @@ Headless state for the lights, rooms, and zones in one home.
 
 The application key stays in memory for the life of the app. Saving it between launches belongs to the product that calls this package. `@huxel/client` does the HTTP.
 
-### [design-system](./packages/design-system)
+### [@huxel/design-system](./packages/design-system)
 
 Private. Svelte 5 components and design tokens shared by the web dashboard and the browser extension. It renders `@huxel/app` state and ships no UI of its own to npm.
 
@@ -66,6 +66,6 @@ bun run lint
 bun run test
 ```
 
-Root scripts run in every workspace in dependency order, so `@huxel/client` builds before `@huxel/app`, `@huxel/app` before `design-system`, and all of them before the apps. Apps consume the libraries' `dist/` builds, so build the libraries before running an app. Run a script in a single workspace with `bunx vp run --filter <name> <script>`.
+Root scripts run in every workspace in dependency order, so `@huxel/client` builds before `@huxel/app`, `@huxel/app` before `@huxel/design-system`, and all of them before the apps. Apps consume the libraries' `dist/` builds, so build the libraries before running an app. Run a script in a single workspace with `bunx vp run --filter <name> <script>`.
 
 Formatting settings are shared across the repository in the root `vite.config.ts`: `bun run format`.

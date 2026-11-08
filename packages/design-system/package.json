@@ -1,5 +1,5 @@
 {
-	"name": "design-system",
+	"name": "@huxel/design-system",
 	"version": "0.1.0",
 	"description": "Svelte components and design tokens shared by the Hue apps",
 	"private": true,
