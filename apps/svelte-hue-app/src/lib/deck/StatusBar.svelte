@@ -1,13 +1,7 @@
 <script lang="ts">
+	import { data } from 'data-bus/svelte';
 	import type { HueAppConnection } from 'hue-app';
 	import { bridgeTail } from './readout';
-
-	interface Props {
-		bridgeId: string;
-		connection?: HueAppConnection;
-	}
-
-	let { bridgeId, connection }: Props = $props();
 
 	const labels: Record<HueAppConnection, string> = {
 		live: 'Live',
@@ -15,14 +9,24 @@
 		connecting: 'Connecting',
 		offline: 'Offline'
 	};
-	const tail = $derived(bridgeTail(bridgeId));
-	const label = $derived(connection ? labels[connection] : 'Not connected');
-	const live = $derived(connection === 'live');
+	const bridge = data('hue.bridge');
+	const connection = data('hue.connection');
+	const tail = $derived(bridgeTail(bridge.value.id));
+	const label = $derived.by(() => {
+		const current = connection.value;
+
+		if (!current) {
+			return 'Not connected';
+		}
+
+		return labels[current];
+	});
+	const live = $derived(connection.value === 'live');
 </script>
 
 <header class="status">
 	<p class="brand">Hue</p>
-	<p class="bridge" title={bridgeId}>Bridge {tail}</p>
+	<p class="bridge" title={bridge.value.id}>Bridge {tail}</p>
 	<p class={['pill', { live }]} role="status" aria-live="polite">{label}</p>
 </header>
 

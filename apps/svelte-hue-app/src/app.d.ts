@@ -1,5 +1,13 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
+import type { HueBridge } from '$lib/hue/bridge';
+import type { HueConnection } from '$lib/hue/connection-data';
+
+declare module 'data-bus' {
+	interface DataMap {
+		'hue.bridge': HueBridge;
+		'hue.connection': HueConnection;
+	}
+}
+
 declare global {
 	namespace App {
 		// interface Error {}

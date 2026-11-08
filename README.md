@@ -4,6 +4,7 @@ Libraries and apps for controlling Philips Hue lights over the CLIP API v2.
 
 | Workspace                                            | Description                                                       |
 | ---------------------------------------------------- | ----------------------------------------------------------------- |
+| [`packages/data-bus`](./packages/data-bus)           | Signal-style named values, with a Svelte adapter                  |
 | [`packages/hue-sdk`](./packages/hue-sdk)             | Typed, environment agnostic SDK for the Hue CLIP API v2           |
 | [`packages/hue-app`](./packages/hue-app)             | Headless app state for Hue lights, with Svelte and React adapters |
 | [`packages/design-system`](./packages/design-system) | Svelte components and design tokens shared by the Svelte apps     |

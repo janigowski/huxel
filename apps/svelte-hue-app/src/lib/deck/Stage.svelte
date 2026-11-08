@@ -1,12 +1,9 @@
 <script lang="ts">
-	import type { HueAppConnection } from 'hue-app';
 	import type { Snippet } from 'svelte';
 	import Masthead from './Masthead.svelte';
 	import StatusBar from './StatusBar.svelte';
 
 	interface Props {
-		bridgeId: string;
-		connection?: HueAppConnection;
 		onCount: number | null;
 		total: number | null;
 		rooms?: number;
@@ -14,13 +11,13 @@
 		children: Snippet;
 	}
 
-	let { bridgeId, connection, onCount, total, rooms, zones, children }: Props = $props();
+	let { onCount, total, rooms, zones, children }: Props = $props();
 </script>
 
 <div class="field">
 	<a class="skip" href="#lights">Skip to lights</a>
 	<main class="frame" id="lights">
-		<StatusBar {bridgeId} {connection} />
+		<StatusBar />
 		<Masthead
 			title="All lights"
 			detail="Connect a bridge to control your lights."

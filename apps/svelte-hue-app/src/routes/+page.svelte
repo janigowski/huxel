@@ -2,7 +2,7 @@
 	import Board from '$lib/deck/Board.svelte';
 	import ConnectPanel from '$lib/deck/ConnectPanel.svelte';
 	import Stage from '$lib/deck/Stage.svelte';
-	import { bridge } from '$lib/hue/bridge';
+	import { hueConnection } from '$lib/hue/connection-data';
 	import { BridgeConnection } from '$lib/hue/connection.svelte';
 	import GroupsSection from '$lib/hue/GroupsSection.svelte';
 	import LightsField from '$lib/hue/LightsField.svelte';
@@ -16,6 +16,10 @@
 	const roomCount = $derived(hue?.rooms.all.length);
 	const zoneCount = $derived(hue?.zones.all.length);
 	const loading = $derived(hue?.status === 'idle' || hue?.status === 'loading');
+
+	$effect(() => {
+		hueConnection.value = hue?.connection ?? null;
+	});
 
 	$effect(() => {
 		const app = hue;
@@ -36,14 +40,7 @@
 	<title>Hue Remote</title>
 </svelte:head>
 
-<Stage
-	bridgeId={bridge.id}
-	connection={hue?.connection}
-	{onCount}
-	{total}
-	rooms={roomCount}
-	zones={zoneCount}
->
+<Stage {onCount} {total} rooms={roomCount} zones={zoneCount}>
 	{#if hue}
 		<Board>
 			{#snippet lanes()}
