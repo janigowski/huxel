@@ -1,4 +1,4 @@
-import { HueRateLimitError } from 'hue-sdk';
+import { HueRateLimitError } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import { page } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';

@@ -1,5 +1,5 @@
 import type { HueApp } from 'hue-app';
-import type { DiscoveredBridge } from 'hue-sdk';
+import type { DiscoveredBridge } from '@huxel/client';
 
 export interface KeyValueStorage {
 	get(key: string): Promise<unknown>;

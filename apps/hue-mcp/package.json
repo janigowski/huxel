@@ -16,7 +16,7 @@
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.29.0",
 		"hue-app": "workspace:*",
-		"hue-sdk": "workspace:*",
+		"@huxel/client": "workspace:*",
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {

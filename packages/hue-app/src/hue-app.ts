@@ -1,5 +1,5 @@
 import { batch, computed, signal, type ReadonlySignal } from '@preact/signals-core';
-import { createHueClient, type HttpClient } from 'hue-sdk';
+import { createHueClient, type HttpClient } from '@huxel/client';
 import { Area } from './area';
 import { AreaCollection } from './area-collection';
 import { AreaLaneRegistry } from './area-lanes';
@@ -22,7 +22,7 @@ import {
 } from './errors';
 import type { PresetId } from './preset';
 import type { AreaGateway, BridgeArea, HueAppConnection, HueGateway } from './gateway';
-import { HueSdkGateway } from './hue-sdk-gateway';
+import { HueClientGateway } from './hue-client-gateway';
 import { Light } from './light';
 import { LightCollection } from './light-collection';
 import { LightLaneRegistry } from './light-lanes';
@@ -356,7 +356,7 @@ export function createHueApp(options: HueAppOptions): HueApp {
 	const gateway =
 		'gateway' in options
 			? options.gateway
-			: new HueSdkGateway(
+			: new HueClientGateway(
 					createHueClient({
 						baseUrl: options.baseUrl,
 						appKey: options.appKey,

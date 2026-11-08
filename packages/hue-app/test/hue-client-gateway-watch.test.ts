@@ -6,9 +6,9 @@ import type {
 	HueEvent,
 	HueEventResource,
 	LightGet
-} from 'hue-sdk';
+} from '@huxel/client';
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { HueSdkGateway } from '../src/hue-sdk-gateway';
+import { HueClientGateway } from '../src/hue-client-gateway';
 import { createHueApp } from '../src/index';
 import type { HueAppConnection, LightChange, LightChangeObserver } from '../src/index';
 import { deferred, flushMicrotasks, type Deferred } from './fakes';
@@ -96,7 +96,7 @@ function recorder() {
 
 function setup() {
 	const fake = fakeClient();
-	const gateway = new HueSdkGateway(fake.client);
+	const gateway = new HueClientGateway(fake.client);
 	const recorded = recorder();
 	const unwatch = gateway.watch(recorded.observer);
 	return { ...fake, ...recorded, gateway, unwatch };
@@ -116,7 +116,7 @@ function lightGet(id: string, name: string, isOn: boolean, brightness?: number):
 	} as unknown as LightGet;
 }
 
-describe('HueSdkGateway.watch', () => {
+describe('HueClientGateway.watch', () => {
 	it('reports connecting from the subscription state even when the stream emits no initial state', () => {
 		const { observers, events } = setup();
 
@@ -233,7 +233,7 @@ describe('HueSdkGateway.watch', () => {
 		]);
 	});
 
-	it('emits one onChanges per SDK batch and skips batches without light changes', () => {
+	it('emits one onChanges per client batch and skips batches without light changes', () => {
 		const { stream, changes } = setup();
 
 		stream().onEvents([
@@ -528,7 +528,7 @@ describe('HueSdkGateway.watch', () => {
 		vi.spyOn(fake.client.events, 'subscribe').mockImplementation(() => {
 			throw error;
 		});
-		const gateway = new HueSdkGateway(fake.client);
+		const gateway = new HueClientGateway(fake.client);
 
 		expect(() => gateway.watch(recorder().observer)).toThrow(error);
 	});
@@ -536,7 +536,7 @@ describe('HueSdkGateway.watch', () => {
 	describe('with HueApp', () => {
 		async function setupApp() {
 			const fake = fakeClient();
-			const app = createHueApp({ gateway: new HueSdkGateway(fake.client), settleMs: 0 });
+			const app = createHueApp({ gateway: new HueClientGateway(fake.client), settleMs: 0 });
 			const states: HueAppConnection[] = [];
 			const unsubscribe = app.state.connection.subscribe((state) => states.push(state));
 			const initialization = app.initialize();

@@ -1,4 +1,4 @@
-import { HueApiError } from 'hue-sdk';
+import { HueApiError } from '@huxel/client';
 import type {
 	EventStreamState,
 	GroupedLightPut,
@@ -7,7 +7,7 @@ import type {
 	LightGet,
 	LightPut,
 	ResourceIdentifierResponse
-} from 'hue-sdk';
+} from '@huxel/client';
 import { AreaCatalog } from './area-catalog';
 import { AreaEventSession } from './area-event-session';
 import { ChildLights } from './child-lights';
@@ -35,10 +35,10 @@ const CONNECTION_STATES: Record<EventStreamState, HueAppConnection> = {
 };
 
 /**
- * Expects a client created with `throttle: false`: the SDK's default write throttling can resolve
+ * Expects a client created with `throttle: false`: the client's default write throttling can resolve
  * a command with another request's response and drop its outcome.
  */
-export class HueSdkGateway implements HueGateway {
+export class HueClientGateway implements HueGateway {
 	private readonly client: HueClient;
 	private readonly catalog = new AreaCatalog();
 	private readonly childLights = new ChildLights();

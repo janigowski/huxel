@@ -9,7 +9,7 @@ Rooms and zones belong to `HueApp`. Do not add an opt-in such as `roomsAndZones`
 
 Sort rooms and zones in `hue-app`, in the area collection. UI sections render the order they are given.
 
-Model behavior with classes and private state, as `LiveSync`, `AreaSync`, and `HueSdkGateway` do. Do not build a feature as a closure that returns a bag of functions, or as a pile of free functions sharing mutable maps.
+Model behavior with classes and private state, as `LiveSync`, `AreaSync`, and `HueClientGateway` do. Do not build a feature as a closure that returns a bag of functions, or as a pile of free functions sharing mutable maps.
 
 ```ts
 // ❌ BAD
@@ -32,4 +32,4 @@ export class AreaEventSession {
 }
 ```
 
-Tests in `packages/hue-app` fake `HueClient` with `FakeHueClient`. HTTP request mocking belongs in `hue-sdk`, not in hue-app gateway tests.
+Tests in `packages/hue-app` fake `HueClient` with `FakeHueClient`. HTTP request mocking belongs in `@huxel/client`, not in hue-app gateway tests.

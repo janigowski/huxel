@@ -7,7 +7,7 @@ import type {
 	SceneGet,
 	XYColor,
 	ZoneGet
-} from 'hue-sdk';
+} from '@huxel/client';
 import { SessionError } from './errors';
 
 export interface TargetChange {

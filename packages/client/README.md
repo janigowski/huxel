@@ -1,15 +1,15 @@
-# hue-sdk
+# @huxel/client
 
-Typed, environment-agnostic TypeScript SDK for the Philips Hue [CLIP API v2](https://developers.meethue.com/). ESM-only, single runtime dependency (`lodash-es`). Runs in browsers, Node.js 18+, and Bun.
+Typed, environment-agnostic TypeScript client for the Philips Hue [CLIP API v2](https://developers.meethue.com/). ESM-only, single runtime dependency (`lodash-es`). Runs in browsers, Node.js 18+, and Bun.
 
 ## Install
 
 ```bash
-bun add hue-sdk
+bun add @huxel/client
 ```
 
 ```bash
-npm install hue-sdk
+npm install @huxel/client
 ```
 
 ## Quick start
@@ -23,7 +23,7 @@ import {
 	discoverBridges,
 	HueLinkButtonNotPressedError,
 	registerApplication
-} from 'hue-sdk';
+} from '@huxel/client';
 
 const [bridge] = await discoverBridges();
 const baseUrl = bridge
@@ -56,7 +56,7 @@ await hue.lights.update(lights[0].id, {
 });
 ```
 
-Press the bridge link button before calling `registerApplication`. The SDK performs a single registration request (no polling), never stores credentials, and expects you to pass the returned `username` as `appKey`.
+Press the bridge link button before calling `registerApplication`. The client performs a single registration request (no polling), never stores credentials, and expects you to pass the returned `username` as `appKey`.
 
 ## Client
 
@@ -82,7 +82,7 @@ createHueClient({ baseUrl, appKey, httpClient?, throttle? }) => HueClient
 
 ### Response shape
 
-All CLIP v2 calls resolve to the full envelope `{ errors: ApiError[]; data: T[] }`. The SDK does not unwrap `data`. HTTP **207** partial success still resolves; inspect `response.errors`. Non-fatal errors returned inside **200** responses are preserved in `errors`.
+All CLIP v2 calls resolve to the full envelope `{ errors: ApiError[]; data: T[] }`. The client does not unwrap `data`. HTTP **207** partial success still resolves; inspect `response.errors`. Non-fatal errors returned inside **200** responses are preserved in `errors`.
 
 ### Types
 
@@ -105,7 +105,7 @@ Uses V1 `POST /api` on the bridge origin (not `/clip/v2`). Catch `HueLinkButtonN
 
 ## Error handling
 
-All SDK errors extend `HueError`.
+All client errors extend `HueError`.
 
 | Class                          | When                                                       |
 | ------------------------------ | ---------------------------------------------------------- |
@@ -122,7 +122,7 @@ All SDK errors extend `HueError`.
 `AbortError` from cancelled requests is rethrown unchanged.
 
 ```ts
-import { HueApiError, HueNotFoundError } from 'hue-sdk';
+import { HueApiError, HueNotFoundError } from '@huxel/client';
 
 try {
 	await hue.lights.get('unknown-id');
@@ -193,7 +193,7 @@ console.log(subscription.state);
 subscription.close();
 ```
 
-- `onEvents` receives each batch the bridge sends as `HueEvent[]` (`{ id, creationtime, type: 'add' | 'update' | 'delete' | 'error', data }`). `update` payloads are partial: only `id`, `type` and the changed fields are guaranteed. `resource.type === 'light'` narrows to `LightEventResource`; resource types the SDK does not model pass through unchanged at runtime.
+- `onEvents` receives each batch the bridge sends as `HueEvent[]` (`{ id, creationtime, type: 'add' | 'update' | 'delete' | 'error', data }`). `update` payloads are partial: only `id`, `type` and the changed fields are guaranteed. `resource.type === 'light'` narrows to `LightEventResource`; resource types the client does not model pass through unchanged at runtime.
 - States: `connecting` (first attempt) → `open` (2xx headers received) → `reconnecting` (after a disconnect, through backoff and retries until the next `open`) → `closed` (terminal). `onStateChange` fires only on transitions, and no observer callback runs synchronously inside `subscribe()`.
 - **401** (`HueUnauthorizedError`) and **403** (`HueForbiddenError`) are reported via `onError` and stop the stream permanently (`closed`).
 - Other non-2xx statuses (`HueRateLimitError` for 429, `HueApiError` otherwise) and transport failures (`HueNetworkError`, original error on `cause`) are reported via `onError`, then the stream reconnects. A clean end of the stream reconnects without an `onError`.
@@ -248,7 +248,7 @@ Implementations must **resolve** for every HTTP status and **reject** only on ne
 Logging wrapper (illustrative):
 
 ```ts
-import { createFetchHttpClient, createHueClient, type HttpClient } from 'hue-sdk';
+import { createFetchHttpClient, createHueClient, type HttpClient } from '@huxel/client';
 
 function withLogging(inner: HttpClient): HttpClient {
 	return {
@@ -269,7 +269,7 @@ const hue = createHueClient({
 });
 ```
 
-In Node, you can pass a custom `fetch` (e.g. undici with a `dispatcher` that trusts the Hue root CA). This is environment-specific; the SDK does not ship CA bundles or disable TLS verification.
+In Node, you can pass a custom `fetch` (e.g. undici with a `dispatcher` that trusts the Hue root CA). This is environment-specific; the client does not ship CA bundles or disable TLS verification.
 
 ## Resource coverage
 
@@ -280,19 +280,19 @@ In Node, you can pass a custom `fetch` (e.g. undici with a `dispatcher` that tru
 
 ## Networking limitations
 
-- The bridge serves **HTTPS** with a certificate signed by Signify’s private CA. Browsers require the user to trust or accept that certificate for the bridge host. Node and Bun need a custom transport configured with the Hue root CA. The SDK never disables TLS verification.
+- The bridge serves **HTTPS** with a certificate signed by Signify’s private CA. Browsers require the user to trust or accept that certificate for the bridge host. Node and Bun need a custom transport configured with the Hue root CA. The client never disables TLS verification.
 - Browser **CORS** policies apply to requests to the bridge and to `discovery.meethue.com`; behavior depends on the environment (e.g. extensions with host permissions can avoid some restrictions).
 
 ## Validation
 
-There is no runtime schema validation of request bodies or `data` items. The SDK checks that responses match the CLIP v2 envelope shape (`errors` + `data`). Field constraints are enforced by the bridge; JSDoc on types documents Hue-documented limits where applicable.
+There is no runtime schema validation of request bodies or `data` items. The client checks that responses match the CLIP v2 envelope shape (`errors` + `data`). Field constraints are enforced by the bridge; JSDoc on types documents Hue-documented limits where applicable.
 
 ## Versioning
 
 This package uses [semantic versioning](https://semver.org/) independently of Hue’s API version. It targets **CLIP v2 only**; the API reference it is built against lives in [`docs/clip-v2`](./docs/clip-v2/README.md).
 
 - **Minor**: new optional fields or endpoints.
-- **Patch**: internal fixes, no breaking change to the public SDK contract.
+- **Patch**: internal fixes, no breaking change to the public client contract.
 - **Major**: breaking changes to exported APIs or behavior guaranteed by this package.
 
 See [CHANGELOG.md](./CHANGELOG.md).

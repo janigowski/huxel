@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { hexToXy } from 'hue-app';
-import type { DiscoveredBridge, HttpRequest } from 'hue-sdk';
+import type { DiscoveredBridge, HttpRequest } from '@huxel/client';
 import { ConfigStore } from '../src/config/config-store';
 import { KEY_REJECTED, NOT_LINKED, PRESS_BUTTON } from '../src/errors';
 import { HueSession } from '../src/session';

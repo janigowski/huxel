@@ -1,4 +1,4 @@
-import { HueLinkButtonNotPressedError, HueNetworkError, HueRateLimitError } from 'hue-sdk';
+import { HueLinkButtonNotPressedError, HueNetworkError, HueRateLimitError } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import {
 	describeConnectError,

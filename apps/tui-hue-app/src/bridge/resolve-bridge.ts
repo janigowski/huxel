@@ -1,4 +1,4 @@
-import type { DiscoveredBridge } from 'hue-sdk';
+import type { DiscoveredBridge } from '@huxel/client';
 import type { BridgeAddress, ConfigStore } from '../config/config-store';
 
 export interface BridgeSession {

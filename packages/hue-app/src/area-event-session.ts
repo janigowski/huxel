@@ -1,4 +1,4 @@
-import type { GroupedLightGet, HueClient, HueEventType } from 'hue-sdk';
+import type { GroupedLightGet, HueClient, HueEventType } from '@huxel/client';
 import { AreaCatalog, type AreaControl, type AreaGroup } from './area-catalog';
 import type { ChildLights, ResourceRef } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';

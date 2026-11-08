@@ -1,6 +1,6 @@
 import { useKeyboard } from '@opentui/react';
 import { describeError, type HueApp } from 'hue-app';
-import { HueForbiddenError, HueUnauthorizedError } from 'hue-sdk';
+import { HueForbiddenError, HueUnauthorizedError } from '@huxel/client';
 import { useEffect, useState } from 'react';
 import type { BridgeAddress } from '../config/config-store';
 import type { Connection } from '../connection';

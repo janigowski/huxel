@@ -1,7 +1,7 @@
-import { createHueClient, HueApiError, HueNetworkError } from 'hue-sdk';
-import type { HttpClient, HttpRequest, HttpResponse } from 'hue-sdk';
+import { createHueClient, HueApiError, HueNetworkError } from '@huxel/client';
+import type { HttpClient, HttpRequest, HttpResponse } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
-import { HueSdkGateway } from '../src/hue-sdk-gateway';
+import { HueClientGateway } from '../src/hue-client-gateway';
 
 interface Reply {
 	status?: number;
@@ -34,7 +34,7 @@ function setup(reply: Reply | Error) {
 		httpClient,
 		throttle: false
 	});
-	return { gateway: new HueSdkGateway(client), requests };
+	return { gateway: new HueClientGateway(client), requests };
 }
 
 const ok = { body: { errors: [], data: [{ rid: 'light-1', rtype: 'light' }] } };
@@ -56,7 +56,7 @@ function lightFixture(
 	};
 }
 
-describe('HueSdkGateway', () => {
+describe('HueClientGateway', () => {
 	describe('listLights', () => {
 		it('maps lights and returns null brightness and color for lights without them', async () => {
 			const { gateway, requests } = setup({

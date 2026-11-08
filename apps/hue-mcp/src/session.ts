@@ -10,7 +10,7 @@ import {
 	type ApiResponse,
 	type DiscoveredBridge,
 	type HttpClient
-} from 'hue-sdk';
+} from '@huxel/client';
 import { bridgeBaseUrl, readBridgeEnv, sameBridge, type BridgeAddress } from './bridge/address';
 import { createBridgeHttpClient } from './bridge/http-client';
 import { ConfigStore, defaultConfigPath } from './config/config-store';

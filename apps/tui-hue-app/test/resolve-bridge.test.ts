@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { DiscoveredBridge } from 'hue-sdk';
+import type { DiscoveredBridge } from '@huxel/client';
 import { bridgeBaseUrl, BridgeNotFoundError, resolveBridge } from '../src/bridge/resolve-bridge';
 import type { Config, ConfigStore } from '../src/config/config-store';
 

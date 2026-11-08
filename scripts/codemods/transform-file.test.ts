@@ -79,7 +79,7 @@ test('resolves repository imports from the filesystem', () => {
 		'javascript'
 	);
 	assert.equal(
-		filesystemImportTarget(path.join(repoRoot, 'packages/hue-app/src/light.ts'), 'hue-sdk'),
+		filesystemImportTarget(path.join(repoRoot, 'packages/hue-app/src/light.ts'), '@huxel/client'),
 		'missing'
 	);
 });

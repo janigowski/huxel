@@ -1,4 +1,4 @@
-import type { GroupedLightGet } from 'hue-sdk';
+import type { GroupedLightGet } from '@huxel/client';
 import type { ChildLights, ResourceRef } from './child-lights';
 import { xyColorFrom, type XyColor } from './color';
 import type { BridgeArea } from './gateway';

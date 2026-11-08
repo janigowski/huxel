@@ -62,7 +62,7 @@
 	},
 	"dependencies": {
 		"@preact/signals-core": "^1.14.4",
-		"hue-sdk": "workspace:^"
+		"@huxel/client": "workspace:^"
 	},
 	"devDependencies": {
 		"@sveltejs/vite-plugin-svelte": "^7",

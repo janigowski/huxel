@@ -1,7 +1,7 @@
-import type { GroupedLightGet, HueEvent, HueEventResource, RoomGet, ZoneGet } from 'hue-sdk';
+import type { GroupedLightGet, HueEvent, HueEventResource, RoomGet, ZoneGet } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import type { AreaChange, LightChangeObserver } from '../src/index';
-import { HueSdkGateway } from '../src/hue-sdk-gateway';
+import { HueClientGateway } from '../src/hue-client-gateway';
 import { FakeHueClient } from './fake-hue-client';
 import { flushMicrotasks } from './fakes';
 
@@ -41,14 +41,14 @@ const kitchenLight: GroupedLightGet = {
 	color: { xy: { x: 0.5, y: 0.4 } }
 };
 
-describe('HueSdkGateway areas', () => {
+describe('HueClientGateway areas', () => {
 	it('joins rooms and zones with their grouped lights and skips groups that have none', async () => {
 		const fake = new FakeHueClient({
 			rooms: [kitchen, emptyRoom],
 			zones: [downstairs],
 			groupedLights: [kitchenLight]
 		});
-		const gateway = new HueSdkGateway(fake.client);
+		const gateway = new HueClientGateway(fake.client);
 
 		await expect(gateway.listAreas()).resolves.toEqual({
 			rooms: [
@@ -103,7 +103,7 @@ describe('HueSdkGateway areas', () => {
 				}
 			]
 		});
-		const gateway = new HueSdkGateway(fake.client);
+		const gateway = new HueClientGateway(fake.client);
 
 		await expect(gateway.listAreas()).resolves.toMatchObject({
 			rooms: [{ id: 'room-1', children: ['light-a'] }],
@@ -113,7 +113,7 @@ describe('HueSdkGateway areas', () => {
 
 	it('sends room and zone commands to the grouped light', async () => {
 		const fake = new FakeHueClient();
-		const gateway = new HueSdkGateway(fake.client);
+		const gateway = new HueClientGateway(fake.client);
 
 		await gateway.setAreaPower('gl-kitchen', false);
 		await gateway.setAreaBrightness('gl-kitchen', 12);
@@ -150,7 +150,7 @@ describe('HueSdkGateway areas', () => {
 				changes.push(batch);
 			}
 		};
-		new HueSdkGateway(fake.client).watch(observer);
+		new HueClientGateway(fake.client).watch(observer);
 
 		const event = (type: HueEvent['type'], data: HueEventResource[]): HueEvent => ({
 			id: 'event',

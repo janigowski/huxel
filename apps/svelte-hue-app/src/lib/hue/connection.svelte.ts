@@ -1,5 +1,5 @@
 import { createHueApp, describeError } from 'hue-app';
-import { registerApplication } from 'hue-sdk';
+import { registerApplication } from '@huxel/client';
 import { bridgeBaseUrl } from './bridge';
 
 const APP_KEY_STORAGE_KEY = 'hue-app-key';

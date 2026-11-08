@@ -1,13 +1,13 @@
 # hue-app
 
-Headless, framework agnostic application for controlling Philips Hue lights, built on [`hue-sdk`](../hue-sdk) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes optional Svelte 5 and React adapters.
+Headless, framework agnostic application for controlling Philips Hue lights, built on [`@huxel/client`](../client) and [`@preact/signals-core`](https://github.com/preactjs/signals). Runs in Node.js, browsers and browser extensions. Includes optional Svelte 5 and React adapters.
 
 Scope: load lights, rooms and zones, read name, power, brightness and color, toggle power, change brightness and color, and follow changes made elsewhere (Hue app, switches, automations) in real time. Colors are CIE 1931 xy; color temperature, gradients and effects are not supported. No discovery or authentication. Rooms and zones are listed by name.
 
 ## Install
 
 ```bash
-bun add hue-app hue-sdk
+bun add hue-app @huxel/client
 ```
 
 ## CLI / Node.js
@@ -34,7 +34,7 @@ unsubscribe();
 app.dispose();
 ```
 
-`createHueApp` creates the `hue-sdk` client itself with `throttle: false`. The SDK's default write throttling can resolve a command with a different request's response and silently drop failures. `hue-app` already limits each light property to one request in flight. Pass `httpClient` to customize the transport, for example to pin the bridge certificate.
+`createHueApp` creates its `@huxel/client` with `throttle: false`. The client's default write throttling can resolve a command with a different request's response and silently drop failures. `hue-app` already limits each light property to one request in flight. Pass `httpClient` to customize the transport, for example to pin the bridge certificate.
 
 ## API
 
@@ -85,7 +85,7 @@ State is read-only: signals are computed, light and color objects are frozen, an
 
 `hexToXy` converts an sRGB hex color to xy rounded to 4 decimals, like the bridge reports it; black maps to the D65 white point. `xyToHex` converts back at full brightness, so the result has at least one channel at `ff`. Colors outside the sRGB gamut are clamped. The bridge maps xy into each bulb's own gamut, so the light may look different from the screen.
 
-The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness`, `setColor` and the optional `watch`). Area commands also need `listAreas`, `setAreaPower`, `setAreaBrightness` and `setAreaColor`. `HueSdkGateway` provides them. A gateway without those methods still loads lights; room and zone collections stay empty.
+The `gateway` option accepts any `HueGateway` implementation (`listLights`, `setPower`, `setBrightness`, `setColor` and the optional `watch`). Area commands also need `listAreas`, `setAreaPower`, `setAreaBrightness` and `setAreaColor`. `HueClientGateway` provides them. A gateway without those methods still loads lights; room and zone collections stay empty.
 
 `describeError` turns an error into a user-facing message, appending each `cause` in parentheses and asking the user to press the link button for `HueLinkButtonNotPressedError`.
 
@@ -121,7 +121,7 @@ After the first successful `initialize()`, the app subscribes to the bridge even
 - `'offline'` before live sync starts and after `dispose()`.
 - `'connecting'` as soon as live sync starts watching, until the stream first opens.
 - `'live'` while the stream is open and events flow.
-- `'reconnecting'` after the stream drops; the SDK retries with backoff and the state returns to `'live'` once reconnected.
+- `'reconnecting'` after the stream drops; the client retries with backoff and the state returns to `'live'` once reconnected.
 - `'offline'` again when the stream stops for good, for example when the bridge rejects the application key with 401 or 403, or when `watch` throws because the HTTP transport cannot stream.
 
 Stream errors themselves are not exposed; a permanent failure only shows up as `connection` going `'offline'`. Recreate the app to try again.

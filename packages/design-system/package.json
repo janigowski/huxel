@@ -42,7 +42,7 @@
 		"eslint-plugin-svelte": "^3.13.1",
 		"globals": "^16.5.0",
 		"hue-app": "workspace:*",
-		"hue-sdk": "workspace:*",
+		"@huxel/client": "workspace:*",
 		"playwright": "^1.57.0",
 		"svelte": "^5.46.1",
 		"svelte-check": "^4.3.4",

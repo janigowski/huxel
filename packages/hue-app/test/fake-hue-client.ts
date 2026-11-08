@@ -7,7 +7,7 @@ import type {
 	HueEvent,
 	RoomGet,
 	ZoneGet
-} from 'hue-sdk';
+} from '@huxel/client';
 
 export interface FakeHueFixtures {
 	rooms?: readonly RoomGet[];

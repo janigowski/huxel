@@ -13,6 +13,6 @@ import type { HueClient } from './client';
 import config from './svelte.config.js';
 ```
 
-`hue-sdk` and `hue-app` use `"moduleResolution": "bundler"`. `NodeNext` rejects extensionless relative imports, so do not switch those packages back. `vp pack` adds `.js` again in published `dist` files.
+`@huxel/client` and `hue-app` use `"moduleResolution": "bundler"`. `NodeNext` rejects extensionless relative imports, so do not switch those packages back. `vp pack` adds `.js` again in published `dist` files.
 
 `bun run check` fails while relative `.js` imports of TypeScript files remain. Update them with `bun run codemod`.

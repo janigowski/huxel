@@ -1,4 +1,4 @@
-import { HueLinkButtonNotPressedError } from 'hue-sdk';
+import { HueLinkButtonNotPressedError } from '@huxel/client';
 
 export function describeError(error: unknown): string {
 	if (error instanceof HueLinkButtonNotPressedError) {

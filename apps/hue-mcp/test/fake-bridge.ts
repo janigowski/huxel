@@ -1,4 +1,4 @@
-import type { HttpClient, HttpRequest, HttpResponse } from 'hue-sdk';
+import type { HttpClient, HttpRequest, HttpResponse } from '@huxel/client';
 
 export interface StoredLight {
 	id: string;

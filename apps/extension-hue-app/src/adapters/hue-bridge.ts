@@ -1,5 +1,5 @@
 import { createHueApp } from 'hue-app';
-import { discoverBridges, registerApplication } from 'hue-sdk';
+import { discoverBridges, registerApplication } from '@huxel/client';
 import type { Dependencies } from '../ports';
 
 export function createHueBridgeDependencies(): Pick<

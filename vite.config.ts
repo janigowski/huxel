@@ -18,7 +18,7 @@ export default defineConfig({
 			'apps/svelte-hue-app/src/lib/paraglide',
 			'packages/design-system/.svelte-kit',
 			'apps/extension-hue-app/.e2e',
-			'packages/hue-sdk/docs/clip-v2'
+			'packages/client/docs/clip-v2'
 		],
 		overrides: [
 			{

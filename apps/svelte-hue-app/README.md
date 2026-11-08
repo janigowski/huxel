@@ -1,14 +1,14 @@
 # svelte-hue-app
 
-Web dashboard for Philips Hue lights, rooms, and zones: link to a bridge, list them, and toggle, dim, and set their color with live updates. Built with SvelteKit on top of [`hue-app`](../../packages/hue-app) and [`hue-sdk`](../../packages/hue-sdk).
+Web dashboard for Philips Hue lights, rooms, and zones: link to a bridge, list them, and toggle, dim, and set their color with live updates. Built with SvelteKit on top of [`hue-app`](../../packages/hue-app) and [`@huxel/client`](../../packages/client).
 
 ## Setup
 
-`hue-app` and `hue-sdk` are workspace dependencies that resolve to their `dist/` builds, so build them first from the repository root:
+`hue-app` and `@huxel/client` are workspace dependencies that resolve to their `dist/` builds, so build them first from the repository root:
 
 ```bash
 bun install
-bun run --filter hue-sdk --filter hue-app build
+bun run --filter @huxel/client --filter hue-app build
 ```
 
 ## Run

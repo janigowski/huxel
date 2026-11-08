@@ -1,4 +1,4 @@
-import type { DiscoveredBridge } from 'hue-sdk';
+import type { DiscoveredBridge } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import { SimulatedGateway } from '../src/preview/simulated-gateway';
 import { BridgeSession } from '../src/session/bridge-session.svelte';

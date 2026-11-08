@@ -1,7 +1,7 @@
 {
-	"name": "hue-sdk",
+	"name": "@huxel/client",
 	"version": "0.1.0",
-	"description": "Typed, environment agnostic TypeScript SDK for the Philips Hue CLIP API v2",
+	"description": "Typed, environment agnostic TypeScript client for the Philips Hue CLIP API v2",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -24,7 +24,7 @@
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/dawidjaniga/philips-hue-remote.git",
-		"directory": "packages/hue-sdk"
+		"directory": "packages/client"
 	},
 	"keywords": [
 		"philips-hue",

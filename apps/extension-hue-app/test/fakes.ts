@@ -1,5 +1,9 @@
 import { createHueApp, type BridgeLight, type HueGateway } from 'hue-app';
-import { HueLinkButtonNotPressedError, HueNetworkError, type DiscoveredBridge } from 'hue-sdk';
+import {
+	HueLinkButtonNotPressedError,
+	HueNetworkError,
+	type DiscoveredBridge
+} from '@huxel/client';
 import { MemoryHostAccess } from '../src/adapters/memory-host-access';
 import { MemoryStorage } from '../src/adapters/memory-storage';
 import type { BridgeCredentials, Dependencies, KeyValueStorage } from '../src/ports';

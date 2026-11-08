@@ -1,4 +1,4 @@
-import { createFetchHttpClient, type HttpClient } from 'hue-sdk';
+import { createFetchHttpClient, type HttpClient } from '@huxel/client';
 import { HUE_ROOT_CA } from './hue-root-ca';
 import { checkBridgeIdentity } from './identity';
 

@@ -21,7 +21,7 @@ export type CoveredResourceGet =
 	| BridgeHomeGet;
 
 /**
- * A resource whose type is not modelled by this SDK version yet. Only the identity fields are
+ * A resource whose type is not modelled by this client version yet. Only the identity fields are
  * typed; other properties are present but unknown.
  */
 export interface UncoveredResourceGet {
