@@ -3,6 +3,7 @@
 	"private": true,
 	"version": "0.1.0",
 	"description": "Chromium browser extension (Arc, Chrome) for Philips Hue lights",
+	"license": "MIT",
 	"type": "module",
 	"scripts": {
 		"dev": "vp dev",
