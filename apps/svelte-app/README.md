@@ -1,4 +1,4 @@
-# svelte-hue-app
+# svelte-app
 
 Web dashboard for Philips Hue lights, rooms, and zones: link to a bridge, list them, and toggle, dim, and set their color with live updates. Built with SvelteKit on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client).
 

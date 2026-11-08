@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { findAreaPreset, xyToHex } from '@huxel/app';
 	import type { SvelteArea } from '@huxel/app/svelte';
-	import { findPaletteColor } from 'design-system';
+	import { findPaletteColor } from '@huxel/design-system';
 	import ControlCard from './ControlCard.svelte';
 
 	interface Props {

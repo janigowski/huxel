@@ -1,5 +1,5 @@
 import './tokens.css';
-import { palette } from 'design-system';
+import { palette } from '@huxel/design-system';
 import type { SvelteArea } from '@huxel/app/svelte';
 import { page } from 'vite-plus/test/browser';
 import { describe, expect, it, vi } from 'vite-plus/test';

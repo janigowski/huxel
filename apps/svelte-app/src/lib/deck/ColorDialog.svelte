@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { XyColor } from '@huxel/app';
-	import { findPaletteColor, palette } from 'design-system';
+	import { findPaletteColor, palette } from '@huxel/design-system';
 	import ColorSwatch from './ColorSwatch.svelte';
 
 	interface Props {

@@ -73,7 +73,7 @@ test('resolves repository imports from the filesystem', () => {
 	);
 	assert.equal(
 		filesystemImportTarget(
-			path.join(repoRoot, 'apps/svelte-hue-app/eslint.config.js'),
+			path.join(repoRoot, 'apps/svelte-app/eslint.config.js'),
 			'./svelte.config.js'
 		),
 		'javascript'

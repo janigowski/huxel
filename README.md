@@ -38,7 +38,7 @@ Private. Svelte 5 components and design tokens shared by the web dashboard and t
 
 Each app links to a bridge, keeps the application key, and talks to the lights through `@huxel/app`.
 
-### [svelte-hue-app](./apps/svelte-hue-app)
+### [svelte-app](./apps/svelte-app)
 
 Web dashboard. List lights, rooms, and zones, then toggle, dim, and set color with live updates. Run it locally, or deploy it to a server.
 

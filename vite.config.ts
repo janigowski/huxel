@@ -11,11 +11,11 @@ export default defineConfig({
 			'bun.lock',
 			'dist',
 			'coverage',
-			'apps/svelte-hue-app/.svelte-kit',
-			'apps/svelte-hue-app/build',
-			'apps/svelte-hue-app/static',
-			'apps/svelte-hue-app/project.inlang',
-			'apps/svelte-hue-app/src/lib/paraglide',
+			'apps/svelte-app/.svelte-kit',
+			'apps/svelte-app/build',
+			'apps/svelte-app/static',
+			'apps/svelte-app/project.inlang',
+			'apps/svelte-app/src/lib/paraglide',
 			'packages/design-system/.svelte-kit',
 			'apps/extension-hue-app/.e2e',
 			'packages/client/docs/clip-v2'
@@ -26,11 +26,11 @@ export default defineConfig({
 				options: { svelte: true }
 			},
 			{
-				files: ['apps/svelte-hue-app/**'],
+				files: ['apps/svelte-app/**'],
 				options: {
 					svelte: true,
 					sortTailwindcss: {
-						stylesheet: './apps/svelte-hue-app/src/routes/layout.css'
+						stylesheet: './apps/svelte-app/src/routes/layout.css'
 					}
 				}
 			}
