@@ -19,9 +19,35 @@ bun add @huxel/client
 One client for the Philips Hue API.
 
 - One way to interact with the Philips Hue API. The types and the HTTP calls live here, so the next app does not start from scratch.
-- A one-to-one mirror of the official API, including streaming from the Hue Bridge (SSE).
+- A full mirror of the official API. 10 of 46 resource types are supported (22%), plus discovery, registration, and the bridge event stream (SSE).
 
 This package stores nothing on purpose. The bridge address, the application key, and the session belong to `@huxel/app`. `createHueClient` only sends the `baseUrl` and `appKey` you pass in.
+
+## API mirror
+
+The percent is resource types in the CLIP v2 notes stored in this repo. A type counts as supported when the client has typed methods for it.
+
+| Area | Progress | Share |
+| --- | --- | --- |
+| Lights and groups | 2 of 2 · `light`, `grouped_light` | 100% |
+| Rooms, zones, home | 3 of 3 · `room`, `zone`, `bridge_home` | 100% |
+| Scenes | 2 of 2 · `scene`, `smart_scene` | 100% |
+| Bridge and devices | 2 of 2 · `bridge`, `device` | 100% |
+| Resource catalog | 1 of 1 · `/resource` | 100% |
+| Sensors and input | 0 of 16 | 0% |
+| Connectivity and power | 0 of 6 | 0% |
+| Behavior | 0 of 3 | 0% |
+| Entertainment | 0 of 2 | 0% |
+| Matter and HomeKit | 0 of 3 | 0% |
+| Configuration and other | 0 of 6 | 0% |
+| **All resource types** | **10 of 46** | **22%** |
+
+| Also in the client | Status |
+| --- | --- |
+| Bridge discovery | Supported |
+| Link-button registration | Supported |
+| Event stream (SSE) | Supported |
+| Entertainment streaming | Not started |
 
 ## Bridge address
 

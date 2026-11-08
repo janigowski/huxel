@@ -1,5 +1,5 @@
 {
-	"name": "philips-hue-remote",
+	"name": "huxel",
 	"private": true,
 	"description": "Libraries and apps for controlling Philips Hue lights",
 	"author": "janigowski <dawidjaniga@gmail.com>",
@@ -7,7 +7,7 @@
 	"type": "module",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dawidjaniga/philips-hue-remote.git"
+		"url": "https://github.com/janigowski/huxel.git"
 	},
 	"workspaces": [
 		"packages/*",

@@ -30,5 +30,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Many CLIP v2 resource types (sensors, connectivity, entertainment, Matter/HomeKit, behavior, geofence, etc.) are not implemented.
 - `/eventstream` and Entertainment streaming are not supported.
 
-[Unreleased]: https://github.com/dawidjaniga/philips-hue-remote/compare/client-v0.1.0...HEAD
-[0.1.0]: https://github.com/dawidjaniga/philips-hue-remote/releases/tag/client-v0.1.0
+[Unreleased]: https://github.com/janigowski/huxel/compare/client-v0.1.0...HEAD
+[0.1.0]: https://github.com/janigowski/huxel/releases/tag/client-v0.1.0

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "philips-hue-remote",
+      "name": "huxel",
       "devDependencies": {
         "@types/node": "^22",
         "svelte": "^5.46.1",

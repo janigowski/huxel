@@ -23,7 +23,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/dawidjaniga/philips-hue-remote.git",
+		"url": "git+https://github.com/janigowski/huxel.git",
 		"directory": "packages/client"
 	},
 	"keywords": [

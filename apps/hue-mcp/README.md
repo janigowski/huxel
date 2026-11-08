@@ -52,7 +52,7 @@ mcp_servers:
   hue:
     command: bun
     args: ['run', '/absolute/path/to/apps/hue-mcp/src/index.ts']
-    cwd: /absolute/path/to/philips-hue-remote
+    cwd: /absolute/path/to/huxel
     timeout: 30
     supports_parallel_tool_calls: false
 ```

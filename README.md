@@ -1,4 +1,4 @@
-# Philips Hue Remote
+# huxel
 
 Libraries and apps for controlling Philips Hue lights over the CLIP API v2.
 
