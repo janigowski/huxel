@@ -1,4 +1,4 @@
-# tui-hue-app
+# tui-app
 
 Terminal remote for Philips Hue lights, rooms, and zones: link to a bridge, then toggle and dim any of them. Rooms and zones also take the same presets and palette colors as the web remote. Built with [OpenTUI](https://opentui.com) and React on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). Requires [Bun](https://bun.sh).
 

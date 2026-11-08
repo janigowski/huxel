@@ -1,12 +1,12 @@
 {
-	"name": "tui-hue-app",
+	"name": "tui-app",
 	"version": "0.1.0",
 	"description": "Terminal remote for Philips Hue lights, rooms, and zones",
 	"private": true,
 	"license": "MIT",
 	"type": "module",
 	"bin": {
-		"tui-hue-app": "./src/index.tsx"
+		"tui-app": "./src/index.tsx"
 	},
 	"scripts": {
 		"start": "bun run src/index.tsx",

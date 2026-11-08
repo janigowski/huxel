@@ -46,7 +46,7 @@ Web dashboard. List lights, rooms, and zones, then toggle, dim, and set color wi
 
 Chromium toolbar popup for Arc and Chrome. Control the lights on the local network from the browser. You load it unpacked from a local build.
 
-### [tui-hue-app](./apps/tui-hue-app)
+### [tui-app](./apps/tui-app)
 
 Terminal remote. Link a bridge, then toggle and dim lights, rooms, and zones, including the same presets as the web dashboard.
 

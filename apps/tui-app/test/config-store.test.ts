@@ -8,7 +8,7 @@ describe('config store', () => {
 	let dir: string;
 
 	beforeEach(async () => {
-		dir = await mkdtemp(join(tmpdir(), 'tui-hue-app-'));
+		dir = await mkdtemp(join(tmpdir(), 'tui-app-'));
 	});
 
 	afterEach(async () => {
