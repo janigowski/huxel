@@ -51,7 +51,7 @@ In `~/.hermes/config.yaml`:
 mcp_servers:
   hue:
     command: bun
-    args: ['run', '/absolute/path/to/apps/mcp/src/index.ts']
+    args: ['run', '/absolute/path/to/packages/mcp/src/index.ts']
     cwd: /absolute/path/to/huxel
     timeout: 30
     supports_parallel_tool_calls: false

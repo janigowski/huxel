@@ -45,23 +45,6 @@
         "vitest-browser-svelte": "^3.1.0",
       },
     },
-    "apps/mcp": {
-      "name": "@huxel/mcp",
-      "version": "0.1.0",
-      "bin": {
-        "huxel-mcp": "./src/index.ts",
-      },
-      "dependencies": {
-        "@huxel/app": "workspace:*",
-        "@huxel/client": "workspace:*",
-        "@modelcontextprotocol/sdk": "^1.29.0",
-        "zod": "^4.1.12",
-      },
-      "devDependencies": {
-        "@types/bun": "^1.4.3",
-        "typescript": "^5.9.3",
-      },
-    },
     "apps/svelte-app": {
       "name": "svelte-app",
       "version": "0.0.1",
@@ -194,6 +177,23 @@
         "svelte": "^5.46.1",
       },
     },
+    "packages/mcp": {
+      "name": "@huxel/mcp",
+      "version": "0.1.0",
+      "bin": {
+        "huxel-mcp": "./src/index.ts",
+      },
+      "dependencies": {
+        "@huxel/app": "workspace:*",
+        "@huxel/client": "workspace:*",
+        "@modelcontextprotocol/sdk": "^1.29.0",
+        "zod": "^4.1.12",
+      },
+      "devDependencies": {
+        "@types/bun": "^1.4.3",
+        "typescript": "^5.9.3",
+      },
+    },
   },
   "overrides": {
     "vite": "catalog:",
@@ -288,7 +288,7 @@
 
     "@huxel/design-system": ["@huxel/design-system@workspace:packages/design-system"],
 
-    "@huxel/mcp": ["@huxel/mcp@workspace:apps/mcp"],
+    "@huxel/mcp": ["@huxel/mcp@workspace:packages/mcp"],
 
     "@inlang/paraglide-js": ["@inlang/paraglide-js@2.29.1", "", { "dependencies": { "@inlang/recommend-sherlock": "^0.2.1", "@inlang/sdk": "^4.0.4", "commander": "11.1.0", "consola": "3.4.0", "jiti": "^2.7.0", "json5": "2.2.3", "jsonc-parser": "^3.3.1", "unplugin": "^2.1.2", "urlpattern-polyfill": "^10.0.0", "valibot": "^1.4.2" }, "peerDependencies": { "eslint": "^9.0.0 || ^10.0.0", "typescript": ">=5.6", "vite": ">=5.0.0" }, "optionalPeers": ["eslint", "typescript", "vite"], "bin": { "paraglide-js": "bin/run.js" } }, "sha512-rE1AH0Uc86WEb+0HUKAdrfOfu1aqpGkvHebEK3PEIFYC2VJj0asF2BI8QYKSalNHTqrctsrImm647NBBg2QzSw=="],
 

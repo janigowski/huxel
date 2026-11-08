@@ -4,7 +4,7 @@
 
 A modular toolkit for Philips Hue. The same bridge calls and the same light state run in a browser, in Node.js, and in Bun.
 
-Two libraries are published. The apps are private products built on them.
+`@huxel/client` and `@huxel/app` are published. `@huxel/mcp` is a package in this repo and is not on npm yet. The apps are private products built on the libraries.
 
 ## Packages
 
@@ -30,6 +30,10 @@ Headless state for the lights, rooms, and zones in one home.
 
 The application key stays in memory for the life of the app. Saving it between launches belongs to the product that calls this package. `@huxel/client` does the HTTP.
 
+### [@huxel/mcp](./packages/mcp)
+
+Local MCP server for an agent on the same network. It speaks stdio and can report status, link a bridge, read the home, and set a light, a room, a zone, or a scene. The application key stays in a config file and is never returned by a tool.
+
 ### [@huxel/design-system](./packages/design-system)
 
 Private. Svelte 5 components and design tokens shared by the web dashboard and the browser extension. It renders `@huxel/app` state and ships no UI of its own to npm.
@@ -49,10 +53,6 @@ Chromium toolbar popup for Arc and Chrome. Control the lights on the local netwo
 ### [tui-app](./apps/tui-app)
 
 Terminal remote. Link a bridge, then toggle and dim lights, rooms, and zones, including the same presets as the web dashboard.
-
-### [@huxel/mcp](./apps/mcp)
-
-Local MCP server for an agent on the same network. It speaks stdio and can report status, link a bridge, read the home, and set a light, a room, a zone, or a scene. The application key stays in a config file and is never returned by a tool.
 
 ## Development
 
