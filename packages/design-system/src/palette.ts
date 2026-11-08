@@ -1,4 +1,4 @@
-import { hexToXy, type XyColor } from 'hue-app';
+import { hexToXy, type XyColor } from '@huxel/app';
 
 export interface PaletteColor {
 	readonly name: string;

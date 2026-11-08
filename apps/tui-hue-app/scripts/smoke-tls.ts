@@ -1,4 +1,4 @@
-import { describeError } from 'hue-app';
+import { describeError } from '@huxel/app';
 import { createBridgeHttpClient } from '../src/bridge/http-client';
 
 const ip = process.env.HUE_BRIDGE_IP ?? '192.168.1.10';

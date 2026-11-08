@@ -1,4 +1,4 @@
-import { describeError } from 'hue-app';
+import { describeError } from '@huxel/app';
 import { HueNetworkError, HueRateLimitError } from '@huxel/client';
 import type { BridgeHostResult } from './bridge-host';
 

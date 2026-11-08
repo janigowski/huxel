@@ -5,7 +5,7 @@ Libraries and apps for controlling Philips Hue lights over the CLIP API v2.
 | Workspace                                            | Description                                                       |
 | ---------------------------------------------------- | ----------------------------------------------------------------- |
 | [`packages/client`](./packages/client)               | Typed, environment agnostic client for the Hue CLIP API v2        |
-| [`packages/hue-app`](./packages/hue-app)             | Headless app state for Hue lights, with Svelte and React adapters |
+| [`packages/app`](./packages/app)                     | Headless app state for Hue lights, with Svelte and React adapters |
 | [`packages/design-system`](./packages/design-system) | Svelte components and design tokens shared by the Svelte apps     |
 | [`apps/svelte-hue-app`](./apps/svelte-hue-app)       | SvelteKit web dashboard                                           |
 | [`apps/extension-hue-app`](./apps/extension-hue-app) | Browser extension for Arc and other Chromium browsers             |
@@ -26,6 +26,6 @@ bun run lint
 bun run test
 ```
 
-Root scripts run in every workspace in dependency order, so `@huxel/client` builds before `hue-app`, `hue-app` before `design-system`, and all of them before the apps. Apps consume the libraries' `dist/` builds, so build the libraries before running an app. Run a script in a single workspace with `bunx vp run --filter <name> <script>`.
+Root scripts run in every workspace in dependency order, so `@huxel/client` builds before `@huxel/app`, `@huxel/app` before `design-system`, and all of them before the apps. Apps consume the libraries' `dist/` builds, so build the libraries before running an app. Run a script in a single workspace with `bunx vp run --filter <name> <script>`.
 
 Formatting settings are shared across the repository in the root `vite.config.ts`: `bun run format`.

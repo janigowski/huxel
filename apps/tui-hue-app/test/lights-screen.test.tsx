@@ -6,7 +6,7 @@ import {
 	type BridgeArea,
 	type BridgeLight,
 	type HueGateway
-} from 'hue-app';
+} from '@huxel/app';
 import { act } from 'react';
 import type { Connection } from '../src/connection';
 import { App } from '../src/ui/App';

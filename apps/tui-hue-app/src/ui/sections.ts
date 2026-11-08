@@ -1,4 +1,4 @@
-import { findAreaPreset, type XyColor } from 'hue-app';
+import { findAreaPreset, type XyColor } from '@huxel/app';
 import { findPaletteColor } from './palette';
 
 export interface ListedControl {

@@ -2,8 +2,8 @@
 	import LightGrid from '$lib/deck/LightGrid.svelte';
 	import Notice from '$lib/deck/Notice.svelte';
 	import SectionBar from '$lib/deck/SectionBar.svelte';
-	import { describeError, type PresetId, type XyColor } from 'hue-app';
-	import type { SvelteHueApp } from 'hue-app/svelte';
+	import { describeError, type PresetId, type XyColor } from '@huxel/app';
+	import type { SvelteHueApp } from '@huxel/app/svelte';
 
 	interface Props {
 		hue: SvelteHueApp;

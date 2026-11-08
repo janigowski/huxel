@@ -1,4 +1,4 @@
-import { createHueApp, describeError } from 'hue-app';
+import { createHueApp, describeError } from '@huxel/app';
 import { registerApplication } from '@huxel/client';
 import { bridgeBaseUrl } from './bridge';
 

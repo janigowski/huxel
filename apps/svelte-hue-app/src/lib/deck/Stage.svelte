@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HueAppConnection } from 'hue-app';
+	import type { HueAppConnection } from '@huxel/app';
 	import type { Snippet } from 'svelte';
 	import Masthead from './Masthead.svelte';
 	import StatusBar from './StatusBar.svelte';

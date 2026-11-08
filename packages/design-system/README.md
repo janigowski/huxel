@@ -1,13 +1,13 @@
 # design-system
 
-Svelte 5 components and design tokens shared by [`svelte-hue-app`](../../apps/svelte-hue-app) and [`extension-hue-app`](../../apps/extension-hue-app). Light components render the state of [`hue-app`](../hue-app)'s Svelte adapter.
+Svelte 5 components and design tokens shared by [`svelte-hue-app`](../../apps/svelte-hue-app) and [`extension-hue-app`](../../apps/extension-hue-app). Light components render the state of [`@huxel/app`](../app)'s Svelte adapter.
 
 ## Usage
 
 ```svelte
 <script lang="ts">
 	import { DashboardBar, Hero, LightsSection } from 'design-system';
-	import type { SvelteHueApp } from 'hue-app/svelte';
+	import type { SvelteHueApp } from '@huxel/app/svelte';
 
 	let { hue }: { hue: SvelteHueApp } = $props();
 </script>

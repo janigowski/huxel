@@ -1,4 +1,4 @@
-import { createHueApp, type HueApp } from 'hue-app';
+import { createHueApp, type HueApp } from '@huxel/app';
 import { registerApplication, type DiscoveredBridge } from '@huxel/client';
 import { createBridgeHttpClient } from './bridge/http-client';
 import { bridgeBaseUrl, resolveBridge, type BridgeSession } from './bridge/resolve-bridge';

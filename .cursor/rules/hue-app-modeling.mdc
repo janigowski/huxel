@@ -1,5 +1,5 @@
 ---
-description: Model Hue behavior with classes, keep sorting in hue-app, and fake HueClient in tests
+description: Model Hue behavior with classes, keep sorting in @huxel/app, and fake HueClient in tests
 alwaysApply: true
 ---
 
@@ -7,7 +7,7 @@ alwaysApply: true
 
 Rooms and zones belong to `HueApp`. Do not add an opt-in such as `roomsAndZones`. Callers do not turn the feature on. A gateway without area methods stays lights-only.
 
-Sort rooms and zones in `hue-app`, in the area collection. UI sections render the order they are given.
+Sort rooms and zones in `@huxel/app`, in the area collection. UI sections render the order they are given.
 
 Model behavior with classes and private state, as `LiveSync`, `AreaSync`, and `HueClientGateway` do. Do not build a feature as a closure that returns a bag of functions, or as a pile of free functions sharing mutable maps.
 
@@ -32,4 +32,4 @@ export class AreaEventSession {
 }
 ```
 
-Tests in `packages/hue-app` fake `HueClient` with `FakeHueClient`. HTTP request mocking belongs in `@huxel/client`, not in hue-app gateway tests.
+Tests in `packages/app` fake `HueClient` with `FakeHueClient`. HTTP request mocking belongs in `@huxel/client`, not in `@huxel/app` gateway tests.

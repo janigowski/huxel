@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { describeError, type XyColor } from 'hue-app';
-	import type { SvelteHueApp } from 'hue-app/svelte';
+	import { describeError, type XyColor } from '@huxel/app';
+	import type { SvelteHueApp } from '@huxel/app/svelte';
 	import LightGrid from './LightGrid.svelte';
 	import Notice from './Notice.svelte';
 	import SectionHeader from './SectionHeader.svelte';

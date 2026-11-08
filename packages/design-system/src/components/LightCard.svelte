@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { xyToHex } from 'hue-app';
-	import type { SvelteLight } from 'hue-app/svelte';
+	import { xyToHex } from '@huxel/app';
+	import type { SvelteLight } from '@huxel/app/svelte';
 	import { findPaletteColor } from '../palette';
 	import ColorSwatch from './ColorSwatch.svelte';
 	import Label from './Label.svelte';

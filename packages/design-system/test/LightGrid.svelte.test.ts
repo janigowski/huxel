@@ -1,4 +1,4 @@
-import type { SvelteLight } from 'hue-app/svelte';
+import type { SvelteLight } from '@huxel/app/svelte';
 import { page } from 'vite-plus/test/browser';
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';

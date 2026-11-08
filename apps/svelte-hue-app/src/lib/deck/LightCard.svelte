@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { findAreaPreset, xyToHex } from 'hue-app';
-	import type { SvelteLight } from 'hue-app/svelte';
+	import { findAreaPreset, xyToHex } from '@huxel/app';
+	import type { SvelteLight } from '@huxel/app/svelte';
 	import { findPaletteColor } from 'design-system';
 	import ControlCard from './ControlCard.svelte';
 

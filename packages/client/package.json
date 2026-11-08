@@ -16,7 +16,8 @@
 	"files": [
 		"dist",
 		"README.md",
-		"CHANGELOG.md"
+		"CHANGELOG.md",
+		"banner.jpg"
 	],
 	"engines": {
 		"node": ">=18"

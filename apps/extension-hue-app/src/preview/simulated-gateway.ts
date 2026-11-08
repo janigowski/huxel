@@ -1,4 +1,4 @@
-import type { BridgeLight, HueGateway, LightChangeObserver, XyColor } from 'hue-app';
+import type { BridgeLight, HueGateway, LightChangeObserver, XyColor } from '@huxel/app';
 
 export interface SimulatedGatewayOptions {
 	latencyMs?: number;

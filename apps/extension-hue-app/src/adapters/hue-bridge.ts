@@ -1,4 +1,4 @@
-import { createHueApp } from 'hue-app';
+import { createHueApp } from '@huxel/app';
 import { discoverBridges, registerApplication } from '@huxel/client';
 import type { Dependencies } from '../ports';
 

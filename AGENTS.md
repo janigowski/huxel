@@ -6,4 +6,4 @@ Mechanical syntax in this repo is owned by the codemods in `scripts/codemods` an
 - Class state uses TypeScript `private` / `private readonly`, not `#private` fields.
 - `bun run codemod` applies both transforms. `bun run check` rejects a tree that still has either pattern.
 
-`@huxel/client` and `hue-app` typecheck with `moduleResolution: bundler`. Published `dist` output still uses `.js` extensions; `vp pack` adds them.
+`@huxel/client` and `@huxel/app` typecheck with `moduleResolution: bundler`. Published `dist` output still uses `.js` extensions; `vp pack` adds them.

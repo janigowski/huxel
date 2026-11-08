@@ -29,7 +29,7 @@
 		"test": "vp test run"
 	},
 	"peerDependencies": {
-		"hue-app": "workspace:*",
+		"@huxel/app": "workspace:*",
 		"svelte": "^5.46.1"
 	},
 	"devDependencies": {
@@ -41,7 +41,7 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.1",
 		"globals": "^16.5.0",
-		"hue-app": "workspace:*",
+		"@huxel/app": "workspace:*",
 		"@huxel/client": "workspace:*",
 		"playwright": "^1.57.0",
 		"svelte": "^5.46.1",

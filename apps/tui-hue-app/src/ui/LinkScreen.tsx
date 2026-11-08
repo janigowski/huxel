@@ -1,6 +1,6 @@
 import { TextAttributes } from '@opentui/core';
 import { useKeyboard } from '@opentui/react';
-import { describeError } from 'hue-app';
+import { describeError } from '@huxel/app';
 import { useRef, useState } from 'react';
 import { Footer } from './Footer';
 import { Notice } from './Notice';

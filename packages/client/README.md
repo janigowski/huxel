@@ -21,7 +21,7 @@ One client for the Philips Hue API.
 - One way to interact with the Philips Hue API. The types and the HTTP calls live here, so the next app does not start from scratch.
 - A full mirror of the official API. 10 of 46 resource types are supported (22%), plus discovery, registration, and the bridge event stream (SSE).
 
-This package stores nothing on purpose. The bridge address, the application key, and the session belong to `@huxel/app`. `createHueClient` only sends the `baseUrl` and `appKey` you pass in.
+This package stores nothing on purpose. Pass the bridge address and the application key in. `@huxel/app` keeps that session in memory and does not write the key down. Saving the key is the application's job.
 
 ## API mirror
 
@@ -135,7 +135,7 @@ try {
 
 ## Non-goals
 
-- Storing the bridge address, the application key, or the Entertainment key. That is `@huxel/app`'s job.
+- Storing the bridge address, the application key, or the Entertainment key. `@huxel/app` holds a session in memory. The application that calls it decides where the key is saved.
 - A UI, cached light state, or presets.
 - Polling the link button, or retrying registration on your behalf.
 - Entertainment streaming, and typed calls for sensors, buttons, Matter, and HomeKit. Those resources still show up on the event stream as plain records.

@@ -1,6 +1,6 @@
 import './tokens.css';
 import { palette } from 'design-system';
-import type { SvelteArea } from 'hue-app/svelte';
+import type { SvelteArea } from '@huxel/app/svelte';
 import { page } from 'vite-plus/test/browser';
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-svelte';

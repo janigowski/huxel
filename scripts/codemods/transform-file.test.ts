@@ -68,7 +68,7 @@ test('reports relative .js imports that do not resolve', () => {
 
 test('resolves repository imports from the filesystem', () => {
 	assert.equal(
-		filesystemImportTarget(path.join(repoRoot, 'packages/hue-app/src/light.ts'), './color.js'),
+		filesystemImportTarget(path.join(repoRoot, 'packages/app/src/light.ts'), './color.js'),
 		'typescript'
 	);
 	assert.equal(
@@ -79,7 +79,7 @@ test('resolves repository imports from the filesystem', () => {
 		'javascript'
 	);
 	assert.equal(
-		filesystemImportTarget(path.join(repoRoot, 'packages/hue-app/src/light.ts'), '@huxel/client'),
+		filesystemImportTarget(path.join(repoRoot, 'packages/app/src/light.ts'), '@huxel/client'),
 		'missing'
 	);
 });

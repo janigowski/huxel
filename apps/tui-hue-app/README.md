@@ -1,14 +1,14 @@
 # tui-hue-app
 
-Terminal remote for Philips Hue lights, rooms, and zones: link to a bridge, then toggle and dim any of them. Rooms and zones also take the same presets and palette colors as the web remote. Built with [OpenTUI](https://opentui.com) and React on top of [`hue-app`](../../packages/hue-app) and [`@huxel/client`](../../packages/client). Requires [Bun](https://bun.sh).
+Terminal remote for Philips Hue lights, rooms, and zones: link to a bridge, then toggle and dim any of them. Rooms and zones also take the same presets and palette colors as the web remote. Built with [OpenTUI](https://opentui.com) and React on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). Requires [Bun](https://bun.sh).
 
 ## Setup
 
-`hue-app` and `@huxel/client` are workspace dependencies that resolve to their `dist/` builds, so build them first from the repository root:
+`@huxel/app` and `@huxel/client` are workspace dependencies that resolve to their `dist/` builds, so build them first from the repository root:
 
 ```bash
 bun install
-bun run --filter @huxel/client --filter hue-app build
+bun run --filter @huxel/client --filter @huxel/app build
 ```
 
 ## Run

@@ -1,4 +1,4 @@
-import { createHueApp, hexToXy, type BridgeLight } from 'hue-app';
+import { createHueApp, hexToXy, type BridgeLight } from '@huxel/app';
 import { HueLinkButtonNotPressedError, HueNetworkError } from '@huxel/client';
 import { MemoryHostAccess } from '../adapters/memory-host-access';
 import { MemoryStorage } from '../adapters/memory-storage';

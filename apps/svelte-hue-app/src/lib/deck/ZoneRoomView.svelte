@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { areaPresets, mirekToHex, xyToHex, type PresetId } from 'hue-app';
+	import { areaPresets, mirekToHex, xyToHex, type PresetId } from '@huxel/app';
 	import ColorSwatch from './ColorSwatch.svelte';
 
 	interface Props {

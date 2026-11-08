@@ -6,7 +6,7 @@
 	import { BridgeConnection } from '$lib/hue/connection.svelte';
 	import GroupsSection from '$lib/hue/GroupsSection.svelte';
 	import LightsField from '$lib/hue/LightsField.svelte';
-	import { createSvelteHueApp } from 'hue-app/svelte';
+	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 
 	const connection = new BridgeConnection(localStorage);

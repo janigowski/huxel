@@ -1,4 +1,4 @@
-import { hexToXy, xyToHex } from 'hue-app';
+import { hexToXy, xyToHex } from '@huxel/app';
 import type {
 	GroupedLightGet,
 	LightGet,

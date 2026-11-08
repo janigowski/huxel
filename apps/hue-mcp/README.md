@@ -2,11 +2,11 @@
 
 Local [MCP](https://modelcontextprotocol.io) server for Philips Hue. It speaks stdio, links to a bridge on the same network, and exposes a few tools for an agent. [Hermes](https://hermes-agent.nousresearch.com/) can run it and reach it from Telegram. The server does not know about Telegram.
 
-Requires [Bun](https://bun.sh). `@huxel/client` and `hue-app` resolve to their `dist/` builds, so build them first from the repository root:
+Requires [Bun](https://bun.sh). `@huxel/client` and `@huxel/app` resolve to their `dist/` builds, so build them first from the repository root:
 
 ```bash
 bun install
-bun run --filter @huxel/client --filter hue-app build
+bun run --filter @huxel/client --filter @huxel/app build
 ```
 
 ## Tools

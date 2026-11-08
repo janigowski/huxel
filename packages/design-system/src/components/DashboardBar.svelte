@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HueAppConnection } from 'hue-app';
+	import type { HueAppConnection } from '@huxel/app';
 	import Label from './Label.svelte';
 
 	interface Props {

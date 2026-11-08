@@ -1,4 +1,4 @@
-import { describeError, type HueApp } from 'hue-app';
+import { describeError, type HueApp } from '@huxel/app';
 import { bridgeOrigin, formatDiscoveredHost, parseBridgeHostInput } from '../bridge/bridge-host';
 import { createBridgeStore, type BridgeStore, type LinkedBridge } from '../bridge/bridge-store';
 import {

@@ -1,7 +1,7 @@
 {
-	"name": "hue-app",
+	"name": "@huxel/app",
 	"version": "0.1.0",
-	"description": "Headless, framework agnostic application for controlling Philips Hue lights",
+	"description": "Headless application state for Philips Hue lights, rooms, and zones",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -24,15 +24,20 @@
 	"types": "./dist/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"CHANGELOG.md",
+		"banner.jpg"
 	],
+	"publishConfig": {
+		"access": "public"
+	},
 	"engines": {
 		"node": ">=18"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/janigowski/huxel.git",
-		"directory": "packages/hue-app"
+		"directory": "packages/app"
 	},
 	"keywords": [
 		"philips-hue",

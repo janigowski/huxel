@@ -1,6 +1,6 @@
 # extension-hue-app
 
-Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge on the local network, then toggle, dim and recolor lights from the toolbar popup. It is a Svelte 5 + Vite app built from the shared [`design-system`](../../packages/design-system) components on top of [`hue-app`](../../packages/hue-app) and [`@huxel/client`](../../packages/client). The extension is not published to a store. You load it unpacked.
+Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge on the local network, then toggle, dim and recolor lights from the toolbar popup. It is a Svelte 5 + Vite app built from the shared [`design-system`](../../packages/design-system) components on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). The extension is not published to a store. You load it unpacked.
 
 ## Setup
 
@@ -8,7 +8,7 @@ Workspace dependencies resolve to their `dist/` builds, so build them first from
 
 ```bash
 bun install
-bun run --filter @huxel/client --filter hue-app --filter design-system build
+bun run --filter @huxel/client --filter @huxel/app --filter design-system build
 ```
 
 ## Mock preview

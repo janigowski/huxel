@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ConnectPanel, DashboardBar, Hero, LightsSection, Notice } from 'design-system';
-	import { createSvelteHueApp } from 'hue-app/svelte';
+	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 	import { bridgeOrigin, parseBridgeHost } from './bridge/bridge-host';
 	import { isUnreachable, unreachableMessage } from './bridge/session-error';

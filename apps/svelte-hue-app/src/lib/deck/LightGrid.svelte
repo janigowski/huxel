@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { findAreaPreset, type PresetId, type XyColor } from 'hue-app';
-	import type { SvelteLight } from 'hue-app/svelte';
+	import { findAreaPreset, type PresetId, type XyColor } from '@huxel/app';
+	import type { SvelteLight } from '@huxel/app/svelte';
 	import ColorDialog from './ColorDialog.svelte';
 	import LightCard from './LightCard.svelte';
 	import ZoneRoomView from './ZoneRoomView.svelte';

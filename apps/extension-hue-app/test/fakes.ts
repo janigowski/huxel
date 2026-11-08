@@ -1,4 +1,4 @@
-import { createHueApp, type BridgeLight, type HueGateway } from 'hue-app';
+import { createHueApp, type BridgeLight, type HueGateway } from '@huxel/app';
 import {
 	HueLinkButtonNotPressedError,
 	HueNetworkError,

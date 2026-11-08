@@ -1,7 +1,7 @@
 import { TextAttributes, type BoxRenderable, type KeyEvent } from '@opentui/core';
 import { useKeyboard } from '@opentui/react';
-import { areaPresets, describeError, findAreaPreset, type HueApp, type PresetId } from 'hue-app';
-import { useHueApp, type ReactArea } from 'hue-app/react';
+import { areaPresets, describeError, findAreaPreset, type HueApp, type PresetId } from '@huxel/app';
+import { useHueApp, type ReactArea } from '@huxel/app/react';
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { Footer } from './Footer';
 import { Notice } from './Notice';

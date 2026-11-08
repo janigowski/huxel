@@ -1,4 +1,4 @@
-import type { HueApp } from 'hue-app';
+import type { HueApp } from '@huxel/app';
 import type { DiscoveredBridge } from '@huxel/client';
 
 export interface KeyValueStorage {

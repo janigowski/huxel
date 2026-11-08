@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { XyColor } from 'hue-app';
+	import type { XyColor } from '@huxel/app';
 	import { findPaletteColor, palette } from 'design-system';
 	import ColorSwatch from './ColorSwatch.svelte';
 
