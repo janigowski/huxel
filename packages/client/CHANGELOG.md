@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-08
+
 ### Added
 
 - `PUT` requests are throttled per resource URL with lodash `throttle` (100 ms, 1 s for `grouped_light`), last call wins. Disable with `throttle: false`.
@@ -30,5 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Many CLIP v2 resource types (sensors, connectivity, entertainment, Matter/HomeKit, behavior, geofence, etc.) are not implemented.
 - `/eventstream` and Entertainment streaming are not supported.
 
-[Unreleased]: https://github.com/janigowski/huxel/compare/client-v0.1.0...HEAD
+[Unreleased]: https://github.com/janigowski/huxel/compare/client-v0.2.0...HEAD
+[0.2.0]: https://github.com/janigowski/huxel/compare/client-v0.1.0...client-v0.2.0
 [0.1.0]: https://github.com/janigowski/huxel/releases/tag/client-v0.1.0
