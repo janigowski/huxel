@@ -1,18 +1,58 @@
 # huxel
 
-Libraries and apps for controlling Philips Hue lights over the CLIP API v2.
+![Banner: huxel, a modular toolkit for Philips Hue](./banner.jpg)
 
-| Workspace                                            | Description                                                       |
-| ---------------------------------------------------- | ----------------------------------------------------------------- |
-| [`packages/client`](./packages/client)               | Typed, environment agnostic client for the Hue CLIP API v2        |
-| [`packages/app`](./packages/app)                     | Headless app state for Hue lights, with Svelte and React adapters |
-| [`packages/design-system`](./packages/design-system) | Svelte components and design tokens shared by the Svelte apps     |
-| [`apps/svelte-hue-app`](./apps/svelte-hue-app)       | SvelteKit web dashboard                                           |
-| [`apps/extension-hue-app`](./apps/extension-hue-app) | Browser extension for Arc and other Chromium browsers             |
-| [`apps/tui-hue-app`](./apps/tui-hue-app)             | Terminal remote built with OpenTUI and React                      |
-| [`apps/hue-mcp`](./apps/hue-mcp)                     | Local stdio MCP server for an agent on the same network           |
+A modular toolkit for Philips Hue. The same bridge calls and the same light state run in a browser, in Node.js, and in Bun.
 
-Libraries in `packages/` are meant to be published to npm, except the private `design-system`. Apps in `apps/` are private.
+Two libraries are published. The apps are private products built on them.
+
+## Packages
+
+### [@huxel/client](./packages/client)
+
+[npm](https://www.npmjs.com/package/@huxel/client) · 0.2.0
+
+One typed client for the [Hue CLIP API v2](https://developers.meethue.com/develop/hue-api-v2/).
+
+- Send the HTTP calls and own the types, so the next app does not start from scratch.
+- Mirror the official API. 10 of 46 resource types are supported, plus bridge discovery, link-button registration, and the event stream.
+- Store nothing. The bridge address and the application key are passed in on each call.
+
+### [@huxel/app](./packages/app)
+
+[npm](https://www.npmjs.com/package/@huxel/app) · 0.1.0
+
+Headless state for the lights, rooms, and zones in one home.
+
+- Load them, then change power, brightness, color, and color temperature.
+- Follow changes made somewhere else, such as the Hue app, a switch, or an automation.
+- Hand the same state to Svelte 5 and React. Those adapters are optional.
+
+The application key stays in memory for the life of the app. Saving it between launches belongs to the product that calls this package. `@huxel/client` does the HTTP.
+
+### [design-system](./packages/design-system)
+
+Private. Svelte 5 components and design tokens shared by the web dashboard and the browser extension. It renders `@huxel/app` state and ships no UI of its own to npm.
+
+## Apps
+
+Each app links to a bridge, keeps the application key, and talks to the lights through `@huxel/app`.
+
+### [svelte-hue-app](./apps/svelte-hue-app)
+
+Web dashboard. List lights, rooms, and zones, then toggle, dim, and set color with live updates. Run it locally, or deploy it to a server.
+
+### [extension-hue-app](./apps/extension-hue-app)
+
+Chromium toolbar popup for Arc and Chrome. Control the lights on the local network from the browser. You load it unpacked from a local build.
+
+### [tui-hue-app](./apps/tui-hue-app)
+
+Terminal remote. Link a bridge, then toggle and dim lights, rooms, and zones, including the same presets as the web dashboard.
+
+### [hue-mcp](./apps/hue-mcp)
+
+Local MCP server for an agent on the same network. It speaks stdio and can report status, link a bridge, read the home, and set a light, a room, a zone, or a scene. The application key stays in a config file and is never returned by a tool.
 
 ## Development
 
