@@ -19,7 +19,10 @@
 	.bar {
 		display: flex;
 		align-items: baseline;
+		justify-content: space-between;
 		gap: var(--space-3);
+		padding-bottom: var(--space-3);
+		border-bottom: var(--border-width) solid var(--border-neutral);
 	}
 
 	h2,
@@ -28,17 +31,16 @@
 	}
 
 	h2 {
-		font-family: var(--font-display);
-		font-size: var(--text-section);
-		font-weight: var(--font-weight-bold);
-		letter-spacing: var(--tracking-title);
-		line-height: 1.2;
+		font-size: var(--font-size-heading-2);
+		font-weight: var(--font-weight-heading-2);
+		letter-spacing: var(--tracking-heading-2);
+		line-height: var(--line-height-heading-2);
 	}
 
 	.count {
-		color: var(--color-mute);
+		color: var(--foreground-neutral-secondary);
 		font-family: var(--font-mono);
-		font-size: var(--text-label);
-		line-height: 1.2;
+		font-size: var(--font-size-body-2);
+		line-height: var(--line-height-body-2);
 	}
 </style>

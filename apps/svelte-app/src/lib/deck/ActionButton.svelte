@@ -16,27 +16,35 @@
 
 <style>
 	.action {
-		min-height: var(--control-size);
-		padding: var(--space-3) var(--space-5);
-		border: var(--rule) solid var(--color-paper);
-		background: var(--color-paper);
-		color: var(--color-ink);
-		font-family: var(--font-display);
-		font-size: var(--text-body);
-		font-weight: var(--font-weight-bold);
-		line-height: 1.2;
+		min-height: var(--size-large);
+		padding: var(--space-3) var(--space-4);
+		border: 0;
+		border-radius: var(--radius-control);
+		background: var(--background-emphasis-strong);
+		box-shadow: var(--elevation-1);
+		color: var(--foreground-emphasis-on-fill);
+		font-size: var(--font-size-body-1);
+		font-weight: var(--font-weight-control);
+		letter-spacing: var(--tracking-control);
+		line-height: var(--line-height-body-1);
 		cursor: pointer;
+		transition: background var(--duration-default) var(--ease-default);
 	}
 
 	.action:disabled {
-		opacity: 0.6;
+		background: var(--background-emphasis-strong-disabled);
+		box-shadow: none;
+		color: var(--foreground-emphasis-on-fill-disabled);
 		cursor: progress;
 	}
 
 	@media (hover: hover) {
 		.action:hover:not(:disabled) {
-			background: transparent;
-			color: var(--color-paper);
+			background: var(--background-emphasis-strong-hover);
 		}
+	}
+
+	.action:active:not(:disabled) {
+		background: var(--background-emphasis-strong-pressed);
 	}
 </style>

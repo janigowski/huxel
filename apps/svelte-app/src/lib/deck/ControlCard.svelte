@@ -43,9 +43,14 @@
 	const adjustable = $derived(
 		swatch !== null || brightness !== null || oneditpresets !== undefined
 	);
+	const glow = $derived(colors[0] ?? 'var(--foreground-emphasis-primary)');
 </script>
 
-<article class={['card', { lit: isOn }]} aria-labelledby={nameId}>
+<article class={['card', { lit: isOn }]} style:--glow={glow} aria-labelledby={nameId}>
+	{#if showGradient}
+		<GradientBar {colors} {opacity} />
+	{/if}
+
 	<div class="body">
 		<div class="identity">
 			<p id={nameId} class="name" title={name}>{name}</p>
@@ -60,14 +65,8 @@
 				<span>{stateLabel}</span>
 			</button>
 		</div>
-	</div>
 
-	{#if showGradient}
-		<GradientBar {colors} {opacity} />
-	{/if}
-
-	{#if adjustable}
-		<div class="body">
+		{#if adjustable}
 			<div class="controls">
 				{#if brightness !== null}
 					<div class="dim">
@@ -81,7 +80,7 @@
 
 				{#if swatch}
 					<button
-						class="color"
+						class="choice"
 						type="button"
 						aria-haspopup="dialog"
 						aria-label="{name} color, {colorName}"
@@ -89,16 +88,16 @@
 						onclick={oneditcolor}
 					>
 						<ColorSwatch hex={swatch} />
-						<span class="color-copy">
+						<span class="choice-copy">
 							<span class="meta">Color</span>
-							<span class="color-name">{colorName}</span>
+							<span class="choice-name">{colorName}</span>
 						</span>
 					</button>
 				{/if}
 
 				{#if presetName && oneditpresets}
 					<button
-						class="preset"
+						class="choice"
 						type="button"
 						aria-haspopup="dialog"
 						aria-label="{name} presets, {presetName}"
@@ -108,30 +107,40 @@
 						{#if swatch}
 							<ColorSwatch hex={swatch} />
 						{/if}
-						<span class="color-copy">
+						<span class="choice-copy">
 							<span class="meta">Presets</span>
-							<span class="color-name">{presetName}</span>
+							<span class="choice-name">{presetName}</span>
 						</span>
 					</button>
 				{/if}
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </article>
 
 <style>
 	.card {
-		--focus: var(--color-paper);
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		border: var(--rule) solid var(--color-line);
-		background: var(--color-surface);
-		color: var(--color-paper);
+		overflow: hidden;
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-12);
+		background: color-mix(in srgb, var(--background-neutral-medium) 42%, var(--background-default));
+		box-shadow: var(--elevation-1);
+		color: var(--foreground-neutral-primary);
+		transition:
+			border-color var(--duration-default) var(--ease-default),
+			background var(--duration-default) var(--ease-default),
+			box-shadow var(--duration-default) var(--ease-default);
 	}
 
 	.lit {
-		border-color: #3a3a3a;
+		border-color: color-mix(in srgb, var(--glow) 55%, var(--border-neutral));
+		background: var(--background-neutral-medium);
+		box-shadow:
+			var(--elevation-2),
+			0 0 28px color-mix(in srgb, var(--glow) 22%, transparent);
 	}
 
 	.body {
@@ -139,10 +148,6 @@
 		flex-direction: column;
 		gap: var(--space-4);
 		padding: var(--space-4);
-	}
-
-	.body + .body {
-		padding-top: 0;
 	}
 
 	.identity {
@@ -157,40 +162,41 @@
 		min-width: 0;
 		margin: 0;
 		overflow: hidden;
-		font-family: var(--font-display);
-		font-size: var(--text-name);
-		font-weight: var(--font-weight-bold);
-		letter-spacing: var(--tracking-title);
-		line-height: 1.2;
+		font-size: var(--font-size-heading-3);
+		font-weight: var(--font-weight-heading-3);
+		letter-spacing: var(--tracking-heading-3);
+		line-height: var(--line-height-heading-3);
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	.power {
-		--focus: var(--color-paper);
 		display: inline-flex;
 		flex-shrink: 0;
 		align-items: center;
-		gap: var(--space-2);
 		justify-content: center;
-		min-width: 4.75rem;
-		min-height: var(--control-size);
+		gap: var(--space-2);
+		min-width: 4.5rem;
+		min-height: var(--size-small);
 		padding: 0 var(--space-3);
-		border: var(--rule) solid var(--color-line);
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-control);
 		background: transparent;
-		color: var(--color-mute);
-		font-family: var(--font-display);
-		font-size: var(--text-body);
-		font-weight: var(--font-weight-bold);
+		color: var(--foreground-neutral-secondary);
+		font-size: var(--font-size-body-2);
+		font-weight: var(--font-weight-control);
 		line-height: 1;
 		cursor: pointer;
+		transition:
+			background var(--duration-default) var(--ease-default),
+			border-color var(--duration-default) var(--ease-default),
+			color var(--duration-default) var(--ease-default);
 	}
 
 	.lit .power {
-		--focus: var(--color-ink);
-		border-color: var(--color-paper);
-		background: var(--color-paper);
-		color: var(--color-ink);
+		border-color: transparent;
+		background: var(--background-emphasis-strong);
+		color: var(--foreground-emphasis-on-fill);
 	}
 
 	.controls {
@@ -202,7 +208,7 @@
 	.dim {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
-		gap: var(--space-2) var(--space-3);
+		gap: var(--space-1) var(--space-3);
 		align-items: center;
 	}
 
@@ -211,70 +217,71 @@
 	}
 
 	.meta {
-		color: var(--color-mute);
-		font-size: var(--text-label);
-		line-height: 1.3;
+		color: var(--foreground-neutral-secondary);
+		font-size: var(--font-size-body-2);
+		line-height: var(--line-height-body-2);
 	}
 
 	.level {
 		font-family: var(--font-mono);
-		font-size: var(--text-body);
-		letter-spacing: var(--tracking-tight);
-		line-height: 1;
+		font-size: var(--font-size-body-2);
+		line-height: var(--line-height-body-2);
 	}
 
-	.color,
-	.preset {
+	.choice {
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
 		width: 100%;
-		min-height: var(--control-size);
+		min-height: var(--size-medium);
 		padding: var(--space-2) var(--space-3);
-		border: var(--rule) solid var(--color-line);
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-control);
 		background: transparent;
 		color: inherit;
 		text-align: left;
 		cursor: pointer;
+		transition:
+			border-color var(--duration-default) var(--ease-default),
+			background var(--duration-default) var(--ease-default);
 	}
 
-	.color:disabled,
-	.preset:disabled,
-	.power:disabled {
-		opacity: 0.45;
+	.choice:disabled {
+		color: var(--foreground-neutral-disabled);
 		cursor: not-allowed;
 	}
 
-	.color-copy {
+	.choice-copy {
 		display: flex;
 		flex-direction: column;
-		gap: 0.1rem;
 		min-width: 0;
 	}
 
-	.color-name {
+	.choice-name {
 		overflow: hidden;
-		font-size: var(--text-body);
-		font-weight: var(--font-weight-bold);
-		line-height: 1.2;
+		font-size: var(--font-size-body-1);
+		font-weight: var(--font-weight-medium);
+		line-height: var(--line-height-body-1);
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	@media (hover: hover) {
 		.power:hover {
-			border-color: var(--color-paper);
-			color: var(--color-paper);
+			border-color: var(--border-neutral-hover);
+			background: var(--background-neutral-soft-hover);
+			color: var(--foreground-neutral-primary);
 		}
 
 		.lit .power:hover {
-			background: transparent;
-			color: var(--color-paper);
+			border-color: transparent;
+			background: var(--background-emphasis-strong-hover);
+			color: var(--foreground-emphasis-on-fill);
 		}
 
-		.color:hover:not(:disabled),
-		.preset:hover:not(:disabled) {
-			border-color: var(--color-paper);
+		.choice:hover:not(:disabled) {
+			border-color: var(--border-emphasis);
+			background: var(--background-emphasis-soft);
 		}
 	}
 </style>

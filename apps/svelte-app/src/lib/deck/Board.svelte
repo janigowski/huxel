@@ -20,19 +20,23 @@
 
 <style>
 	.board {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--space-8);
+		align-items: start;
 	}
 
 	.lanes,
 	.sources {
-		min-width: 0;
-	}
-
-	.lanes {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-8);
+		min-width: 0;
+	}
+
+	@media (min-width: 960px) {
+		.board {
+			grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr);
+		}
 	}
 </style>

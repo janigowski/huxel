@@ -24,30 +24,30 @@
 		align-items: flex-start;
 		gap: var(--space-3);
 		padding: var(--space-3) var(--space-4);
-		border: var(--rule) solid var(--color-paper);
-		background: var(--color-surface);
+		border: var(--border-width) solid var(--border-critical);
+		border-radius: var(--radius-8);
+		background: var(--background-critical-soft);
+		color: var(--foreground-critical-primary);
 	}
 
 	.message {
 		margin: 0;
-		font-size: var(--text-body);
-		line-height: var(--leading-body);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
 	}
 
 	.muted {
-		color: var(--color-mute);
-		border-color: var(--color-line);
-		background: transparent;
+		border-color: var(--border-neutral);
+		background: var(--background-neutral-medium);
+		color: var(--foreground-neutral-secondary);
 	}
 
 	.flag {
 		flex-shrink: 0;
-		padding: var(--space-1) var(--space-2);
-		background: var(--color-paper);
-		color: var(--color-ink);
-		font-family: var(--font-display);
-		font-size: var(--text-label);
-		font-weight: var(--font-weight-bold);
-		line-height: 1.2;
+		font-family: var(--font-mono);
+		font-size: var(--font-size-body-2);
+		letter-spacing: var(--tracking-label);
+		line-height: var(--line-height-body-2);
+		text-transform: uppercase;
 	}
 </style>

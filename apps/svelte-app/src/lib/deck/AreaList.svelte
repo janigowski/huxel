@@ -93,7 +93,7 @@
 	.list {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
-		gap: var(--space-3);
+		gap: var(--space-4);
 		margin: 0;
 		padding: 0;
 		list-style: none;

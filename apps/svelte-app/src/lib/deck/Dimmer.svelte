@@ -27,8 +27,9 @@
 <style>
 	.dimmer {
 		width: 100%;
-		height: var(--control-size);
+		height: var(--size-small);
 		margin: 0;
+		color: var(--glow, var(--foreground-emphasis-primary));
 		appearance: none;
 		background: transparent;
 		cursor: pointer;
@@ -39,17 +40,13 @@
 		cursor: not-allowed;
 	}
 
-	.dimmer:focus-visible {
-		outline: var(--rule) solid var(--focus, var(--color-paper));
-		outline-offset: var(--focus-offset);
-	}
-
 	.dimmer::-webkit-slider-runnable-track {
 		height: var(--track-size);
+		border-radius: var(--radius-full);
 		background: linear-gradient(
 			to right,
 			currentColor 0 var(--pct),
-			var(--color-line) var(--pct) 100%
+			var(--border-neutral) var(--pct) 100%
 		);
 	}
 
@@ -58,24 +55,33 @@
 		height: var(--thumb-size);
 		margin-top: calc((var(--track-size) - var(--thumb-size)) / 2);
 		appearance: none;
-		border: var(--rule-strong) solid var(--color-background);
-		background: currentColor;
+		border: var(--focus-width) solid var(--background-default);
+		border-radius: var(--radius-full);
+		background: var(--foreground-neutral-primary);
+		box-shadow: var(--elevation-1);
 	}
 
 	.dimmer::-moz-range-track {
 		height: var(--track-size);
 		border: 0;
+		border-radius: var(--radius-full);
 		background: linear-gradient(
 			to right,
 			currentColor 0 var(--pct),
-			var(--color-line) var(--pct) 100%
+			var(--border-neutral) var(--pct) 100%
 		);
+	}
+
+	.dimmer::-moz-range-progress {
+		background: transparent;
 	}
 
 	.dimmer::-moz-range-thumb {
 		width: var(--thumb-size);
 		height: var(--thumb-size);
-		border: var(--rule-strong) solid var(--color-background);
-		background: currentColor;
+		border: var(--focus-width) solid var(--background-default);
+		border-radius: var(--radius-full);
+		background: var(--foreground-neutral-primary);
+		box-shadow: var(--elevation-1);
 	}
 </style>

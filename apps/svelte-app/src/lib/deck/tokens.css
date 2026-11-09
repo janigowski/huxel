@@ -15,41 +15,32 @@
 	--text-label: var(--font-size-body-2);
 	--text-index: var(--font-size-body-2);
 	--text-body: var(--font-size-body-1);
-	--text-name: 1.125rem;
-	--text-section: 1.25rem;
-	--text-title: clamp(1.75rem, 3vw, 2.25rem);
+	--text-name: var(--font-size-heading-3);
+	--text-section: var(--font-size-heading-2);
+	--text-title: var(--font-size-heading-1);
 
-	--tracking-title: var(--tracking-section);
+	--tracking-title: var(--tracking-heading-1);
 	--tracking-tight: var(--tracking-display);
 
-	--leading-body: 1.45;
-	--leading-title: 1.1;
+	--leading-body: var(--line-height-body-1);
+	--leading-title: var(--line-height-heading-1);
 
-	--space-1: 0.25rem;
-	--space-2: 0.5rem;
-	--space-3: 0.75rem;
-	--space-4: 1rem;
-	--space-5: 1.25rem;
-	--space-6: 1.5rem;
-	--space-8: 2rem;
-	--space-12: 3rem;
-
-	--frame-inset: clamp(0.75rem, 2vw, 1.5rem);
+	--page-width: 72rem;
+	--frame-inset: clamp(var(--space-4), 4vw, var(--space-8));
+	--space-5: var(--space-6);
 	--frame-pad: 0px;
-	--lane-min: 20rem;
-	--lane-width: 26rem;
-	--tile-min: 16.5rem;
+	--lane-min: 18rem;
+	--lane-width: 22rem;
+	--tile-min: 17.5rem;
 
-	--rule: 1px;
-	--rule-strong: 2px;
+	--rule: var(--border-width);
+	--rule-strong: var(--focus-width);
 	--gradient-height: 14px;
-	--control-size: 2.75rem;
-	--track-size: 6px;
-	--thumb-size: 1.125rem;
-	--icon-size: 1rem;
-	--index-size: 2.75rem;
-	--dialog-width: 32rem;
-	--focus-offset: 3px;
+	--control-size: var(--size-medium);
+	--track-size: var(--space-1);
+	--thumb-size: var(--icon-size);
+	--index-size: var(--size-large);
+	--dialog-width: var(--overlay-medium);
 	--z-mark: 3;
 
 	--mark-bg: transparent;
@@ -57,7 +48,11 @@
 	--field: var(--color-background);
 	--focus: var(--focus-border);
 
-	--hatch: repeating-linear-gradient(-45deg, var(--color-paper) 0 1px, transparent 1px 8px);
+	--hatch: repeating-linear-gradient(
+		-45deg,
+		color-mix(in srgb, var(--foreground-neutral-tertiary) 80%, transparent) 0 1px,
+		transparent 1px 7px
+	);
 	--barcode: repeating-linear-gradient(
 		to right,
 		var(--color-paper) 0 1px,
