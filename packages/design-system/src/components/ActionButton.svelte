@@ -18,7 +18,7 @@
 <style>
 	.action {
 		padding: var(--space-3) var(--space-6);
-		background: var(--color-orange);
+		background: var(--color-accent);
 		color: var(--color-ink);
 		cursor: pointer;
 	}

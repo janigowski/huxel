@@ -17,11 +17,12 @@ Svelte 5 components and design tokens shared by [`svelte-app`](../../apps/svelte
 <LightsSection {hue} />
 ```
 
-Import the tokens once in the app stylesheet, after a CSS reset such as Tailwind's preflight, and load the Inter font:
+Import the shared tokens once, then these component aliases. Load Instrument Sans. Do not load Inter.
 
 ```css
 @import 'tailwindcss';
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/instrument-sans';
+@import '@huxel/tokens/tokens.css';
 @import '@huxel/design-system/tokens.css';
 ```
 

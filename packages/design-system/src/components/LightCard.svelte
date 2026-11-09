@@ -81,24 +81,24 @@
 		width: 100%;
 		min-height: 9rem;
 		padding: var(--space-3);
-		border: var(--rule-thin) solid var(--color-orange);
+		border: var(--rule-thin) solid var(--color-accent);
 		background: repeating-linear-gradient(
 			-45deg,
-			color-mix(in srgb, var(--color-orange) 25%, transparent) 0 1px,
+			color-mix(in srgb, var(--color-accent) 25%, transparent) 0 1px,
 			transparent 1px 6px
 		);
-		color: var(--color-orange);
+		color: var(--color-accent);
 	}
 
 	.card.on {
-		background: var(--color-orange);
+		background: var(--color-accent);
 		color: var(--color-ink);
 	}
 
 	.card.combined,
 	.card.on.combined {
 		position: relative;
-		color: var(--color-orange);
+		color: var(--color-accent);
 		background: var(--color-background);
 	}
 

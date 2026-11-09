@@ -1,21 +1,19 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/instrument-sans';
+@import '@huxel/tokens/tokens.css';
 @import '@huxel/design-system/tokens.css';
 
 :root {
 	--popup-width: 30rem;
 	--page-width: var(--popup-width);
 	--page-gutter: var(--space-4);
-	--text-title: 3rem;
-	--text-subtitle: 1.125rem;
-	--space-12: var(--space-6);
 	--dialog-width: 24rem;
 }
 
 body {
 	width: var(--popup-width);
 	background: var(--color-background);
-	color: var(--color-mint);
+	color: var(--color-text);
 	font-family: var(--font-sans);
 	font-size: var(--text-body);
 	-webkit-font-smoothing: antialiased;

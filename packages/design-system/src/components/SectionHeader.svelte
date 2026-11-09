@@ -31,19 +31,19 @@
 	}
 
 	h2 {
-		color: var(--color-orange);
+		color: var(--color-accent);
 		font-weight: var(--font-weight-semibold);
 	}
 
 	.ratio {
 		height: var(--rule-thick);
 		margin-block-end: var(--space-6);
-		background: var(--color-mint);
+		background: var(--color-text);
 	}
 
 	.fill {
 		display: block;
 		height: 100%;
-		background: var(--color-orange);
+		background: var(--color-accent);
 	}
 </style>

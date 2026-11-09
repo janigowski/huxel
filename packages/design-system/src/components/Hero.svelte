@@ -4,9 +4,10 @@
 	interface Props {
 		title: string;
 		subtitle: string;
+		product?: string;
 	}
 
-	let { title, subtitle }: Props = $props();
+	let { title, subtitle, product }: Props = $props();
 </script>
 
 <section class="hero">
@@ -14,7 +15,7 @@
 		<h1>{title}</h1>
 		<p class="subtitle">{subtitle}</p>
 	</div>
-	<BrandMark name="HUE" />
+	<BrandMark {product} />
 </section>
 
 <style>

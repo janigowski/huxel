@@ -85,9 +85,9 @@
 		width: min(var(--dialog-width), calc(100vw - 2 * var(--space-4)));
 		margin: auto;
 		padding: var(--space-4);
-		border: var(--rule-thin) solid var(--color-orange);
+		border: var(--rule-thin) solid var(--color-accent);
 		background: var(--color-background);
-		color: var(--color-mint);
+		color: var(--color-text);
 	}
 
 	.dialog::backdrop {
@@ -100,11 +100,11 @@
 		align-items: center;
 		padding-block-end: var(--space-3);
 		margin-block-end: var(--space-4);
-		border-block-end: var(--rule-thin) solid var(--color-orange);
+		border-block-end: var(--rule-thin) solid var(--color-accent);
 	}
 
 	h2 {
-		color: var(--color-orange);
+		color: var(--color-accent);
 		font-weight: var(--font-weight-semibold);
 	}
 
@@ -114,14 +114,14 @@
 		width: var(--icon-tile-size);
 		height: var(--icon-tile-size);
 		padding: 0;
-		border: var(--rule-thin) solid var(--color-orange);
+		border: var(--rule-thin) solid var(--color-accent);
 		background: none;
-		color: var(--color-orange);
+		color: var(--color-accent);
 		cursor: pointer;
 	}
 
 	.close:focus-visible {
-		outline: var(--rule-thin) solid var(--color-mint);
+		outline: var(--rule-thin) solid var(--color-text);
 		outline-offset: var(--rule-thin);
 	}
 
@@ -138,12 +138,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-1);
-		color: var(--color-mint);
+		color: var(--color-text);
 		cursor: pointer;
 	}
 
 	.option:has(:checked) {
-		color: var(--color-orange);
+		color: var(--color-accent);
 	}
 
 	.block {
@@ -153,17 +153,17 @@
 	}
 
 	.option:has(:checked) .block {
-		outline: var(--rule-thick) solid var(--color-orange);
+		outline: var(--rule-thick) solid var(--color-accent);
 		outline-offset: 0;
 	}
 
 	.option:has(:focus-visible) .block {
-		outline: var(--rule-thin) solid var(--color-mint);
+		outline: var(--rule-thin) solid var(--color-text);
 		outline-offset: var(--rule-thick);
 	}
 
 	.option:has(:checked:focus-visible) .block {
-		outline: var(--rule-thick) solid var(--color-mint);
+		outline: var(--rule-thick) solid var(--color-text);
 		outline-offset: 0;
 	}
 
@@ -174,7 +174,7 @@
 		visibility: hidden;
 		padding: 2px;
 		background: var(--color-ink);
-		color: var(--color-mint);
+		color: var(--color-text);
 		box-sizing: content-box;
 	}
 

@@ -37,6 +37,6 @@
 		align-items: flex-start;
 		gap: var(--space-4);
 		padding-block: var(--space-6);
-		border-top: var(--rule-thick) solid var(--color-orange);
+		border-top: var(--rule-thick) solid var(--color-accent);
 	}
 </style>

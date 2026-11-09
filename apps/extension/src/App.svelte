@@ -36,7 +36,7 @@
 
 <main class="page">
 	<DashboardBar label="Hue control dashboard" date={new Date()} connection={hue?.connection} />
-	<Hero title="Home Lights" subtitle={session.subtitle} />
+	<Hero title="Home Lights" subtitle={session.subtitle} product="extension" />
 
 	{#if session.status === 'restoring'}
 		<Notice tone="muted">Loading…</Notice>

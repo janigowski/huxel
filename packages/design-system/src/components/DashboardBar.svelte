@@ -52,7 +52,7 @@
 		justify-content: space-between;
 		align-items: center;
 		padding-block-end: var(--space-2);
-		border-bottom: var(--rule-thin) solid var(--color-mint);
+		border-bottom: var(--rule-thin) solid var(--color-text);
 	}
 
 	.title {
@@ -65,11 +65,11 @@
 		width: var(--space-3);
 		height: var(--space-3);
 		border-radius: 50%;
-		background: var(--color-mint-muted);
+		background: var(--color-text-secondary);
 	}
 
 	.dot.live {
-		background: var(--color-mint);
+		background: var(--color-text);
 	}
 
 	.dot.pending {
@@ -77,7 +77,7 @@
 	}
 
 	.state {
-		color: var(--color-mint-muted);
+		color: var(--color-text-secondary);
 	}
 
 	@keyframes pulse {

@@ -1,6 +1,8 @@
+import { tokenValue } from '@huxel/tokens/values';
+
 export const colors = {
-	accent: '#f26a36',
-	text: '#bfd8c6',
-	muted: '#7e8f83',
-	background: '#262626'
+	accent: tokenValue('--color-brand-500'),
+	text: tokenValue('--foreground-neutral-primary'),
+	muted: tokenValue('--foreground-neutral-secondary'),
+	background: tokenValue('--background-default')
 };

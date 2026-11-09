@@ -6,5 +6,5 @@ html.preview {
 html.preview body {
 	min-height: 37.5rem;
 	margin: var(--space-8) auto;
-	outline: var(--rule-thin) solid var(--color-mint-muted);
+	outline: var(--rule-thin) solid var(--color-text-secondary);
 }

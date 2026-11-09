@@ -1,35 +1,24 @@
 <script lang="ts">
-	import HexIcon from './icons/HexIcon.svelte';
-
 	interface Props {
-		name: string;
+		product?: string;
 	}
 
-	let { name }: Props = $props();
+	let { product }: Props = $props();
 </script>
 
-<span class="brand">
-	<HexIcon />
-	<span class="divider" aria-hidden="true"></span>
-	<span class="name">{name}</span>
+<span class="wordmark">
+	huxel<span class="slash">//</span>{product}
 </span>
 
 <style>
-	.brand {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-3);
-	}
-
-	.divider {
-		width: var(--rule-thin);
-		height: var(--space-6);
-		background: currentColor;
-	}
-
-	.name {
+	.wordmark {
 		font-size: var(--text-subtitle);
-		font-weight: var(--font-weight-medium);
-		letter-spacing: var(--tracking-label);
+		font-weight: var(--font-weight-bold);
+		letter-spacing: var(--tracking-display);
+		line-height: 1;
+	}
+
+	.slash {
+		color: var(--color-accent);
 	}
 </style>

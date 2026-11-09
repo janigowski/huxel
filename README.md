@@ -34,9 +34,13 @@ The application key stays in memory for the life of the app. Saving it between l
 
 Local MCP server for an agent on the same network. It speaks stdio and can report status, link a bridge, read the home, and set a light, a room, a zone, or a scene. The application key stays in a config file and is never returned by a tool.
 
+### [@huxel/tokens](./packages/tokens) and [@huxel/icons](./packages/icons)
+
+Private design system. Tokens are the only source of color, type, spacing, and motion. Icons are one generated sprite. The Svelte screens and the terminal app read the same tokens.
+
 ### [@huxel/design-system](./packages/design-system)
 
-Private. Svelte 5 components and design tokens shared by the web dashboard and the browser extension. It renders `@huxel/app` state and ships no UI of its own to npm.
+Private. Svelte 5 product components shared by the web dashboard and the browser extension. It renders `@huxel/app` state and ships no UI of its own to npm.
 
 ## Apps
 

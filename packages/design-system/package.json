@@ -28,6 +28,9 @@
 		"lint": "eslint .",
 		"test": "vp test run"
 	},
+	"dependencies": {
+		"@huxel/tokens": "workspace:*"
+	},
 	"peerDependencies": {
 		"@huxel/app": "workspace:*",
 		"svelte": "^5.46.1"

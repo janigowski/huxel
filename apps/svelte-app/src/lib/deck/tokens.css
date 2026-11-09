@@ -1,29 +1,26 @@
+@import '@huxel/tokens/tokens.css';
+
 :root {
-	--color-background: #090909;
-	--color-surface: #141414;
-	--color-paper: #f4f4f4;
-	--color-ink: #090909;
-	--color-mute: #b5b5b5;
-	--color-line: #2c2c2c;
-	--color-line-dim: #2c2c2c;
-	--color-backdrop: rgb(0 0 0 / 0.78);
+	--color-background: var(--background-default);
+	--color-surface: var(--background-neutral-medium);
+	--color-paper: var(--foreground-neutral-primary);
+	--color-ink: var(--foreground-emphasis-on-fill);
+	--color-mute: var(--foreground-neutral-secondary);
+	--color-line: var(--border-neutral);
+	--color-line-dim: var(--border-neutral-disabled);
+	--color-backdrop: rgb(0 0 0 / 0.72);
 
-	--font-display: 'Syne Variable', 'Avenir Next', system-ui, sans-serif;
-	--font-mono: 'Share Tech Mono', ui-monospace, monospace;
+	--font-display: var(--font-sans);
 
-	--font-weight-regular: 400;
-	--font-weight-bold: 700;
-	--font-weight-black: 800;
-
-	--text-label: 0.8125rem;
-	--text-body: 1rem;
+	--text-label: var(--font-size-body-2);
+	--text-index: var(--font-size-body-2);
+	--text-body: var(--font-size-body-1);
 	--text-name: 1.125rem;
 	--text-section: 1.25rem;
 	--text-title: clamp(1.75rem, 3vw, 2.25rem);
 
-	--tracking-label: 0.01em;
-	--tracking-title: -0.03em;
-	--tracking-tight: -0.03em;
+	--tracking-title: var(--tracking-section);
+	--tracking-tight: var(--tracking-display);
 
 	--leading-body: 1.45;
 	--leading-title: 1.1;
@@ -58,7 +55,7 @@
 	--mark-bg: transparent;
 	--mark-fg: var(--color-paper);
 	--field: var(--color-background);
-	--focus: var(--color-paper);
+	--focus: var(--focus-border);
 
 	--hatch: repeating-linear-gradient(-45deg, var(--color-paper) 0 1px, transparent 1px 8px);
 	--barcode: repeating-linear-gradient(

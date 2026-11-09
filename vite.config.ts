@@ -17,6 +17,7 @@ export default defineConfig({
 			'apps/svelte-app/project.inlang',
 			'apps/svelte-app/src/lib/paraglide',
 			'packages/design-system/.svelte-kit',
+			'packages/ui/storybook-static',
 			'apps/extension/.e2e',
 			'packages/client/docs/clip-v2'
 		],

@@ -21,20 +21,20 @@
 		align-items: center;
 		margin-block-start: var(--space-6);
 		padding-block-start: var(--space-2);
-		border-top: var(--rule-thin) solid var(--color-mint);
-		color: var(--color-mint-muted);
+		border-top: var(--rule-thin) solid var(--color-text);
+		color: var(--color-text-secondary);
 	}
 
 	button {
 		padding: 0;
 		border: none;
 		background: none;
-		color: var(--color-mint);
+		color: var(--color-text);
 		cursor: pointer;
 	}
 
 	button:hover,
 	button:focus-visible {
-		color: var(--color-orange);
+		color: var(--color-accent);
 	}
 </style>

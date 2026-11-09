@@ -1,0 +1,401 @@
+:root {
+	--foreground-neutral-primary: var(--color-neutral-200);
+	--foreground-neutral-primary-hover: var(--color-neutral-100);
+	--foreground-neutral-primary-pressed: var(--color-neutral-300);
+	--foreground-neutral-primary-disabled: var(--color-neutral-500);
+	--foreground-neutral-secondary: var(--color-neutral-400);
+	--foreground-neutral-secondary-hover: var(--color-neutral-300);
+	--foreground-neutral-secondary-pressed: var(--color-neutral-500);
+	--foreground-neutral-secondary-disabled: var(--color-neutral-500);
+	--foreground-neutral-tertiary: var(--color-neutral-500);
+	--foreground-neutral-tertiary-hover: var(--color-neutral-400);
+	--foreground-neutral-tertiary-pressed: var(--color-neutral-500);
+	--foreground-neutral-tertiary-disabled: var(--color-neutral-500);
+	--foreground-neutral-on-fill: var(--color-neutral-200);
+	--foreground-neutral-on-fill-hover: var(--color-neutral-100);
+	--foreground-neutral-on-fill-pressed: var(--color-neutral-200);
+	--foreground-neutral-on-fill-disabled: var(--color-neutral-500);
+	--foreground-neutral-disabled: var(--color-neutral-500);
+
+	--foreground-emphasis-primary: var(--color-brand-500);
+	--foreground-emphasis-primary-hover: var(--color-brand-400);
+	--foreground-emphasis-primary-pressed: var(--color-brand-600);
+	--foreground-emphasis-primary-disabled: var(--color-brand-800);
+	--foreground-emphasis-secondary: var(--color-brand-300);
+	--foreground-emphasis-secondary-hover: var(--color-brand-200);
+	--foreground-emphasis-secondary-pressed: var(--color-brand-400);
+	--foreground-emphasis-secondary-disabled: var(--color-brand-800);
+	--foreground-emphasis-tertiary: var(--color-brand-400);
+	--foreground-emphasis-tertiary-hover: var(--color-brand-300);
+	--foreground-emphasis-tertiary-pressed: var(--color-brand-500);
+	--foreground-emphasis-tertiary-disabled: var(--color-brand-800);
+	--foreground-emphasis-on-fill: var(--color-neutral-1200);
+	--foreground-emphasis-on-fill-hover: var(--color-neutral-1200);
+	--foreground-emphasis-on-fill-pressed: var(--color-neutral-1200);
+	--foreground-emphasis-on-fill-disabled: var(--color-neutral-500);
+	--foreground-emphasis-disabled: var(--color-brand-800);
+
+	--foreground-critical-primary: var(--color-critical-400);
+	--foreground-critical-primary-hover: var(--color-critical-300);
+	--foreground-critical-primary-pressed: var(--color-critical-500);
+	--foreground-critical-primary-disabled: var(--color-critical-800);
+	--foreground-critical-secondary: var(--color-critical-300);
+	--foreground-critical-secondary-hover: var(--color-critical-200);
+	--foreground-critical-secondary-pressed: var(--color-critical-400);
+	--foreground-critical-secondary-disabled: var(--color-critical-800);
+	--foreground-critical-tertiary: var(--color-critical-500);
+	--foreground-critical-tertiary-hover: var(--color-critical-400);
+	--foreground-critical-tertiary-pressed: var(--color-critical-600);
+	--foreground-critical-tertiary-disabled: var(--color-critical-800);
+	--foreground-critical-on-fill: var(--color-neutral-200);
+	--foreground-critical-on-fill-hover: var(--color-neutral-200);
+	--foreground-critical-on-fill-pressed: var(--color-neutral-200);
+	--foreground-critical-on-fill-disabled: var(--color-neutral-500);
+	--foreground-critical-disabled: var(--color-critical-800);
+
+	--foreground-warning-primary: var(--color-warning-400);
+	--foreground-warning-primary-hover: var(--color-warning-300);
+	--foreground-warning-primary-pressed: var(--color-warning-500);
+	--foreground-warning-primary-disabled: var(--color-warning-800);
+	--foreground-warning-secondary: var(--color-warning-300);
+	--foreground-warning-secondary-hover: var(--color-warning-200);
+	--foreground-warning-secondary-pressed: var(--color-warning-400);
+	--foreground-warning-secondary-disabled: var(--color-warning-900);
+	--foreground-warning-tertiary: var(--color-warning-500);
+	--foreground-warning-tertiary-hover: var(--color-warning-400);
+	--foreground-warning-tertiary-pressed: var(--color-warning-600);
+	--foreground-warning-tertiary-disabled: var(--color-warning-900);
+	--foreground-warning-on-fill: var(--color-neutral-100);
+	--foreground-warning-on-fill-hover: var(--color-neutral-100);
+	--foreground-warning-on-fill-pressed: var(--color-neutral-100);
+	--foreground-warning-on-fill-disabled: var(--color-neutral-500);
+	--foreground-warning-disabled: var(--color-warning-900);
+
+	--foreground-success-primary: var(--color-success-400);
+	--foreground-success-primary-hover: var(--color-success-300);
+	--foreground-success-primary-pressed: var(--color-success-500);
+	--foreground-success-primary-disabled: var(--color-success-800);
+	--foreground-success-secondary: var(--color-success-300);
+	--foreground-success-secondary-hover: var(--color-success-200);
+	--foreground-success-secondary-pressed: var(--color-success-400);
+	--foreground-success-secondary-disabled: var(--color-success-800);
+	--foreground-success-tertiary: var(--color-success-500);
+	--foreground-success-tertiary-hover: var(--color-success-400);
+	--foreground-success-tertiary-pressed: var(--color-success-600);
+	--foreground-success-tertiary-disabled: var(--color-success-800);
+	--foreground-success-on-fill: var(--color-neutral-100);
+	--foreground-success-on-fill-hover: var(--color-neutral-100);
+	--foreground-success-on-fill-pressed: var(--color-neutral-100);
+	--foreground-success-on-fill-disabled: var(--color-neutral-500);
+	--foreground-success-disabled: var(--color-success-800);
+
+	--foreground-featured-primary: var(--color-featured-400);
+	--foreground-featured-primary-hover: var(--color-featured-300);
+	--foreground-featured-primary-pressed: var(--color-featured-500);
+	--foreground-featured-primary-disabled: var(--color-featured-800);
+	--foreground-featured-secondary: var(--color-featured-300);
+	--foreground-featured-secondary-hover: var(--color-featured-200);
+	--foreground-featured-secondary-pressed: var(--color-featured-400);
+	--foreground-featured-secondary-disabled: var(--color-featured-800);
+	--foreground-featured-tertiary: var(--color-featured-500);
+	--foreground-featured-tertiary-hover: var(--color-featured-400);
+	--foreground-featured-tertiary-pressed: var(--color-featured-600);
+	--foreground-featured-tertiary-disabled: var(--color-featured-800);
+	--foreground-featured-on-fill: var(--color-neutral-100);
+	--foreground-featured-on-fill-hover: var(--color-neutral-100);
+	--foreground-featured-on-fill-pressed: var(--color-neutral-100);
+	--foreground-featured-on-fill-disabled: var(--color-neutral-500);
+	--foreground-featured-disabled: var(--color-featured-800);
+
+	--foreground-inverted-primary: var(--color-neutral-1200);
+	--foreground-inverted-primary-hover: var(--color-neutral-1100);
+	--foreground-inverted-primary-pressed: var(--color-neutral-1000);
+	--foreground-inverted-primary-disabled: var(--color-neutral-700);
+	--foreground-inverted-secondary: var(--color-neutral-700);
+	--foreground-inverted-secondary-hover: var(--color-neutral-800);
+	--foreground-inverted-secondary-pressed: var(--color-neutral-900);
+	--foreground-inverted-secondary-disabled: var(--color-neutral-700);
+	--foreground-inverted-tertiary: var(--color-neutral-800);
+	--foreground-inverted-tertiary-hover: var(--color-neutral-900);
+	--foreground-inverted-tertiary-pressed: var(--color-neutral-1000);
+	--foreground-inverted-tertiary-disabled: var(--color-neutral-700);
+	--foreground-inverted-on-fill: var(--color-neutral-100);
+	--foreground-inverted-on-fill-hover: var(--color-neutral-200);
+	--foreground-inverted-on-fill-pressed: var(--color-neutral-100);
+	--foreground-inverted-on-fill-disabled: var(--color-neutral-700);
+	--foreground-inverted-disabled: var(--color-neutral-700);
+
+	--background-default: var(--color-neutral-1200);
+	--background-hover: var(--color-neutral-1100);
+	--background-pressed: var(--color-neutral-1000);
+	--background-selected: var(--color-neutral-1000);
+	--background-invalid: color-mix(
+		in srgb,
+		var(--color-critical-500) 18%,
+		var(--color-neutral-1200)
+	);
+	--background-disabled: var(--color-neutral-1100);
+
+	--background-neutral-soft: transparent;
+	--background-neutral-soft-hover: var(--color-neutral-1000);
+	--background-neutral-soft-pressed: var(--color-neutral-900);
+	--background-neutral-soft-disabled: transparent;
+	--background-neutral-soft-selected: var(--color-neutral-1000);
+	--background-neutral-medium: var(--color-neutral-1100);
+	--background-neutral-medium-hover: var(--color-neutral-1000);
+	--background-neutral-medium-pressed: var(--color-neutral-900);
+	--background-neutral-medium-disabled: var(--color-neutral-1100);
+	--background-neutral-medium-selected: var(--color-neutral-1000);
+	--background-neutral-strong: var(--color-neutral-1000);
+	--background-neutral-strong-hover: var(--color-neutral-900);
+	--background-neutral-strong-pressed: var(--color-neutral-800);
+	--background-neutral-strong-disabled: var(--color-neutral-1100);
+	--background-neutral-strong-selected: var(--color-neutral-900);
+
+	--background-emphasis-soft: color-mix(in srgb, var(--color-brand-500) 8%, transparent);
+	--background-emphasis-soft-hover: color-mix(in srgb, var(--color-brand-500) 16%, transparent);
+	--background-emphasis-soft-pressed: color-mix(in srgb, var(--color-brand-500) 24%, transparent);
+	--background-emphasis-soft-disabled: transparent;
+	--background-emphasis-soft-selected: color-mix(in srgb, var(--color-brand-500) 20%, transparent);
+	--background-emphasis-medium: color-mix(
+		in srgb,
+		var(--color-brand-500) 28%,
+		var(--color-neutral-1100)
+	);
+	--background-emphasis-medium-hover: color-mix(
+		in srgb,
+		var(--color-brand-500) 36%,
+		var(--color-neutral-1100)
+	);
+	--background-emphasis-medium-pressed: color-mix(
+		in srgb,
+		var(--color-brand-500) 44%,
+		var(--color-neutral-1100)
+	);
+	--background-emphasis-medium-disabled: var(--color-neutral-1100);
+	--background-emphasis-medium-selected: color-mix(
+		in srgb,
+		var(--color-brand-500) 40%,
+		var(--color-neutral-1100)
+	);
+	--background-emphasis-strong: var(--color-brand-500);
+	--background-emphasis-strong-hover: var(--color-brand-400);
+	--background-emphasis-strong-pressed: var(--color-brand-600);
+	--background-emphasis-strong-disabled: var(--color-neutral-1000);
+	--background-emphasis-strong-selected: var(--color-brand-500);
+
+	--background-critical-soft: color-mix(in srgb, var(--color-critical-500) 8%, transparent);
+	--background-critical-soft-hover: color-mix(in srgb, var(--color-critical-500) 16%, transparent);
+	--background-critical-soft-pressed: color-mix(
+		in srgb,
+		var(--color-critical-500) 24%,
+		transparent
+	);
+	--background-critical-soft-disabled: transparent;
+	--background-critical-soft-selected: color-mix(
+		in srgb,
+		var(--color-critical-500) 20%,
+		transparent
+	);
+	--background-critical-medium: color-mix(
+		in srgb,
+		var(--color-critical-500) 28%,
+		var(--color-neutral-1100)
+	);
+	--background-critical-medium-hover: color-mix(
+		in srgb,
+		var(--color-critical-500) 36%,
+		var(--color-neutral-1100)
+	);
+	--background-critical-medium-pressed: color-mix(
+		in srgb,
+		var(--color-critical-500) 44%,
+		var(--color-neutral-1100)
+	);
+	--background-critical-medium-disabled: var(--color-neutral-1100);
+	--background-critical-medium-selected: color-mix(
+		in srgb,
+		var(--color-critical-500) 40%,
+		var(--color-neutral-1100)
+	);
+	--background-critical-strong: var(--color-critical-700);
+	--background-critical-strong-hover: var(--color-critical-800);
+	--background-critical-strong-pressed: var(--color-critical-900);
+	--background-critical-strong-disabled: var(--color-neutral-1000);
+	--background-critical-strong-selected: var(--color-critical-700);
+
+	--background-warning-soft: color-mix(in srgb, var(--color-warning-500) 8%, transparent);
+	--background-warning-soft-hover: color-mix(in srgb, var(--color-warning-500) 16%, transparent);
+	--background-warning-soft-pressed: color-mix(in srgb, var(--color-warning-500) 24%, transparent);
+	--background-warning-soft-disabled: transparent;
+	--background-warning-soft-selected: color-mix(in srgb, var(--color-warning-500) 20%, transparent);
+	--background-warning-medium: color-mix(
+		in srgb,
+		var(--color-warning-500) 28%,
+		var(--color-neutral-1100)
+	);
+	--background-warning-medium-hover: color-mix(
+		in srgb,
+		var(--color-warning-500) 36%,
+		var(--color-neutral-1100)
+	);
+	--background-warning-medium-pressed: color-mix(
+		in srgb,
+		var(--color-warning-500) 44%,
+		var(--color-neutral-1100)
+	);
+	--background-warning-medium-disabled: var(--color-neutral-1100);
+	--background-warning-medium-selected: color-mix(
+		in srgb,
+		var(--color-warning-500) 40%,
+		var(--color-neutral-1100)
+	);
+	--background-warning-strong: var(--color-warning-800);
+	--background-warning-strong-hover: var(--color-warning-900);
+	--background-warning-strong-pressed: var(--color-warning-1000);
+	--background-warning-strong-disabled: var(--color-neutral-1000);
+	--background-warning-strong-selected: var(--color-warning-800);
+
+	--background-success-soft: color-mix(in srgb, var(--color-success-500) 8%, transparent);
+	--background-success-soft-hover: color-mix(in srgb, var(--color-success-500) 16%, transparent);
+	--background-success-soft-pressed: color-mix(in srgb, var(--color-success-500) 24%, transparent);
+	--background-success-soft-disabled: transparent;
+	--background-success-soft-selected: color-mix(in srgb, var(--color-success-500) 20%, transparent);
+	--background-success-medium: color-mix(
+		in srgb,
+		var(--color-success-500) 28%,
+		var(--color-neutral-1100)
+	);
+	--background-success-medium-hover: color-mix(
+		in srgb,
+		var(--color-success-500) 36%,
+		var(--color-neutral-1100)
+	);
+	--background-success-medium-pressed: color-mix(
+		in srgb,
+		var(--color-success-500) 44%,
+		var(--color-neutral-1100)
+	);
+	--background-success-medium-disabled: var(--color-neutral-1100);
+	--background-success-medium-selected: color-mix(
+		in srgb,
+		var(--color-success-500) 40%,
+		var(--color-neutral-1100)
+	);
+	--background-success-strong: var(--color-success-700);
+	--background-success-strong-hover: var(--color-success-800);
+	--background-success-strong-pressed: var(--color-success-900);
+	--background-success-strong-disabled: var(--color-neutral-1000);
+	--background-success-strong-selected: var(--color-success-700);
+
+	--background-featured-soft: color-mix(in srgb, var(--color-featured-500) 8%, transparent);
+	--background-featured-soft-hover: color-mix(in srgb, var(--color-featured-500) 16%, transparent);
+	--background-featured-soft-pressed: color-mix(
+		in srgb,
+		var(--color-featured-500) 24%,
+		transparent
+	);
+	--background-featured-soft-disabled: transparent;
+	--background-featured-soft-selected: color-mix(
+		in srgb,
+		var(--color-featured-500) 20%,
+		transparent
+	);
+	--background-featured-medium: color-mix(
+		in srgb,
+		var(--color-featured-500) 28%,
+		var(--color-neutral-1100)
+	);
+	--background-featured-medium-hover: color-mix(
+		in srgb,
+		var(--color-featured-500) 36%,
+		var(--color-neutral-1100)
+	);
+	--background-featured-medium-pressed: color-mix(
+		in srgb,
+		var(--color-featured-500) 44%,
+		var(--color-neutral-1100)
+	);
+	--background-featured-medium-disabled: var(--color-neutral-1100);
+	--background-featured-medium-selected: color-mix(
+		in srgb,
+		var(--color-featured-500) 40%,
+		var(--color-neutral-1100)
+	);
+	--background-featured-strong: var(--color-featured-700);
+	--background-featured-strong-hover: var(--color-featured-800);
+	--background-featured-strong-pressed: var(--color-featured-900);
+	--background-featured-strong-disabled: var(--color-neutral-1000);
+	--background-featured-strong-selected: var(--color-featured-700);
+
+	--background-inverted-soft: transparent;
+	--background-inverted-soft-hover: var(--color-neutral-300);
+	--background-inverted-soft-pressed: var(--color-neutral-400);
+	--background-inverted-soft-disabled: transparent;
+	--background-inverted-soft-selected: var(--color-neutral-300);
+	--background-inverted-medium: var(--color-neutral-200);
+	--background-inverted-medium-hover: var(--color-neutral-300);
+	--background-inverted-medium-pressed: var(--color-neutral-400);
+	--background-inverted-medium-disabled: var(--color-neutral-300);
+	--background-inverted-medium-selected: var(--color-neutral-300);
+	--background-inverted-strong: var(--color-neutral-1200);
+	--background-inverted-strong-hover: var(--color-neutral-1100);
+	--background-inverted-strong-pressed: var(--color-neutral-1000);
+	--background-inverted-strong-disabled: var(--color-neutral-300);
+	--background-inverted-strong-selected: var(--color-neutral-1100);
+
+	--border-neutral: var(--color-neutral-600);
+	--border-neutral-hover: var(--color-neutral-500);
+	--border-neutral-pressed: var(--color-neutral-500);
+	--border-neutral-focused: var(--focus-border);
+	--border-neutral-selected: var(--color-brand-500);
+	--border-neutral-disabled: var(--color-neutral-900);
+	--border-emphasis: var(--color-brand-700);
+	--border-emphasis-hover: var(--color-brand-500);
+	--border-emphasis-pressed: var(--color-brand-600);
+	--border-emphasis-focused: var(--focus-border);
+	--border-emphasis-selected: var(--color-brand-500);
+	--border-emphasis-disabled: var(--color-neutral-900);
+	--border-critical: var(--color-critical-400);
+	--border-critical-hover: var(--color-critical-300);
+	--border-critical-pressed: var(--color-critical-500);
+	--border-critical-focused: var(--focus-border);
+	--border-critical-selected: var(--color-critical-400);
+	--border-critical-disabled: var(--color-neutral-900);
+	--border-warning: var(--color-warning-400);
+	--border-warning-hover: var(--color-warning-300);
+	--border-warning-pressed: var(--color-warning-500);
+	--border-warning-focused: var(--focus-border);
+	--border-warning-selected: var(--color-warning-400);
+	--border-warning-disabled: var(--color-neutral-900);
+	--border-success: var(--color-success-400);
+	--border-success-hover: var(--color-success-300);
+	--border-success-pressed: var(--color-success-500);
+	--border-success-focused: var(--focus-border);
+	--border-success-selected: var(--color-success-400);
+	--border-success-disabled: var(--color-neutral-900);
+	--border-featured: var(--color-featured-400);
+	--border-featured-hover: var(--color-featured-300);
+	--border-featured-pressed: var(--color-featured-500);
+	--border-featured-focused: var(--focus-border);
+	--border-featured-selected: var(--color-featured-400);
+	--border-featured-disabled: var(--color-neutral-900);
+	--border-inverted: var(--color-neutral-500);
+	--border-inverted-hover: var(--color-neutral-700);
+	--border-inverted-pressed: var(--color-neutral-800);
+	--border-inverted-focused: var(--focus-border);
+	--border-inverted-selected: var(--color-brand-500);
+	--border-inverted-disabled: var(--color-neutral-400);
+
+	--focus-width: 2px;
+	--focus-offset: 0px;
+	--focus-border: var(--color-brand-500);
+	--intelligent-ring: conic-gradient(
+		from 120deg,
+		var(--color-brand-400),
+		var(--color-insight-300),
+		var(--color-brand-600),
+		var(--color-insight-500),
+		var(--color-brand-400)
+	);
+}

@@ -1,0 +1,97 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+@theme {
+	--color-*: initial;
+	--font-*: initial;
+	--text-*: initial;
+	--font-weight-*: initial;
+	--tracking-*: initial;
+	--leading-*: initial;
+	--shadow-*: initial;
+	--inset-shadow-*: initial;
+	--drop-shadow-*: initial;
+	--text-shadow-*: initial;
+	--radius-*: initial;
+	--ease-*: initial;
+	--animate-*: initial;
+	--blur-*: initial;
+	--spacing: initial;
+}
+
+@theme inline {
+	--color-page: var(--background-default);
+	--color-surface: var(--background-neutral-medium);
+	--color-elevated: var(--background-neutral-strong);
+	--color-fg: var(--foreground-neutral-primary);
+	--color-fg-secondary: var(--foreground-neutral-secondary);
+	--color-fg-tertiary: var(--foreground-neutral-tertiary);
+	--color-fg-disabled: var(--foreground-neutral-disabled);
+	--color-border: var(--border-neutral);
+	--color-emphasis: var(--color-brand-500);
+	--color-critical: var(--foreground-critical-primary);
+	--color-warning: var(--foreground-warning-primary);
+	--color-success: var(--foreground-success-primary);
+	--color-featured: var(--foreground-featured-primary);
+
+	--font-sans: var(--font-sans);
+	--font-mono: var(--font-mono);
+
+	--font-weight-regular: var(--font-weight-regular);
+	--font-weight-medium: var(--font-weight-medium);
+	--font-weight-semibold: var(--font-weight-semibold);
+	--font-weight-bold: var(--font-weight-bold);
+
+	--text-heading-1: var(--font-size-heading-1);
+	--text-heading-1--line-height: var(--line-height-heading-1);
+	--text-heading-2: var(--font-size-heading-2);
+	--text-heading-2--line-height: var(--line-height-heading-2);
+	--text-heading-3: var(--font-size-heading-3);
+	--text-heading-3--line-height: var(--line-height-heading-3);
+	--text-heading-4: var(--font-size-heading-4);
+	--text-heading-4--line-height: var(--line-height-heading-4);
+	--text-heading-5: var(--font-size-heading-5);
+	--text-heading-5--line-height: var(--line-height-heading-5);
+	--text-body-1: var(--font-size-body-1);
+	--text-body-1--line-height: var(--line-height-body-1);
+	--text-body-2: var(--font-size-body-2);
+	--text-body-2--line-height: var(--line-height-body-2);
+
+	--tracking-display: var(--tracking-display);
+	--tracking-heading-1: var(--tracking-heading-1);
+	--tracking-section: var(--tracking-section);
+	--tracking-label: var(--tracking-label);
+	--tracking-control: var(--tracking-control);
+
+	--radius-2: var(--radius-2);
+	--radius-4: var(--radius-4);
+	--radius-8: var(--radius-8);
+	--radius-12: var(--radius-12);
+	--radius-16: var(--radius-16);
+	--radius-24: var(--radius-24);
+	--radius-full: var(--radius-full);
+
+	--shadow-1: var(--elevation-1);
+	--shadow-2: var(--elevation-2);
+	--shadow-3: var(--elevation-3);
+	--shadow-4: var(--elevation-4);
+	--shadow-5: var(--elevation-5);
+	--shadow-stack: var(--elevation-stack);
+	--shadow-sticky: var(--elevation-sticky);
+
+	--ease-default: var(--ease-default);
+	--ease-emphasis: var(--ease-emphasis);
+	--default-transition-duration: var(--duration-default);
+	--default-transition-timing-function: var(--ease-default);
+
+	--spacing-1: var(--space-1);
+	--spacing-2: var(--space-2);
+	--spacing-3: var(--space-3);
+	--spacing-4: var(--space-4);
+	--spacing-6: var(--space-6);
+	--spacing-8: var(--space-8);
+	--spacing-12: var(--space-12);
+	--spacing-16: var(--space-16);
+}
+
+@source "../test/tailwind.fixture.html";

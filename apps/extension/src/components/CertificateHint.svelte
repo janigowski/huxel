@@ -36,8 +36,8 @@
 		flex-direction: column;
 		gap: var(--space-3);
 		padding-block: var(--space-4);
-		border-top: var(--rule-thin) solid var(--color-orange);
-		color: var(--color-mint);
+		border-top: var(--rule-thin) solid var(--color-accent);
+		color: var(--color-text);
 	}
 
 	.actions {
@@ -48,9 +48,9 @@
 	a,
 	button {
 		padding: var(--space-2) var(--space-4);
-		border: var(--rule-thin) solid var(--color-orange);
+		border: var(--rule-thin) solid var(--color-accent);
 		background: none;
-		color: var(--color-orange);
+		color: var(--color-accent);
 		text-decoration: none;
 		cursor: pointer;
 	}

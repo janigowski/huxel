@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-	<title>Hue Remote</title>
+	<title>huxel</title>
 </svelte:head>
 
 <Stage

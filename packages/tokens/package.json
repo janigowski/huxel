@@ -1,0 +1,28 @@
+{
+	"name": "@huxel/tokens",
+	"version": "0.1.0",
+	"description": "Canonical color, type, spacing, and motion tokens for Huxel",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		"./tokens.css": "./src/tokens.css",
+		"./tailwind.css": "./src/tailwind.css",
+		"./values": "./src/values.ts",
+		"./motion": "./src/motion.ts",
+		"./scroll": "./src/scroll.ts",
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"build": "tsc --noEmit --pretty false",
+		"check": "tsc --noEmit --pretty false",
+		"test": "bun test",
+		"lint": "tsc --noEmit --pretty false"
+	},
+	"devDependencies": {
+		"@tailwindcss/cli": "^4.1.17",
+		"@types/node": "^22",
+		"tailwindcss": "^4.1.17",
+		"typescript": "^5.9.3"
+	}
+}

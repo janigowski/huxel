@@ -1,0 +1,43 @@
+:root {
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-6: 24px;
+	--space-8: 32px;
+	--space-12: 48px;
+	--space-16: 64px;
+
+	--size-xsmall: 24px;
+	--size-small: 32px;
+	--size-medium: 40px;
+	--size-large: 48px;
+	--size-xlarge: 56px;
+
+	--radius-2: 2px;
+	--radius-4: 4px;
+	--radius-8: 8px;
+	--radius-12: 12px;
+	--radius-16: 16px;
+	--radius-24: 24px;
+	--radius-full: 999px;
+	--radius-control: var(--radius-4);
+
+	--elevation-1: 0 1px 1px rgb(0 0 0 / 0.24);
+	--elevation-2: 0 2px 6px rgb(0 0 0 / 0.28);
+	--elevation-3: 0 8px 16px rgb(0 0 0 / 0.32);
+	--elevation-4: 0 16px 32px rgb(0 0 0 / 0.36);
+	--elevation-5: 0 24px 48px rgb(0 0 0 / 0.42);
+	--elevation-stack: 0 1px 0 rgb(0 0 0 / 0.32);
+	--elevation-sticky: 0 1px 0 rgb(0 0 0 / 0.4);
+
+	--border-width: 1px;
+	--icon-size: 16px;
+	--overlay-small: 400px;
+	--overlay-medium: 560px;
+	--overlay-large: 760px;
+	--drawer-width: 400px;
+	--z-sticky: 20;
+	--z-overlay: 40;
+	--z-toast: 60;
+}

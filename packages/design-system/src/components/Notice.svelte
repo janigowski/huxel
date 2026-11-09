@@ -20,10 +20,10 @@
 	}
 
 	.error {
-		color: var(--color-orange);
+		color: var(--color-accent);
 	}
 
 	.muted {
-		color: var(--color-mint-muted);
+		color: var(--color-text-secondary);
 	}
 </style>

@@ -1,0 +1,32 @@
+export const iconNames = [
+	'arrow-right',
+	'calendar',
+	'check',
+	'chevron-down',
+	'chevron-left',
+	'chevron-right',
+	'chevron-up',
+	'clock',
+	'close',
+	'copy',
+	'error',
+	'external',
+	'eye',
+	'eye-off',
+	'file',
+	'grip',
+	'info',
+	'mark',
+	'menu',
+	'minus',
+	'more',
+	'person',
+	'plus',
+	'search',
+	'spark',
+	'success',
+	'upload',
+	'warning'
+] as const;
+
+export type IconName = (typeof iconNames)[number];

@@ -41,9 +41,10 @@
 		"vitest-browser-svelte": "^3.1.0"
 	},
 	"dependencies": {
-		"@fontsource-variable/syne": "^5.3.0",
-		"@fontsource/share-tech-mono": "^5.3.0",
+		"@fontsource-variable/instrument-sans": "^5.3.0",
+		"@fontsource/ibm-plex-mono": "^5.3.0",
 		"@huxel/design-system": "workspace:*",
+		"@huxel/tokens": "workspace:*",
 		"@huxel/app": "workspace:*",
 		"@huxel/client": "workspace:*"
 	}

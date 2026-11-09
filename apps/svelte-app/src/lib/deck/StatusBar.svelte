@@ -21,7 +21,7 @@
 </script>
 
 <header class="status">
-	<p class="brand">Hue</p>
+	<p class="brand">huxel<span class="slash">//</span></p>
 	<p class="bridge" title={bridgeId}>Bridge {tail}</p>
 	<p class={['pill', { live }]} role="status" aria-live="polite">{label}</p>
 </header>
@@ -49,6 +49,10 @@
 		font-weight: var(--font-weight-bold);
 		letter-spacing: var(--tracking-title);
 		line-height: 1;
+	}
+
+	.slash {
+		color: var(--foreground-emphasis-primary);
 	}
 
 	.bridge {

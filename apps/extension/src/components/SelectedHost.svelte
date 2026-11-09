@@ -22,20 +22,20 @@
 		align-items: center;
 		width: 100%;
 		padding: var(--space-2) var(--space-3);
-		border: var(--rule-thin) solid var(--color-mint-muted);
+		border: var(--rule-thin) solid var(--color-text-secondary);
 	}
 
 	button {
 		padding: 0;
 		border: none;
 		background: none;
-		color: var(--color-mint);
+		color: var(--color-text);
 		cursor: pointer;
 	}
 
 	button:hover,
 	button:focus-visible {
-		color: var(--color-orange);
+		color: var(--color-accent);
 	}
 
 	button:disabled {
