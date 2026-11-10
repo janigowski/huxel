@@ -16,14 +16,17 @@
 
 <style>
 	.notice {
-		padding-block: var(--space-4);
-	}
-
-	.error {
-		color: var(--color-accent);
+		margin: 0;
+		padding: var(--space-3) var(--space-4);
+		border: var(--border-width) solid var(--border-critical);
+		border-radius: var(--radius-8);
+		background: var(--background-critical-soft);
+		color: var(--foreground-critical-primary);
 	}
 
 	.muted {
-		color: var(--color-text-secondary);
+		border-color: var(--border-neutral);
+		background: var(--background-neutral-medium);
+		color: var(--foreground-neutral-secondary);
 	}
 </style>

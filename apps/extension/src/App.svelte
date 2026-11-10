@@ -106,6 +106,9 @@
 
 <style>
 	.page {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
 		max-width: var(--page-width);
 		margin-inline: auto;
 		padding: var(--space-4) var(--page-gutter) var(--space-6);

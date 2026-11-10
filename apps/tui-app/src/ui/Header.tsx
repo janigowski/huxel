@@ -13,13 +13,13 @@ export function Header({ bridgeId }: HeaderProps) {
 					huxel
 				</text>
 				<text fg={colors.accent} attributes={TextAttributes.BOLD}>
-					//
+					{' // '}
 				</text>
 				<text fg={colors.text} attributes={TextAttributes.BOLD}>
 					tui
 				</text>
 			</box>
-			<text fg={colors.muted}>{bridgeId ? `Bridge ${bridgeId}` : 'Looking for bridge…'}</text>
+			<text fg={colors.muted}>{bridgeId ? `bridge ${bridgeId}` : 'Looking for a bridge…'}</text>
 		</box>
 	);
 }

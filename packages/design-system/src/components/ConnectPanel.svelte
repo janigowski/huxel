@@ -34,9 +34,17 @@
 	.connect {
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
+		align-items: stretch;
 		gap: var(--space-4);
-		padding-block: var(--space-6);
-		border-top: var(--rule-thick) solid var(--color-accent);
+		padding: var(--space-4);
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-12);
+		background: var(--background-neutral-medium);
+		box-shadow: var(--elevation-1);
+	}
+
+	.connect :global(p) {
+		margin: 0;
+		color: var(--foreground-neutral-secondary);
 	}
 </style>

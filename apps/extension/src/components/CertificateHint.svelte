@@ -35,9 +35,15 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-3);
-		padding-block: var(--space-4);
-		border-top: var(--rule-thin) solid var(--color-accent);
-		color: var(--color-text);
+		padding: var(--space-4);
+		border: var(--border-width) solid var(--border-warning);
+		border-radius: var(--radius-8);
+		background: var(--background-warning-soft);
+		color: var(--foreground-neutral-primary);
+	}
+
+	.hint :global(p) {
+		margin: 0;
 	}
 
 	.actions {
@@ -47,10 +53,11 @@
 
 	a,
 	button {
-		padding: var(--space-2) var(--space-4);
-		border: var(--rule-thin) solid var(--color-accent);
-		background: none;
-		color: var(--color-accent);
+		padding: var(--space-2) var(--space-3);
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-control);
+		background: var(--background-neutral-medium);
+		color: var(--foreground-neutral-primary);
 		text-decoration: none;
 		cursor: pointer;
 	}

@@ -34,6 +34,7 @@
 	class={['card', { on: light.isOn, combined }]}
 	style:--combined-stops={stops}
 	style:--combined-opacity={restOpacity}
+	style:--glow={colors[0] ?? 'var(--foreground-emphasis-primary)'}
 >
 	<button class="toggle" aria-pressed={light.isOn} onclick={ontoggle}>
 		<span class="top">
@@ -81,25 +82,28 @@
 		width: 100%;
 		min-height: 9rem;
 		padding: var(--space-3);
-		border: var(--rule-thin) solid var(--color-accent);
-		background: repeating-linear-gradient(
-			-45deg,
-			color-mix(in srgb, var(--color-accent) 25%, transparent) 0 1px,
-			transparent 1px 6px
-		);
-		color: var(--color-accent);
+		overflow: hidden;
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-8);
+		background: color-mix(in srgb, var(--background-neutral-medium) 42%, var(--background-default));
+		box-shadow: var(--elevation-1);
+		color: var(--foreground-neutral-secondary);
 	}
 
 	.card.on {
-		background: var(--color-accent);
-		color: var(--color-ink);
+		border-color: color-mix(in srgb, var(--glow) 55%, var(--border-neutral));
+		background: var(--background-neutral-medium);
+		color: var(--foreground-neutral-primary);
 	}
 
 	.card.combined,
 	.card.on.combined {
 		position: relative;
-		color: var(--color-accent);
-		background: var(--color-background);
+		background: var(--background-default);
+	}
+
+	.card.on.combined {
+		color: var(--foreground-emphasis-on-fill);
 	}
 
 	.card.combined::before {
@@ -123,6 +127,10 @@
 		z-index: 1;
 	}
 
+	.card.combined:not(.on)::before {
+		opacity: 0.35;
+	}
+
 	.toggle {
 		display: flex;
 		flex: 1;
@@ -139,29 +147,37 @@
 
 	.top {
 		display: flex;
-		justify-content: space-between;
 		align-items: flex-start;
+		justify-content: space-between;
 	}
 
 	.icon {
 		display: grid;
 		place-items: center;
-		width: var(--icon-tile-size);
-		height: var(--icon-tile-size);
-		border: var(--rule-thin) solid currentColor;
+		width: var(--size-small);
+		height: var(--size-small);
+		border: var(--border-width) solid currentColor;
+		border-radius: var(--radius-control);
+	}
+
+	.card.on .icon {
+		border-color: transparent;
+		background: var(--background-emphasis-strong);
+		color: var(--foreground-emphasis-on-fill);
 	}
 
 	.metric {
 		margin-block-start: auto;
-		font-size: var(--text-metric);
-		font-weight: var(--font-weight-bold);
-		letter-spacing: var(--tracking-tight);
-		line-height: 1;
+		font-family: var(--font-mono);
+		font-size: var(--font-size-heading-1);
+		font-weight: var(--font-weight-medium);
+		letter-spacing: var(--tracking-heading-1);
+		line-height: var(--line-height-heading-1);
 	}
 
 	.metric small {
-		font-size: var(--text-body);
-		font-weight: var(--font-weight-semibold);
+		font-size: var(--font-size-body-2);
+		font-weight: var(--font-weight-medium);
 	}
 
 	.color {
@@ -170,7 +186,8 @@
 		align-self: flex-start;
 		gap: var(--space-2);
 		padding: var(--space-1) var(--space-2);
-		border: var(--rule-thin) solid currentColor;
+		border: var(--border-width) solid currentColor;
+		border-radius: var(--radius-control);
 		background: none;
 		color: inherit;
 		font: inherit;
@@ -184,7 +201,7 @@
 
 	.dimmer {
 		width: 100%;
-		accent-color: currentColor;
+		accent-color: var(--glow);
 		cursor: pointer;
 	}
 

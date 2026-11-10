@@ -22,23 +22,25 @@
 	.hero {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: flex-end;
 		justify-content: space-between;
-		align-items: flex-start;
-		gap: var(--space-6);
-		padding-block: var(--space-8) var(--space-12);
+		gap: var(--space-4);
+		padding-block: var(--space-4) var(--space-6);
 	}
 
 	h1 {
-		font-size: var(--text-title);
-		font-weight: var(--font-weight-bold);
-		letter-spacing: var(--tracking-tight);
-		line-height: var(--leading-tight);
+		margin: 0;
+		font-size: var(--font-size-heading-1);
+		font-weight: var(--font-weight-heading-1);
+		letter-spacing: var(--tracking-heading-1);
+		line-height: var(--line-height-heading-1);
 	}
 
 	.subtitle {
-		margin-block-start: var(--space-2);
-		font-size: var(--text-subtitle);
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: var(--tracking-tight);
+		margin: var(--space-2) 0 0;
+		color: var(--foreground-neutral-secondary);
+		font-size: var(--font-size-body-1);
+		font-weight: var(--font-weight-regular);
+		line-height: var(--line-height-body-1);
 	}
 </style>

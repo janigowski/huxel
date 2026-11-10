@@ -4,5 +4,9 @@ export const colors = {
 	accent: tokenValue('--color-brand-500'),
 	text: tokenValue('--foreground-neutral-primary'),
 	muted: tokenValue('--foreground-neutral-secondary'),
-	background: tokenValue('--background-default')
+	faint: tokenValue('--foreground-neutral-tertiary'),
+	background: tokenValue('--background-default'),
+	surface: tokenValue('--background-neutral-medium'),
+	critical: tokenValue('--foreground-critical-primary'),
+	success: tokenValue('--foreground-success-primary')
 };

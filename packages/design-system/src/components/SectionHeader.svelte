@@ -31,19 +31,24 @@
 	}
 
 	h2 {
-		color: var(--color-accent);
-		font-weight: var(--font-weight-semibold);
+		margin: 0;
+		font-size: var(--font-size-heading-3);
+		font-weight: var(--font-weight-heading-3);
+		letter-spacing: var(--tracking-heading-3);
+		line-height: var(--line-height-heading-3);
 	}
 
 	.ratio {
-		height: var(--rule-thick);
-		margin-block-end: var(--space-6);
-		background: var(--color-text);
+		height: var(--focus-width);
+		margin-block-end: var(--space-4);
+		border-radius: var(--radius-full);
+		background: var(--border-neutral);
 	}
 
 	.fill {
 		display: block;
 		height: 100%;
-		background: var(--color-accent);
+		border-radius: inherit;
+		background: var(--background-emphasis-strong);
 	}
 </style>

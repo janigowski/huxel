@@ -28,8 +28,9 @@
 			class={[
 				'dot',
 				{
-					live: connection === undefined || connection === 'live',
-					pending: connection === 'connecting' || connection === 'reconnecting'
+					live: connection === 'live',
+					pending: connection === 'connecting' || connection === 'reconnecting',
+					offline: connection === 'offline'
 				}
 			]}
 			aria-hidden="true"
@@ -49,46 +50,45 @@
 <style>
 	.bar {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		padding-block-end: var(--space-2);
-		border-bottom: var(--rule-thin) solid var(--color-text);
+		justify-content: space-between;
+		gap: var(--space-3);
+		padding-block-end: var(--space-3);
+		border-bottom: var(--border-width) solid var(--border-neutral);
+		color: var(--foreground-neutral-secondary);
 	}
 
 	.title {
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-2);
+		min-width: 0;
 	}
 
 	.dot {
-		width: var(--space-3);
-		height: var(--space-3);
-		border-radius: 50%;
-		background: var(--color-text-secondary);
+		width: 6px;
+		height: 6px;
+		border-radius: var(--radius-full);
+		background: var(--foreground-neutral-tertiary);
 	}
 
 	.dot.live {
-		background: var(--color-text);
+		background: var(--foreground-success-primary);
 	}
 
 	.dot.pending {
-		animation: pulse 1.2s ease-in-out infinite;
+		background: var(--foreground-warning-primary);
+	}
+
+	.dot.offline {
+		background: var(--foreground-critical-primary);
 	}
 
 	.state {
-		color: var(--color-text-secondary);
+		color: var(--foreground-neutral-primary);
 	}
 
-	@keyframes pulse {
-		50% {
-			opacity: 0.3;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.dot.pending {
-			animation: none;
-		}
+	time {
+		font-family: var(--font-mono);
 	}
 </style>

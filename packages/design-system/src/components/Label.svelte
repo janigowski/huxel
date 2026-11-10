@@ -12,9 +12,9 @@
 
 <style>
 	.label {
-		font-size: var(--text-label);
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: var(--tracking-label);
-		text-transform: uppercase;
+		font-size: var(--font-size-body-2);
+		font-weight: var(--font-weight-medium);
+		letter-spacing: var(--tracking-body-2);
+		line-height: var(--line-height-body-2);
 	}
 </style>

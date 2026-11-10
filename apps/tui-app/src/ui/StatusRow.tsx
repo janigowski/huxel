@@ -31,9 +31,9 @@ export const StatusRow = memo(function StatusRow({
 	return (
 		<text flexShrink={0} attributes={selected ? TextAttributes.BOLD : TextAttributes.NONE}>
 			<span fg={colors.accent}>{selected ? '›' : ' '}</span>
-			<span fg={colors.muted}> {number} </span>
+			<span fg={colors.faint}> {number} </span>
 			<span fg={tone}>{isOn ? '●' : '○'} </span>
-			<span fg={selected ? colors.accent : colors.text}>{name.padEnd(nameWidth)} </span>
+			<span fg={selected || isOn ? colors.text : colors.muted}>{name.padEnd(nameWidth)} </span>
 			<span fg={tone}>{`${level}%`.padStart(4)} </span>
 			{brightness === null ? null : (
 				<span fg={tone}>{'█'.repeat(filled) + '░'.repeat(BAR_WIDTH - filled)}</span>

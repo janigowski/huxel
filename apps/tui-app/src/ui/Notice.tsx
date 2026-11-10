@@ -8,7 +8,7 @@ interface NoticeProps {
 
 export function Notice({ tone = 'error', children }: NoticeProps) {
 	return tone === 'error' ? (
-		<text fg={colors.accent} attributes={TextAttributes.BOLD} flexShrink={0}>
+		<text fg={colors.critical} attributes={TextAttributes.BOLD} flexShrink={0}>
 			! {children}
 		</text>
 	) : (

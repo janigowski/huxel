@@ -18,24 +18,27 @@
 <style>
 	.selected {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		justify-content: space-between;
 		width: 100%;
 		padding: var(--space-2) var(--space-3);
-		border: var(--rule-thin) solid var(--color-text-secondary);
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-control);
+		background: var(--background-default);
+		font-family: var(--font-mono);
 	}
 
 	button {
 		padding: 0;
 		border: none;
 		background: none;
-		color: var(--color-text);
+		color: var(--foreground-neutral-secondary);
 		cursor: pointer;
 	}
 
 	button:hover,
 	button:focus-visible {
-		color: var(--color-accent);
+		color: var(--foreground-emphasis-primary);
 	}
 
 	button:disabled {

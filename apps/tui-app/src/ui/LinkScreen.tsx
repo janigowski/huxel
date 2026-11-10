@@ -40,11 +40,11 @@ export function LinkScreen({ onLink, notice }: LinkScreenProps) {
 	});
 
 	return (
-		<box flexDirection="column">
+		<box flexDirection="column" marginTop={1}>
 			<text fg={colors.text} attributes={TextAttributes.BOLD}>
-				Bridge not linked
+				Connect your bridge
 			</text>
-			<text fg={colors.text}>
+			<text fg={colors.muted}>
 				Press the link button on your Hue bridge, then press Enter within 30 seconds.
 			</text>
 			{connecting ? <Notice tone="muted">Connecting…</Notice> : null}

@@ -17,24 +17,26 @@
 <style>
 	.bar {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		margin-block-start: var(--space-6);
-		padding-block-start: var(--space-2);
-		border-top: var(--rule-thin) solid var(--color-text);
-		color: var(--color-text-secondary);
+		justify-content: space-between;
+		gap: var(--space-3);
+		margin-block-start: var(--space-4);
+		padding-block-start: var(--space-3);
+		border-top: var(--border-width) solid var(--border-neutral);
+		color: var(--foreground-neutral-secondary);
+		font-family: var(--font-mono);
 	}
 
 	button {
 		padding: 0;
 		border: none;
 		background: none;
-		color: var(--color-text);
+		color: var(--foreground-neutral-secondary);
 		cursor: pointer;
 	}
 
 	button:hover,
 	button:focus-visible {
-		color: var(--color-accent);
+		color: var(--foreground-emphasis-primary);
 	}
 </style>

@@ -61,32 +61,31 @@
 	input {
 		flex: 1;
 		min-width: 0;
+		min-height: var(--size-large);
 		padding: var(--space-2) var(--space-3);
-		border: var(--rule-thin) solid var(--color-text);
-		background: none;
-		color: var(--color-text);
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-control);
+		background: var(--background-default);
+		color: var(--foreground-neutral-primary);
 		font: inherit;
 	}
 
 	input::placeholder {
-		color: var(--color-text-secondary);
-	}
-
-	input:focus-visible {
-		outline: var(--rule-thin) solid var(--color-accent);
-		outline-offset: var(--rule-thin);
+		color: var(--foreground-neutral-tertiary);
 	}
 
 	button {
+		min-height: var(--size-large);
 		padding: var(--space-2) var(--space-4);
-		border: var(--rule-thin) solid var(--color-text);
-		background: none;
-		color: var(--color-text);
+		border: var(--border-width) solid var(--border-neutral);
+		border-radius: var(--radius-control);
+		background: transparent;
+		color: var(--foreground-neutral-primary);
 		cursor: pointer;
 	}
 
 	button:disabled {
-		opacity: 0.6;
+		color: var(--foreground-neutral-disabled);
 		cursor: progress;
 	}
 </style>

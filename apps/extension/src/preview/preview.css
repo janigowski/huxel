@@ -1,10 +1,20 @@
 html.preview {
 	min-height: 100%;
-	background: var(--color-ink);
+	background:
+		radial-gradient(
+			40rem 16rem at 50% -10%,
+			color-mix(in srgb, var(--color-brand-500) 16%, transparent),
+			transparent 70%
+		),
+		var(--background-default);
 }
 
 html.preview body {
 	min-height: 37.5rem;
 	margin: var(--space-8) auto;
-	outline: var(--rule-thin) solid var(--color-text-secondary);
+	overflow: hidden;
+	border: var(--border-width) solid var(--border-neutral);
+	border-radius: var(--radius-12);
+	background: var(--background-default);
+	box-shadow: var(--elevation-3);
 }

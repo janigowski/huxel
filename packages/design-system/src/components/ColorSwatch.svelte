@@ -13,7 +13,8 @@
 	.swatch {
 		display: block;
 		flex-shrink: 0;
-		border: var(--rule-thin) solid currentColor;
+		border-radius: var(--radius-4);
+		box-shadow: inset 0 0 0 var(--border-width) rgb(0 0 0 / 0.28);
 	}
 
 	.small {
@@ -24,5 +25,6 @@
 	.large {
 		width: 100%;
 		aspect-ratio: 1;
+		border-radius: var(--radius-8);
 	}
 </style>
