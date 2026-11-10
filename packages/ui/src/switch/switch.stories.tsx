@@ -22,3 +22,9 @@ export const On: Story = {
 		defaultSelected: true
 	}
 };
+
+export const Disabled: Story = {
+	args: {
+		disabled: true
+	}
+};

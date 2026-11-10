@@ -1,6 +1,6 @@
-# huxel
+# huxel//
 
-![Banner: huxel, a modular toolkit for Philips Hue](./banner.jpg)
+![huxel//, a modular toolkit for Philips Hue](./banner.svg)
 
 A modular toolkit for Philips Hue. The same bridge calls and the same light state run in a browser, in Node.js, and in Bun.
 
@@ -34,9 +34,9 @@ The application key stays in memory for the life of the app. Saving it between l
 
 Local MCP server for an agent on the same network. It speaks stdio and can report status, link a bridge, read the home, and set a light, a room, a zone, or a scene. The application key stays in a config file and is never returned by a tool.
 
-### [@huxel/tokens](./packages/tokens) and [@huxel/icons](./packages/icons)
+### [@huxel/tokens](./packages/tokens), [@huxel/icons](./packages/icons), and [@huxel/ui](./packages/ui)
 
-Private design system. Tokens are the only source of color, type, spacing, and motion. Icons are one generated sprite. The Svelte screens and the terminal app read the same tokens.
+Private design system. Tokens are the only source of color, type, spacing, and motion. Icons are one generated sprite. `@huxel/ui` is React components. The Storybook catalog runs with `bun run storybook` inside `packages/ui`. The Svelte screens and the terminal app read the same tokens.
 
 ### [@huxel/design-system](./packages/design-system)
 

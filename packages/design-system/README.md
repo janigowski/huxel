@@ -1,4 +1,6 @@
-# @huxel/design-system
+# huxel//design-system
+
+![huxel//design-system, Svelte screens for the lighting apps](./banner.svg)
 
 Svelte 5 components and design tokens shared by [`svelte-app`](../../apps/svelte-app) and [`extension`](../../apps/extension). Light components render the state of [`@huxel/app`](../app)'s Svelte adapter.
 

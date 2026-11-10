@@ -5,12 +5,14 @@ import type { Tone, Variant } from '../types';
 import { Badge } from './badge';
 
 const tones: Tone[] = [
+	'base',
 	'neutral',
+	'neutral-inverted',
 	'emphasis',
+	'featured',
 	'critical',
 	'warning',
 	'success',
-	'featured',
 	'intelligent'
 ];
 const variants: Variant[] = ['primary', 'secondary', 'tertiary'];

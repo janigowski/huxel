@@ -8,6 +8,14 @@ const meta = {
 	title: 'Overlays/Drawer',
 	component: Drawer,
 	tags: ['autodocs'],
+	parameters: {
+		docs: {
+			description: {
+				component:
+					'The trigger opens the drawer and moves focus inside. Tab stays within the drawer. Escape dismisses it. Focus returns to the trigger when it closes.'
+			}
+		}
+	},
 	args: {
 		label: 'Filters',
 		closeLabel: 'Close',

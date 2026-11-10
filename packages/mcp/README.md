@@ -1,4 +1,6 @@
-# @huxel/mcp
+# huxel//mcp
+
+![huxel//mcp, local bridge tools for an agent](./banner.svg)
 
 Local [MCP](https://modelcontextprotocol.io) server for Philips Hue. It speaks stdio, links to a bridge on the same network, and exposes a few tools for an agent. [Hermes](https://hermes-agent.nousresearch.com/) can run it and reach it from Telegram. The server does not know about Telegram.
 

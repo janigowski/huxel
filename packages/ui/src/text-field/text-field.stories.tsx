@@ -23,3 +23,9 @@ export const Invalid: Story = {
 		warning: 'Too short'
 	}
 };
+
+export const Disabled: Story = {
+	args: {
+		disabled: true
+	}
+};

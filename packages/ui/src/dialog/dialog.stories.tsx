@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import gallery from '../stories/gallery.module.css';
 import { Text } from '../text/text';
-import { Dialog } from './dialog';
+import { Dialog, type DialogSize } from './dialog';
+
+const sizes: DialogSize[] = ['small', 'medium', 'large', 'screen'];
 
 const meta = {
 	title: 'Overlays/Dialog',
@@ -28,8 +31,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-	render: () => (
-		<Dialog label="Settings" closeLabel="Close" trigger="Open settings">
+	render: (args) => (
+		<Dialog
+			label={args.label ?? 'Settings'}
+			closeLabel={args.closeLabel ?? 'Close'}
+			trigger={args.trigger ?? 'Open settings'}
+			size={args.size}
+			dismissable={args.dismissable}
+		>
 			<Dialog.Header>
 				<Text.Heading3>Settings</Text.Heading3>
 			</Dialog.Header>
@@ -42,10 +51,14 @@ export const Playground: Story = {
 
 export const Sizes: Story = {
 	render: () => (
-		<Dialog label="Wide" closeLabel="Close" trigger="Large" size="large">
-			<Dialog.Body>
-				<Text.Body1>Large dialog.</Text.Body1>
-			</Dialog.Body>
-		</Dialog>
+		<div className={gallery.row}>
+			{sizes.map((size) => (
+				<Dialog key={size} label={size} closeLabel="Close" trigger={size} size={size}>
+					<Dialog.Body>
+						<Text.Body1>{size}</Text.Body1>
+					</Dialog.Body>
+				</Dialog>
+			))}
+		</div>
 	)
 };

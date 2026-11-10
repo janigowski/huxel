@@ -1,6 +1,6 @@
-# @huxel/client
+# huxel//client
 
-![Banner: huxel//client, TypeScript client for the Philips Hue API](./banner.jpg)
+![huxel//client, TypeScript client for the Philips Hue API](./banner.svg)
 
 Stateless TypeScript client for a Philips Hue bridge over [CLIP API v2](https://developers.meethue.com/develop/hue-api-v2/). One runtime dependency, `lodash-es`. The same calls run in browsers, Node.js 18+, and Bun.
 

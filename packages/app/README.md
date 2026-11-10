@@ -1,6 +1,6 @@
-# @huxel/app
+# huxel//app
 
-![Banner: huxel//app, Svelte-based, run locally or deploy to server](./banner.jpg)
+![huxel//app, headless state for lights, rooms, and zones](./banner.svg)
 
 Headless application state for Philips Hue lights, rooms, and zones. Built on [`@huxel/client`](https://www.npmjs.com/package/@huxel/client) and [`@preact/signals-core`](https://github.com/preactjs/signals). The same state runs in Node.js, browsers, and browser extensions. Svelte 5 and React adapters are optional.
 

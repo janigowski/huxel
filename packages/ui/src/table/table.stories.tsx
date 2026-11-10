@@ -18,7 +18,15 @@ const rows: Room[] = Array.from({ length: 40 }, (_, index) => ({
 const meta = {
 	title: 'Data/Table',
 	component: Table<Room>,
-	tags: ['autodocs']
+	tags: ['autodocs'],
+	parameters: {
+		docs: {
+			description: {
+				component:
+					'Focus a column resizer and press Arrow Left or Arrow Right to change its width.'
+			}
+		}
+	}
 } satisfies Meta<typeof Table<Room>>;
 
 export default meta;
@@ -37,6 +45,7 @@ export const Playground: Story = {
 				header: 'Name',
 				width: 220,
 				sortable: true,
+				pinnable: true,
 				sortValue: (row) => row.name,
 				cell: (row) => <Text.Body2>{row.name}</Text.Body2>
 			},
@@ -60,6 +69,20 @@ export const Playground: Story = {
 			unpin: 'Unpin column',
 			resize: 'Resize column'
 		}
+	}
+};
+
+export const LoadingPage: Story = {
+	args: {
+		...Playground.args,
+		loading: 'page'
+	}
+};
+
+export const LoadingMore: Story = {
+	args: {
+		...Playground.args,
+		loading: 'more'
 	}
 };
 

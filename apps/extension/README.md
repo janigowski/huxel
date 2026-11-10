@@ -1,4 +1,6 @@
-# extension
+# huxel//extension
+
+![huxel//extension, light control from your browser](./banner.svg)
 
 Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge on the local network, then toggle, dim and recolor lights from the toolbar popup. It is a Svelte 5 + Vite app built from the shared [`@huxel/design-system`](../../packages/design-system) components on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). The extension is not published to a store. You load it unpacked.
 

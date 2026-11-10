@@ -1,4 +1,6 @@
-# @huxel/tokens
+# huxel//tokens
+
+![huxel//tokens, color, type, space, and motion](./banner.svg)
 
 Canonical color, type, spacing, and motion tokens for Huxel.
 

@@ -1,4 +1,6 @@
-# @huxel/ui
+# huxel//ui
+
+![huxel//ui, React components for the design system](./banner.svg)
 
 React components for the Huxel design system. Color, type, space, radius, elevation, and motion come from `@huxel/tokens`. Icons come from `@huxel/icons`. Keyboard, focus, and overlays come from `react-aria-components`.
 
