@@ -1,0 +1,34 @@
+@layer components {
+	.field {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-1);
+		width: 100%;
+		min-width: 0;
+	}
+
+	.token {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--size-xsmall);
+		padding-inline: var(--space-2);
+		border-radius: var(--radius-full);
+		background: var(--background-neutral-strong);
+		color: var(--foreground-neutral-primary);
+		font-size: var(--font-size-body-2);
+		line-height: var(--line-height-body-2);
+	}
+
+	.token[data-selected] {
+		background: var(--background-emphasis-medium);
+		color: var(--foreground-emphasis-primary);
+	}
+
+	.text {
+		min-width: var(--space-4);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		color: var(--foreground-neutral-primary);
+	}
+}

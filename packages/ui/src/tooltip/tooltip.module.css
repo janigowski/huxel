@@ -1,0 +1,17 @@
+@layer components {
+	.tooltip {
+		z-index: var(--z-overlay);
+		max-width: var(--overlay-small);
+		padding-block: var(--space-1);
+		padding-inline: var(--space-2);
+		border-radius: var(--radius-4);
+		background: var(--background-inverted-medium);
+		color: var(--foreground-inverted-primary);
+		box-shadow: var(--elevation-2);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-2);
+		line-height: var(--line-height-body-2);
+		font-weight: var(--font-weight-control);
+		letter-spacing: var(--tracking-control);
+	}
+}

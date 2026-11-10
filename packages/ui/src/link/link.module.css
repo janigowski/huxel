@@ -1,0 +1,28 @@
+@layer components {
+	.link {
+		color: var(--foreground-emphasis-primary);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		text-underline-offset: var(--space-1);
+		cursor: pointer;
+	}
+
+	.link[data-hovered] {
+		color: var(--foreground-emphasis-primary-hover);
+	}
+
+	.link[data-pressed] {
+		color: var(--foreground-emphasis-primary-pressed);
+	}
+
+	.link[data-focus-visible] {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+
+	.link[data-disabled] {
+		color: var(--foreground-emphasis-disabled);
+		cursor: not-allowed;
+	}
+}

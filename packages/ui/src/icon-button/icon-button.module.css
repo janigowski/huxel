@@ -1,0 +1,31 @@
+@layer components {
+	.button {
+		box-sizing: border-box;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--size-medium);
+		height: var(--size-medium);
+		padding: 0;
+		border-radius: var(--radius-control);
+	}
+
+	.button[data-variant='primary']:not([data-disabled]) {
+		box-shadow: var(--elevation-1);
+	}
+
+	.button[data-size='xsmall'] {
+		width: var(--size-xsmall);
+		height: var(--size-xsmall);
+	}
+
+	.button[data-size='small'] {
+		width: var(--size-small);
+		height: var(--size-small);
+	}
+
+	.button[data-size='large'] {
+		width: var(--size-large);
+		height: var(--size-large);
+	}
+}

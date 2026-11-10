@@ -1,0 +1,71 @@
+@layer components {
+	.heading1,
+	.heading2,
+	.heading3,
+	.heading4,
+	.heading5,
+	.body1,
+	.body2 {
+		margin: 0;
+		font-family: var(--font-sans);
+		color: inherit;
+	}
+
+	.heading1 {
+		font-size: var(--font-size-heading-1);
+		line-height: var(--line-height-heading-1);
+		font-weight: var(--font-weight-heading-1);
+		letter-spacing: var(--tracking-heading-1);
+	}
+
+	.heading2 {
+		font-size: var(--font-size-heading-2);
+		line-height: var(--line-height-heading-2);
+		font-weight: var(--font-weight-heading-2);
+		letter-spacing: var(--tracking-heading-2);
+	}
+
+	.heading3 {
+		font-size: var(--font-size-heading-3);
+		line-height: var(--line-height-heading-3);
+		font-weight: var(--font-weight-heading-3);
+		letter-spacing: var(--tracking-heading-3);
+	}
+
+	.heading4 {
+		font-size: var(--font-size-heading-4);
+		line-height: var(--line-height-heading-4);
+		font-weight: var(--font-weight-heading-4);
+		letter-spacing: var(--tracking-heading-4);
+	}
+
+	.heading5 {
+		font-size: var(--font-size-heading-5);
+		line-height: var(--line-height-heading-5);
+		font-weight: var(--font-weight-heading-5);
+		letter-spacing: var(--tracking-heading-5);
+	}
+
+	.body1 {
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		font-weight: var(--font-weight-body-1);
+		letter-spacing: var(--tracking-body-1);
+	}
+
+	.body2 {
+		font-size: var(--font-size-body-2);
+		line-height: var(--line-height-body-2);
+		font-weight: var(--font-weight-body-2);
+		letter-spacing: var(--tracking-body-2);
+	}
+
+	.truncate {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+		max-width: 100%;
+	}
+}

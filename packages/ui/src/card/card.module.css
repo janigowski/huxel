@@ -1,0 +1,64 @@
+@layer components {
+	.card {
+		display: grid;
+		gap: var(--space-3);
+		box-sizing: border-box;
+		padding: var(--space-4);
+		border-radius: var(--radius-8);
+		border: var(--border-width) solid var(--border-neutral);
+		background: var(--background-neutral-medium);
+		color: var(--foreground-neutral-primary);
+		box-shadow: var(--elevation-1);
+		text-decoration: none;
+	}
+
+	.card[data-tone='emphasis'] {
+		background: var(--background-emphasis-soft);
+		border-color: var(--border-emphasis);
+	}
+
+	.card[data-tone='featured'] {
+		background: var(--background-featured-soft);
+		border-color: var(--border-featured);
+	}
+
+	.card[data-tone='critical'] {
+		background: var(--background-critical-soft);
+		border-color: var(--border-critical);
+	}
+
+	.card[data-tone='warning'] {
+		background: var(--background-warning-soft);
+		border-color: var(--border-warning);
+	}
+
+	.card[data-tone='success'] {
+		background: var(--background-success-soft);
+		border-color: var(--border-success);
+	}
+
+	.card[data-tone='neutral-inverted'] {
+		background: var(--background-inverted-medium);
+		color: var(--foreground-inverted-primary);
+		border-color: var(--border-inverted);
+	}
+
+	.card[data-hovered] {
+		background: var(--background-hover);
+	}
+
+	.card[data-focus-visible] {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+
+	.card[data-disabled] {
+		box-shadow: none;
+		cursor: not-allowed;
+	}
+
+	.header,
+	.body {
+		min-width: 0;
+	}
+}

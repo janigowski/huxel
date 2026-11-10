@@ -1,0 +1,31 @@
+@layer components {
+	.nav {
+		display: flex;
+		gap: var(--space-3);
+	}
+
+	.item {
+		color: var(--foreground-neutral-secondary);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		font-weight: var(--font-weight-control);
+		letter-spacing: var(--tracking-control);
+		text-decoration: none;
+		cursor: pointer;
+	}
+
+	.item[data-hovered] {
+		color: var(--foreground-neutral-primary-hover);
+	}
+
+	.item[aria-current='page'] {
+		color: var(--foreground-neutral-primary);
+		box-shadow: var(--elevation-sticky);
+	}
+
+	.item[data-focus-visible] {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+}

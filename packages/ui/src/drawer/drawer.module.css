@@ -1,0 +1,37 @@
+@layer components {
+	.overlay {
+		display: flex;
+		padding: 0;
+		background: color-mix(in srgb, var(--background-default) 72%, transparent);
+	}
+
+	.drawer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+		box-sizing: border-box;
+		width: var(--drawer-width);
+		height: 100%;
+		padding: var(--space-4);
+		background: var(--background-default);
+		color: var(--foreground-neutral-primary);
+		box-shadow: var(--elevation-4);
+	}
+
+	.drawer[data-side='end'] {
+		margin-inline-start: auto;
+	}
+
+	.drawer[data-side='start'] {
+		margin-inline-end: auto;
+	}
+
+	.drawer[data-exiting] {
+		box-shadow: none;
+	}
+
+	.toolbar {
+		display: flex;
+		justify-content: flex-end;
+	}
+}

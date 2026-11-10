@@ -1,0 +1,6 @@
+@layer components {
+	.area {
+		min-height: calc(var(--size-xlarge) + var(--size-medium));
+		resize: vertical;
+	}
+}

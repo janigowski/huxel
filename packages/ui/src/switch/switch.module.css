@@ -1,0 +1,65 @@
+@layer components {
+	.switch {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		color: var(--foreground-neutral-primary);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		cursor: pointer;
+	}
+
+	.track {
+		display: inline-flex;
+		align-items: center;
+		width: var(--size-small);
+		height: var(--space-4);
+		padding: var(--space-1);
+		box-sizing: border-box;
+		border-radius: var(--radius-full);
+		background: var(--background-neutral-strong);
+	}
+
+	.thumb {
+		width: var(--space-3);
+		height: var(--space-3);
+		border-radius: var(--radius-full);
+		background: var(--foreground-neutral-primary);
+		transition-property: translate;
+		transition-duration: var(--duration-default);
+		transition-timing-function: var(--ease-default);
+	}
+
+	.switch[data-selected] .track {
+		background: var(--background-emphasis-strong);
+	}
+
+	.switch[data-selected] .thumb {
+		translate: var(--space-3) 0;
+		background: var(--foreground-emphasis-on-fill);
+	}
+
+	.switch[data-hovered] .track {
+		background: var(--background-neutral-strong-hover);
+	}
+
+	.switch[data-selected][data-hovered] .track {
+		background: var(--background-emphasis-strong-hover);
+	}
+
+	.switch[data-focus-visible] .track {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+
+	.switch[data-disabled] {
+		color: var(--foreground-neutral-disabled);
+		cursor: not-allowed;
+	}
+
+	.switch[data-disabled] .track {
+		background: var(--background-disabled);
+		box-shadow: none;
+	}
+}

@@ -1,0 +1,17 @@
+@layer components {
+	.tag {
+		box-sizing: border-box;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		min-height: var(--size-small);
+		padding-inline: var(--space-2);
+		border-radius: var(--radius-control);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-2);
+		line-height: var(--line-height-body-2);
+		font-weight: var(--font-weight-control);
+		letter-spacing: var(--tracking-control);
+		text-decoration: none;
+	}
+}

@@ -1,0 +1,11 @@
+@layer components {
+	.base {
+		display: block;
+		flex: none;
+	}
+
+	.icon {
+		width: var(--icon-size);
+		height: var(--icon-size);
+	}
+}

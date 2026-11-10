@@ -1,0 +1,39 @@
+@layer components {
+	.box,
+	.group {
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+		width: 100%;
+		min-width: 0;
+	}
+
+	.trigger {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--size-small);
+		height: var(--size-small);
+		padding: 0;
+		border: 0;
+		border-radius: var(--radius-control);
+		background: transparent;
+		color: var(--foreground-neutral-secondary);
+		cursor: pointer;
+	}
+
+	.trigger[data-hovered] {
+		background: var(--background-neutral-soft-hover);
+		color: var(--foreground-neutral-primary);
+	}
+
+	.trigger[data-focus-visible] {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+
+	.trigger[data-disabled] {
+		cursor: not-allowed;
+		color: var(--foreground-neutral-disabled);
+	}
+}

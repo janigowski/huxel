@@ -1,0 +1,83 @@
+@layer components {
+	.popover {
+		z-index: var(--z-overlay);
+		min-width: var(--size-xlarge);
+		padding: var(--space-1);
+		border-radius: var(--radius-8);
+		border: var(--border-width) solid var(--border-neutral);
+		background: var(--background-default);
+		color: var(--foreground-neutral-primary);
+		box-shadow: var(--elevation-3);
+	}
+
+	.list {
+		display: grid;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		outline: none;
+	}
+
+	.option {
+		display: flex;
+		align-items: center;
+		min-height: var(--size-small);
+		padding-inline: var(--space-2);
+		border-radius: var(--radius-4);
+		color: var(--foreground-neutral-primary);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		cursor: pointer;
+	}
+
+	.option[data-hovered],
+	.option[data-focused] {
+		background: var(--background-hover);
+	}
+
+	.option[data-selected] {
+		background: var(--background-selected);
+	}
+
+	.option[data-focus-visible] {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+
+	.option[data-disabled] {
+		color: var(--foreground-neutral-disabled);
+		cursor: not-allowed;
+	}
+
+	.modal {
+		position: fixed;
+		inset: 0;
+		z-index: var(--z-overlay);
+		display: grid;
+		place-items: center;
+		padding: var(--space-4);
+		background: color-mix(in srgb, var(--background-default) 72%, transparent);
+	}
+
+	.modal[data-entering],
+	.modal[data-exiting] {
+		animation-name: overlay-fade;
+		animation-duration: var(--duration-long);
+		animation-timing-function: var(--ease-emphasis);
+	}
+
+	.modal[data-exiting] {
+		animation-direction: reverse;
+	}
+
+	@keyframes overlay-fade {
+		from {
+			opacity: 0;
+		}
+
+		to {
+			opacity: 1;
+		}
+	}
+}

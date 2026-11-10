@@ -1,0 +1,45 @@
+@layer components {
+	.collapse {
+		display: grid;
+		gap: var(--space-2);
+		border-block-end: var(--border-width) solid var(--border-neutral);
+	}
+
+	.trigger {
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-2);
+		width: 100%;
+		min-height: var(--size-medium);
+		padding-inline: 0;
+		border: 0;
+		background: transparent;
+		color: var(--foreground-neutral-primary);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		font-weight: var(--font-weight-control);
+		letter-spacing: var(--tracking-control);
+		cursor: pointer;
+	}
+
+	.trigger[data-hovered] {
+		color: var(--foreground-neutral-primary-hover);
+	}
+
+	.trigger[data-focus-visible] {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+
+	.trigger[data-disabled] {
+		color: var(--foreground-neutral-disabled);
+		cursor: not-allowed;
+	}
+
+	.panel {
+		padding-block-end: var(--space-3);
+	}
+}

@@ -1,0 +1,27 @@
+@layer components {
+	.scroll {
+		overflow: auto;
+		min-width: 0;
+		min-height: 0;
+		scrollbar-width: thin;
+		scrollbar-color: transparent transparent;
+	}
+
+	.scroll:hover {
+		scrollbar-color: var(--border-neutral) transparent;
+	}
+
+	.scroll::-webkit-scrollbar {
+		width: var(--space-2);
+		height: var(--space-2);
+	}
+
+	.scroll::-webkit-scrollbar-thumb {
+		background: transparent;
+		border-radius: var(--radius-full);
+	}
+
+	.scroll:hover::-webkit-scrollbar-thumb {
+		background: var(--border-neutral);
+	}
+}

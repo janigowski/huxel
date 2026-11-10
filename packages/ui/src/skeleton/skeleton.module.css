@@ -1,0 +1,23 @@
+@layer components {
+	.skeleton {
+		display: block;
+		min-height: var(--size-medium);
+		border-radius: var(--radius-4);
+		background: var(--background-neutral-medium);
+		animation-name: skeleton-pulse;
+		animation-duration: var(--duration-long);
+		animation-timing-function: var(--ease-default);
+		animation-iteration-count: infinite;
+		animation-direction: alternate;
+	}
+
+	@keyframes skeleton-pulse {
+		from {
+			opacity: 1;
+		}
+
+		to {
+			opacity: 0.45;
+		}
+	}
+}

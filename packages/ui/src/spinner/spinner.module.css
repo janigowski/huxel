@@ -1,0 +1,30 @@
+@layer components {
+	.spinner {
+		display: block;
+		flex: none;
+		width: var(--icon-size);
+		height: var(--icon-size);
+		box-sizing: border-box;
+		border-radius: var(--radius-full);
+		border: var(--border-width) solid var(--foreground-neutral-tertiary);
+		border-block-start-color: currentColor;
+		animation-name: spin;
+		animation-duration: var(--duration-long);
+		animation-timing-function: var(--ease-default);
+		animation-iteration-count: infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		/* loading state must stay perceptible */
+		.spinner {
+			animation-duration: var(--duration-long) !important;
+			animation-iteration-count: infinite !important;
+		}
+	}
+}

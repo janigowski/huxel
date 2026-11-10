@@ -1,0 +1,30 @@
+@layer components {
+	.input {
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+		width: 100%;
+		min-width: 0;
+	}
+
+	.segment {
+		padding-inline: var(--space-1);
+		border-radius: var(--radius-2);
+		font-variant-numeric: tabular-nums;
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		color: var(--foreground-neutral-primary);
+	}
+
+	.segment[data-placeholder] {
+		color: var(--foreground-neutral-tertiary);
+	}
+
+	.segment[data-focused] {
+		background: var(--background-selected);
+	}
+
+	.segment[data-disabled] {
+		color: var(--foreground-neutral-disabled);
+	}
+}

@@ -1,0 +1,13 @@
+@layer components {
+	.separator {
+		border: 0;
+		background: var(--border-neutral);
+		height: var(--border-width);
+		width: 100%;
+	}
+
+	.separator[aria-orientation='vertical'] {
+		width: var(--border-width);
+		height: 100%;
+	}
+}

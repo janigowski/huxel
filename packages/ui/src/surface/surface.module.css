@@ -1,0 +1,318 @@
+@layer components {
+	.surface {
+		background: var(--surface-bg, transparent);
+		color: var(--surface-fg, var(--tone-fg, var(--foreground-neutral-primary)));
+		border-color: var(--surface-border, transparent);
+		border-style: solid;
+		border-width: var(--border-width);
+		cursor: pointer;
+		transition-property: background, color, border-color, box-shadow;
+		transition-duration: var(--duration-default);
+		transition-timing-function: var(--ease-default);
+	}
+
+	.surface[data-tone='base'],
+	.surface[data-tone='neutral'] {
+		--tone-strong: var(--background-neutral-strong);
+		--tone-strong-hover: var(--background-neutral-strong-hover);
+		--tone-strong-pressed: var(--background-neutral-strong-pressed);
+		--tone-strong-disabled: var(--background-neutral-strong-disabled);
+		--tone-strong-selected: var(--background-neutral-strong-selected);
+		--tone-soft: var(--background-neutral-soft);
+		--tone-soft-hover: var(--background-neutral-soft-hover);
+		--tone-soft-pressed: var(--background-neutral-soft-pressed);
+		--tone-soft-disabled: var(--background-neutral-soft-disabled);
+		--tone-soft-selected: var(--background-neutral-soft-selected);
+		--tone-fg: var(--foreground-neutral-primary);
+		--tone-fg-hover: var(--foreground-neutral-primary-hover);
+		--tone-fg-pressed: var(--foreground-neutral-primary-pressed);
+		--tone-fg-disabled: var(--foreground-neutral-primary-disabled);
+		--tone-on: var(--foreground-neutral-on-fill);
+		--tone-on-hover: var(--foreground-neutral-on-fill-hover);
+		--tone-on-pressed: var(--foreground-neutral-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-neutral-on-fill-disabled);
+		--tone-border: var(--border-neutral);
+		--tone-border-hover: var(--border-neutral-hover);
+		--tone-border-pressed: var(--border-neutral-pressed);
+		--tone-border-disabled: var(--border-neutral-disabled);
+		--tone-border-selected: var(--border-neutral-selected);
+	}
+
+	.surface[data-tone='neutral-inverted'] {
+		--tone-strong: var(--background-inverted-strong);
+		--tone-strong-hover: var(--background-inverted-strong-hover);
+		--tone-strong-pressed: var(--background-inverted-strong-pressed);
+		--tone-strong-disabled: var(--background-inverted-strong-disabled);
+		--tone-strong-selected: var(--background-inverted-strong-selected);
+		--tone-soft: var(--background-inverted-soft);
+		--tone-soft-hover: var(--background-inverted-soft-hover);
+		--tone-soft-pressed: var(--background-inverted-soft-pressed);
+		--tone-soft-disabled: var(--background-inverted-soft-disabled);
+		--tone-soft-selected: var(--background-inverted-soft-selected);
+		--tone-fg: var(--foreground-inverted-primary);
+		--tone-fg-hover: var(--foreground-inverted-primary-hover);
+		--tone-fg-pressed: var(--foreground-inverted-primary-pressed);
+		--tone-fg-disabled: var(--foreground-inverted-primary-disabled);
+		--tone-on: var(--foreground-inverted-on-fill);
+		--tone-on-hover: var(--foreground-inverted-on-fill-hover);
+		--tone-on-pressed: var(--foreground-inverted-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-inverted-on-fill-disabled);
+		--tone-border: var(--border-inverted);
+		--tone-border-hover: var(--border-inverted-hover);
+		--tone-border-pressed: var(--border-inverted-pressed);
+		--tone-border-disabled: var(--border-inverted-disabled);
+		--tone-border-selected: var(--border-inverted-selected);
+	}
+
+	.surface[data-tone='emphasis'] {
+		--tone-strong: var(--background-emphasis-strong);
+		--tone-strong-hover: var(--background-emphasis-strong-hover);
+		--tone-strong-pressed: var(--background-emphasis-strong-pressed);
+		--tone-strong-disabled: var(--background-emphasis-strong-disabled);
+		--tone-strong-selected: var(--background-emphasis-strong-selected);
+		--tone-soft: var(--background-emphasis-soft);
+		--tone-soft-hover: var(--background-emphasis-soft-hover);
+		--tone-soft-pressed: var(--background-emphasis-soft-pressed);
+		--tone-soft-disabled: var(--background-emphasis-soft-disabled);
+		--tone-soft-selected: var(--background-emphasis-soft-selected);
+		--tone-fg: var(--foreground-emphasis-primary);
+		--tone-fg-hover: var(--foreground-emphasis-primary-hover);
+		--tone-fg-pressed: var(--foreground-emphasis-primary-pressed);
+		--tone-fg-disabled: var(--foreground-emphasis-primary-disabled);
+		--tone-on: var(--foreground-emphasis-on-fill);
+		--tone-on-hover: var(--foreground-emphasis-on-fill-hover);
+		--tone-on-pressed: var(--foreground-emphasis-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-emphasis-on-fill-disabled);
+		--tone-border: var(--border-emphasis);
+		--tone-border-hover: var(--border-emphasis-hover);
+		--tone-border-pressed: var(--border-emphasis-pressed);
+		--tone-border-disabled: var(--border-emphasis-disabled);
+		--tone-border-selected: var(--border-emphasis-selected);
+	}
+
+	.surface[data-tone='featured'] {
+		--tone-strong: var(--background-featured-strong);
+		--tone-strong-hover: var(--background-featured-strong-hover);
+		--tone-strong-pressed: var(--background-featured-strong-pressed);
+		--tone-strong-disabled: var(--background-featured-strong-disabled);
+		--tone-strong-selected: var(--background-featured-strong-selected);
+		--tone-soft: var(--background-featured-soft);
+		--tone-soft-hover: var(--background-featured-soft-hover);
+		--tone-soft-pressed: var(--background-featured-soft-pressed);
+		--tone-soft-disabled: var(--background-featured-soft-disabled);
+		--tone-soft-selected: var(--background-featured-soft-selected);
+		--tone-fg: var(--foreground-featured-primary);
+		--tone-fg-hover: var(--foreground-featured-primary-hover);
+		--tone-fg-pressed: var(--foreground-featured-primary-pressed);
+		--tone-fg-disabled: var(--foreground-featured-primary-disabled);
+		--tone-on: var(--foreground-featured-on-fill);
+		--tone-on-hover: var(--foreground-featured-on-fill-hover);
+		--tone-on-pressed: var(--foreground-featured-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-featured-on-fill-disabled);
+		--tone-border: var(--border-featured);
+		--tone-border-hover: var(--border-featured-hover);
+		--tone-border-pressed: var(--border-featured-pressed);
+		--tone-border-disabled: var(--border-featured-disabled);
+		--tone-border-selected: var(--border-featured-selected);
+	}
+
+	.surface[data-tone='critical'] {
+		--tone-strong: var(--background-critical-strong);
+		--tone-strong-hover: var(--background-critical-strong-hover);
+		--tone-strong-pressed: var(--background-critical-strong-pressed);
+		--tone-strong-disabled: var(--background-critical-strong-disabled);
+		--tone-strong-selected: var(--background-critical-strong-selected);
+		--tone-soft: var(--background-critical-soft);
+		--tone-soft-hover: var(--background-critical-soft-hover);
+		--tone-soft-pressed: var(--background-critical-soft-pressed);
+		--tone-soft-disabled: var(--background-critical-soft-disabled);
+		--tone-soft-selected: var(--background-critical-soft-selected);
+		--tone-fg: var(--foreground-critical-primary);
+		--tone-fg-hover: var(--foreground-critical-primary-hover);
+		--tone-fg-pressed: var(--foreground-critical-primary-pressed);
+		--tone-fg-disabled: var(--foreground-critical-primary-disabled);
+		--tone-on: var(--foreground-critical-on-fill);
+		--tone-on-hover: var(--foreground-critical-on-fill-hover);
+		--tone-on-pressed: var(--foreground-critical-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-critical-on-fill-disabled);
+		--tone-border: var(--border-critical);
+		--tone-border-hover: var(--border-critical-hover);
+		--tone-border-pressed: var(--border-critical-pressed);
+		--tone-border-disabled: var(--border-critical-disabled);
+		--tone-border-selected: var(--border-critical-selected);
+	}
+
+	.surface[data-tone='warning'] {
+		--tone-strong: var(--background-warning-strong);
+		--tone-strong-hover: var(--background-warning-strong-hover);
+		--tone-strong-pressed: var(--background-warning-strong-pressed);
+		--tone-strong-disabled: var(--background-warning-strong-disabled);
+		--tone-strong-selected: var(--background-warning-strong-selected);
+		--tone-soft: var(--background-warning-soft);
+		--tone-soft-hover: var(--background-warning-soft-hover);
+		--tone-soft-pressed: var(--background-warning-soft-pressed);
+		--tone-soft-disabled: var(--background-warning-soft-disabled);
+		--tone-soft-selected: var(--background-warning-soft-selected);
+		--tone-fg: var(--foreground-warning-primary);
+		--tone-fg-hover: var(--foreground-warning-primary-hover);
+		--tone-fg-pressed: var(--foreground-warning-primary-pressed);
+		--tone-fg-disabled: var(--foreground-warning-primary-disabled);
+		--tone-on: var(--foreground-warning-on-fill);
+		--tone-on-hover: var(--foreground-warning-on-fill-hover);
+		--tone-on-pressed: var(--foreground-warning-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-warning-on-fill-disabled);
+		--tone-border: var(--border-warning);
+		--tone-border-hover: var(--border-warning-hover);
+		--tone-border-pressed: var(--border-warning-pressed);
+		--tone-border-disabled: var(--border-warning-disabled);
+		--tone-border-selected: var(--border-warning-selected);
+	}
+
+	.surface[data-tone='success'] {
+		--tone-strong: var(--background-success-strong);
+		--tone-strong-hover: var(--background-success-strong-hover);
+		--tone-strong-pressed: var(--background-success-strong-pressed);
+		--tone-strong-disabled: var(--background-success-strong-disabled);
+		--tone-strong-selected: var(--background-success-strong-selected);
+		--tone-soft: var(--background-success-soft);
+		--tone-soft-hover: var(--background-success-soft-hover);
+		--tone-soft-pressed: var(--background-success-soft-pressed);
+		--tone-soft-disabled: var(--background-success-soft-disabled);
+		--tone-soft-selected: var(--background-success-soft-selected);
+		--tone-fg: var(--foreground-success-primary);
+		--tone-fg-hover: var(--foreground-success-primary-hover);
+		--tone-fg-pressed: var(--foreground-success-primary-pressed);
+		--tone-fg-disabled: var(--foreground-success-primary-disabled);
+		--tone-on: var(--foreground-success-on-fill);
+		--tone-on-hover: var(--foreground-success-on-fill-hover);
+		--tone-on-pressed: var(--foreground-success-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-success-on-fill-disabled);
+		--tone-border: var(--border-success);
+		--tone-border-hover: var(--border-success-hover);
+		--tone-border-pressed: var(--border-success-pressed);
+		--tone-border-disabled: var(--border-success-disabled);
+		--tone-border-selected: var(--border-success-selected);
+	}
+
+	.surface[data-tone='intelligent'] {
+		--tone-strong: var(--intelligent-ring);
+		--tone-strong-hover: var(--intelligent-ring);
+		--tone-strong-pressed: var(--intelligent-ring);
+		--tone-strong-disabled: var(--background-disabled);
+		--tone-strong-selected: var(--intelligent-ring);
+		--tone-soft: var(--background-emphasis-soft);
+		--tone-soft-hover: var(--background-emphasis-soft-hover);
+		--tone-soft-pressed: var(--background-emphasis-soft-pressed);
+		--tone-soft-disabled: var(--background-emphasis-soft-disabled);
+		--tone-soft-selected: var(--background-emphasis-soft-selected);
+		--tone-fg: var(--foreground-emphasis-primary);
+		--tone-fg-hover: var(--foreground-emphasis-primary-hover);
+		--tone-fg-pressed: var(--foreground-emphasis-primary-pressed);
+		--tone-fg-disabled: var(--foreground-emphasis-primary-disabled);
+		--tone-on: var(--foreground-emphasis-on-fill);
+		--tone-on-hover: var(--foreground-emphasis-on-fill-hover);
+		--tone-on-pressed: var(--foreground-emphasis-on-fill-pressed);
+		--tone-on-disabled: var(--foreground-emphasis-on-fill-disabled);
+		--tone-border: var(--border-emphasis);
+		--tone-border-hover: var(--border-emphasis-hover);
+		--tone-border-pressed: var(--border-emphasis-pressed);
+		--tone-border-disabled: var(--border-emphasis-disabled);
+		--tone-border-selected: var(--border-emphasis-selected);
+	}
+
+	.surface[data-variant='primary'] {
+		--surface-bg: var(--tone-strong);
+		--surface-fg: var(--tone-on);
+		--surface-border: transparent;
+	}
+
+	.surface[data-variant='primary'][data-selected]:not([data-disabled]) {
+		--surface-bg: var(--tone-strong-selected);
+	}
+
+	.surface[data-variant='primary'][data-hovered]:not([data-disabled]) {
+		--surface-bg: var(--tone-strong-hover);
+		--surface-fg: var(--tone-on-hover);
+	}
+
+	.surface[data-variant='primary'][data-pressed]:not([data-disabled]) {
+		--surface-bg: var(--tone-strong-pressed);
+		--surface-fg: var(--tone-on-pressed);
+	}
+
+	.surface[data-variant='primary'][data-disabled] {
+		--surface-bg: var(--tone-strong-disabled);
+		--surface-fg: var(--tone-on-disabled);
+		--surface-border: var(--tone-border-disabled);
+		box-shadow: none;
+		cursor: not-allowed;
+	}
+
+	.surface[data-variant='secondary'] {
+		--surface-bg: transparent;
+		--surface-fg: var(--tone-fg);
+		--surface-border: var(--tone-border);
+	}
+
+	.surface[data-variant='secondary'][data-selected]:not([data-disabled]) {
+		--surface-bg: var(--tone-soft-selected);
+		--surface-border: var(--tone-border-selected);
+	}
+
+	.surface[data-variant='secondary'][data-hovered]:not([data-disabled]) {
+		--surface-bg: var(--tone-soft-hover);
+		--surface-fg: var(--tone-fg-hover);
+		--surface-border: var(--tone-border-hover);
+	}
+
+	.surface[data-variant='secondary'][data-pressed]:not([data-disabled]) {
+		--surface-bg: var(--tone-soft-pressed);
+		--surface-fg: var(--tone-fg-pressed);
+		--surface-border: var(--tone-border-pressed);
+	}
+
+	.surface[data-variant='secondary'][data-disabled] {
+		--surface-bg: var(--tone-soft-disabled);
+		--surface-fg: var(--tone-fg-disabled);
+		--surface-border: var(--tone-border-disabled);
+		box-shadow: none;
+		cursor: not-allowed;
+	}
+
+	.surface[data-variant='tertiary'] {
+		--surface-bg: transparent;
+		--surface-fg: var(--tone-fg);
+		--surface-border: transparent;
+	}
+
+	.surface[data-variant='tertiary'][data-selected]:not([data-disabled]) {
+		--surface-border: var(--tone-border-selected);
+	}
+
+	.surface[data-variant='tertiary'][data-hovered]:not([data-disabled]) {
+		--surface-fg: var(--tone-fg-hover);
+	}
+
+	.surface[data-variant='tertiary'][data-pressed]:not([data-disabled]) {
+		--surface-fg: var(--tone-fg-pressed);
+	}
+
+	.surface[data-variant='tertiary'][data-disabled] {
+		--surface-fg: var(--tone-fg-disabled);
+		box-shadow: none;
+		cursor: not-allowed;
+	}
+
+	.surface[data-readonly] {
+		cursor: default;
+	}
+
+	.surface[data-readonly][data-disabled] {
+		cursor: not-allowed;
+	}
+
+	.surface[data-focus-visible] {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--focus-offset);
+	}
+}

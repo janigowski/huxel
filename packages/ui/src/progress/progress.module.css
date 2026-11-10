@@ -1,0 +1,17 @@
+@layer components {
+	.track {
+		display: block;
+		width: 100%;
+		height: var(--space-2);
+		border-radius: var(--radius-full);
+		background: var(--background-neutral-strong);
+		overflow: hidden;
+	}
+
+	.fill {
+		height: 100%;
+		border-radius: var(--radius-full);
+		background: var(--background-emphasis-strong);
+		transform-origin: left center;
+	}
+}

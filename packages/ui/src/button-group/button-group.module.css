@@ -1,0 +1,22 @@
+@layer components {
+	.group {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+	}
+
+	.item {
+		box-sizing: border-box;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: var(--size-medium);
+		padding-inline: var(--space-3);
+		border-radius: var(--radius-control);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-body-1);
+		line-height: var(--line-height-body-1);
+		font-weight: var(--font-weight-control);
+		letter-spacing: var(--tracking-control);
+	}
+}
