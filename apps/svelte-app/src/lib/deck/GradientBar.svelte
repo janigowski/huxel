@@ -2,16 +2,17 @@
 	interface Props {
 		colors: readonly string[];
 		opacity: number;
+		orientation?: 'horizontal' | 'vertical';
 	}
 
-	let { colors, opacity }: Props = $props();
+	let { colors, opacity, orientation = 'horizontal' }: Props = $props();
 
 	const empty = $derived(colors.length === 0);
 	const stops = $derived(empty ? 'transparent' : colors.join(', '));
 </script>
 
 <div
-	class={['bar', { empty }]}
+	class={['bar', orientation, { empty }]}
 	style:--stops={stops}
 	style:opacity
 	data-gradient=""
@@ -25,6 +26,13 @@
 		height: var(--gradient-height);
 		background-image: linear-gradient(to right, var(--stops));
 		background-repeat: no-repeat;
+	}
+
+	.vertical {
+		width: var(--gradient-height);
+		height: auto;
+		align-self: stretch;
+		background-image: linear-gradient(to bottom, var(--stops));
 	}
 
 	.empty {

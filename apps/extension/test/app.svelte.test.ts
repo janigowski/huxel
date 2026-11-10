@@ -28,7 +28,7 @@ async function renderApp(bridge: FakeBridge): Promise<BridgeSession> {
 const allowButton = () => page.getByRole('button', { name: /^Allow access/ });
 const connectButton = () => page.getByRole('button', { name: 'Connect bridge' });
 const hostInput = () => page.getByLabelText('Bridge address');
-const lightToggle = (name: string) => page.getByRole('button', { name: new RegExp(`% ${name}$`) });
+const roomsHeading = () => page.getByRole('heading', { name: 'Rooms' });
 
 describe('App', () => {
 	it('shows a loading state until the session is restored', async () => {
@@ -49,10 +49,11 @@ describe('App', () => {
 
 		await renderApp(bridge);
 
-		await expect.element(page.getByRole('heading', { name: 'Home Lights' })).toBeVisible();
+		await expect.element(page.getByRole('heading', { name: 'Home' })).toBeVisible();
 		await expect.element(page.getByText(`Bridge ${BRIDGE_ID}`)).toBeVisible();
-		await expect.element(lightToggle('Desk')).toBeVisible();
-		await expect.element(lightToggle('Lamp')).toBeVisible();
+		await expect.element(roomsHeading()).toBeVisible();
+		await expect.element(page.getByRole('heading', { name: 'Zones' })).toBeVisible();
+		await expect.element(page.getByText('All lights')).not.toBeInTheDocument();
 		expect(bridge.openedWith).toEqual([{ origin: BRIDGE_ORIGIN, appKey: 'stored-key' }]);
 	});
 
@@ -78,7 +79,7 @@ describe('App', () => {
 
 		await connectButton().click();
 
-		await expect.element(lightToggle('Desk')).toBeVisible();
+		await expect.element(roomsHeading()).toBeVisible();
 		await expect.element(page.getByText(`Linked to ${BRIDGE_HOST}`)).toBeVisible();
 		expect(bridge.hostAccess.requests).toEqual([BRIDGE_ORIGIN]);
 		expect(bridge.registrationOrigins).toEqual([BRIDGE_ORIGIN, BRIDGE_ORIGIN]);
@@ -214,24 +215,11 @@ describe('App', () => {
 		await expect.element(hostInput()).toBeVisible();
 	});
 
-	it('toggles a light', async () => {
-		const bridge = new FakeBridge({ storage: linkedBridgeStorage(), granted: [BRIDGE_ORIGIN] });
-
-		await renderApp(bridge);
-		await expect.element(lightToggle('Desk')).toHaveAttribute('aria-pressed', 'false');
-		await lightToggle('Desk').click();
-
-		await expect.element(lightToggle('Desk')).toHaveAttribute('aria-pressed', 'true');
-		await expect
-			.poll(() => bridge.gateway.snapshot.find((light) => light.id === 'desk')?.isOn)
-			.toBe(true);
-	});
-
 	it('forgets the linked bridge and stops its live updates', async () => {
 		const bridge = new FakeBridge({ storage: linkedBridgeStorage(), granted: [BRIDGE_ORIGIN] });
 
 		await renderApp(bridge);
-		await expect.element(lightToggle('Desk')).toBeVisible();
+		await expect.element(roomsHeading()).toBeVisible();
 		await expect.poll(() => bridge.gateway.watcherCount).toBe(1);
 
 		await page.getByRole('button', { name: 'Forget bridge' }).click();
@@ -263,7 +251,7 @@ describe('App', () => {
 
 		await page.getByRole('button', { name: 'Retry' }).click();
 
-		await expect.element(lightToggle('Desk')).toBeVisible();
+		await expect.element(roomsHeading()).toBeVisible();
 		await expect.element(page.getByRole('button', { name: 'Retry' })).not.toBeInTheDocument();
 		await expect.element(page.getByText(/Could not reach the bridge/)).not.toBeInTheDocument();
 	});
@@ -279,7 +267,7 @@ describe('App', () => {
 
 		await page.getByRole('button', { name: `Allow access to ${BRIDGE_HOST}` }).click();
 
-		await expect.element(lightToggle('Desk')).toBeVisible();
+		await expect.element(roomsHeading()).toBeVisible();
 		expect(bridge.hostAccess.requests).toEqual([BRIDGE_ORIGIN]);
 	});
 });

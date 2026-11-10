@@ -32,7 +32,7 @@ describe('extension popup', () => {
 	it('renders the access step', async () => {
 		const popup = collectErrors(await extension.openPopup());
 
-		await popup.getByRole('heading', { name: 'Home Lights' }).waitFor();
+		await popup.getByRole('heading', { name: 'Home' }).waitFor();
 
 		expect(await popup.getByText('Bridge access').isVisible()).toBe(true);
 		expect(await popup.getByRole('button', { name: 'Allow access' }).isEnabled()).toBe(true);

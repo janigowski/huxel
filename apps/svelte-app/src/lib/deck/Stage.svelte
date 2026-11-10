@@ -7,8 +7,7 @@
 	interface Props {
 		bridgeId: string;
 		connection?: HueAppConnection;
-		onCount: number | null;
-		total: number | null;
+		linked?: boolean;
 		rooms?: number;
 		zones?: number;
 		title?: string;
@@ -21,8 +20,7 @@
 	let {
 		bridgeId,
 		connection,
-		onCount,
-		total,
+		linked = false,
 		rooms,
 		zones,
 		title = 'Home',
@@ -34,10 +32,10 @@
 </script>
 
 <div class="field">
-	<a class="skip" href="#lights">Skip to lights</a>
+	<a class="skip" href="#rooms">Skip to rooms</a>
 	<StatusBar {bridgeId} {connection} {preview} />
-	<main class={['frame', { resting: onCount === null }]} id="lights">
-		<Masthead {title} {detail} {note} {onCount} {total} {rooms} {zones} />
+	<main class={['frame', { resting: !linked }]}>
+		<Masthead {title} {detail} {note} {linked} {rooms} {zones} />
 		{@render children()}
 	</main>
 </div>

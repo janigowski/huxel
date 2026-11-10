@@ -31,6 +31,7 @@
 	{colorName}
 	{presetName}
 	showBar="always"
+	singleRow
 	{ontoggle}
 	{ondim}
 	{oneditcolor}

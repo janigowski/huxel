@@ -3,20 +3,19 @@
 		title: string;
 		detail: string;
 		note?: string;
-		onCount: number | null;
-		total: number | null;
+		linked?: boolean;
 		rooms?: number;
 		zones?: number;
 	}
 
-	let { title, detail, note, onCount, total, rooms, zones }: Props = $props();
+	let { title, detail, note, linked = false, rooms, zones }: Props = $props();
 
 	const summary = $derived.by(() => {
-		if (onCount === null || total === null) {
+		if (!linked) {
 			return detail;
 		}
 
-		const parts = [`${onCount} of ${total} lights on`];
+		const parts: string[] = [];
 
 		if (rooms !== undefined) {
 			parts.push(`${rooms} ${rooms === 1 ? 'room' : 'rooms'}`);
@@ -28,7 +27,6 @@
 
 		return parts.join(' · ');
 	});
-	const linked = $derived(onCount !== null && total !== null);
 </script>
 
 <section class="mast" aria-labelledby="deck-title">
@@ -42,10 +40,6 @@
 
 	{#if linked}
 		<dl class="metrics">
-			<div class="metric">
-				<dt>Lights</dt>
-				<dd>{onCount}<span class="rest">/{total}</span></dd>
-			</div>
 			{#if rooms !== undefined}
 				<div class="metric">
 					<dt>{rooms === 1 ? 'Room' : 'Rooms'}</dt>
@@ -139,10 +133,5 @@
 		font-weight: var(--font-weight-medium);
 		letter-spacing: var(--tracking-heading-2);
 		line-height: var(--line-height-heading-2);
-	}
-
-	.rest {
-		color: var(--foreground-neutral-tertiary);
-		font-size: var(--font-size-body-2);
 	}
 </style>

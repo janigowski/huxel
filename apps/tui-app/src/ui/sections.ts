@@ -9,7 +9,7 @@ export interface ListedControl {
 	readonly color: XyColor | null;
 }
 
-export type ItemKind = 'room' | 'zone' | 'light';
+export type ItemKind = 'room' | 'zone';
 
 export interface TitleEntry {
 	readonly kind: 'title';
@@ -62,7 +62,6 @@ export function buildEntries(input: {
 	loading: boolean;
 	rooms: readonly ListedControl[];
 	zones: readonly ListedControl[];
-	lights: readonly ListedControl[];
 }): Entry[] {
 	return [
 		...sectionEntries(
@@ -86,23 +85,12 @@ export function buildEntries(input: {
 				showDetail: true
 			},
 			input.loading
-		),
-		...sectionEntries(
-			{
-				kind: 'light',
-				title: 'All lights',
-				loadingLabel: 'Loading lights…',
-				emptyLabel: 'No lights',
-				items: input.lights,
-				showDetail: false
-			},
-			input.loading
 		)
 	];
 }
 
 export function isItem(entry: Entry): entry is ItemEntry {
-	return entry.kind === 'room' || entry.kind === 'zone' || entry.kind === 'light';
+	return entry.kind === 'room' || entry.kind === 'zone';
 }
 
 export function selectedEntryIndex(

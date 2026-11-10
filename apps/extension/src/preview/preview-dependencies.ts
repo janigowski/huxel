@@ -1,4 +1,4 @@
-import { createHueApp, hexToXy, type BridgeLight } from '@huxel/app';
+import { createHueApp, hexToXy, type BridgeArea, type BridgeLight } from '@huxel/app';
 import { HueLinkButtonNotPressedError, HueNetworkError } from '@huxel/client';
 import { MemoryHostAccess } from '../adapters/memory-host-access';
 import { MemoryStorage } from '../adapters/memory-storage';
@@ -46,6 +46,45 @@ export const PREVIEW_LIGHTS: readonly BridgeLight[] = [
 	}
 ];
 
+const amber = hexToXy('#ffbf00');
+const orange = hexToXy('#ff8a1f');
+
+export const PREVIEW_ROOMS: readonly BridgeArea[] = [
+	{
+		id: 'living',
+		name: 'Living room',
+		serviceId: 'living-service',
+		isOn: true,
+		brightness: 62,
+		color: amber,
+		temperature: null,
+		children: ['desk', 'sofa']
+	},
+	{
+		id: 'kitchen',
+		name: 'Kitchen',
+		serviceId: 'kitchen-service',
+		isOn: false,
+		brightness: 40,
+		color: orange,
+		temperature: null,
+		children: ['kitchen']
+	}
+];
+
+export const PREVIEW_ZONES: readonly BridgeArea[] = [
+	{
+		id: 'evening',
+		name: 'Evening',
+		serviceId: 'evening-service',
+		isOn: true,
+		brightness: 22,
+		color: orange,
+		temperature: null,
+		children: ['bed', 'hall']
+	}
+];
+
 const LATENCY_MS = 400;
 
 function wait(ms: number): Promise<void> {
@@ -53,7 +92,11 @@ function wait(ms: number): Promise<void> {
 }
 
 export function createPreviewDependencies(): Dependencies {
-	const gateway = new SimulatedGateway(PREVIEW_LIGHTS, { latencyMs: 150 });
+	const gateway = new SimulatedGateway(PREVIEW_LIGHTS, {
+		latencyMs: 150,
+		rooms: PREVIEW_ROOMS,
+		zones: PREVIEW_ZONES
+	});
 	const previewOrigin = `https://${PREVIEW_BRIDGE.internalipaddress}`;
 	let registrationAttempts = 0;
 

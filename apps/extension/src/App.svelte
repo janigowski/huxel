@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ConnectPanel, DashboardBar, Hero, LightsSection, Notice } from '@huxel/design-system';
+	import { AreaSection, ConnectPanel, DashboardBar, Hero, Notice } from '@huxel/design-system';
 	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 	import { bridgeOrigin, parseBridgeHost } from './bridge/bridge-host';
@@ -36,7 +36,7 @@
 
 <main class="page">
 	<DashboardBar label="Hue control dashboard" date={new Date()} connection={hue?.connection} />
-	<Hero title="Home Lights" subtitle={session.subtitle} product="extension" />
+	<Hero title="Home" subtitle={session.subtitle} product="extension" />
 
 	{#if session.status === 'restoring'}
 		<Notice tone="muted">Loading…</Notice>
@@ -56,7 +56,24 @@
 			<Notice>{unreachableMessage(host)}</Notice>
 			<CertificateHint url="{bridgeOrigin(host)}/" onretry={() => session.reconnect()} />
 		{:else}
-			<LightsSection {hue} />
+			{@const loading = hue.status === 'idle' || hue.status === 'loading'}
+
+			<AreaSection
+				title="Rooms"
+				areas={hue.rooms.all}
+				{loading}
+				ontoggle={(id) => hue.toggleRoom(id)}
+				ondim={(id, brightness) => hue.dimRoom(id, brightness)}
+				onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
+			/>
+			<AreaSection
+				title="Zones"
+				areas={hue.zones.all}
+				{loading}
+				ontoggle={(id) => hue.toggleZone(id)}
+				ondim={(id, brightness) => hue.dimZone(id, brightness)}
+				onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
+			/>
 		{/if}
 
 		{#if hue && errorMessage}

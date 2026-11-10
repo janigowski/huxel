@@ -1,4 +1,5 @@
 export { default as ActionButton } from './components/ActionButton.svelte';
+export { default as AreaSection } from './components/AreaSection.svelte';
 export { default as BrandMark } from './components/BrandMark.svelte';
 export { default as ColorDialog } from './components/ColorDialog.svelte';
 export { default as ColorSwatch } from './components/ColorSwatch.svelte';
@@ -6,9 +7,6 @@ export { default as ConnectPanel } from './components/ConnectPanel.svelte';
 export { default as DashboardBar } from './components/DashboardBar.svelte';
 export { default as Hero } from './components/Hero.svelte';
 export { default as Label } from './components/Label.svelte';
-export { default as LightCard } from './components/LightCard.svelte';
-export { default as LightGrid } from './components/LightGrid.svelte';
-export { default as LightsSection } from './components/LightsSection.svelte';
 export { default as Notice } from './components/Notice.svelte';
 export { default as SectionHeader } from './components/SectionHeader.svelte';
 export { default as HexIcon } from './components/icons/HexIcon.svelte';

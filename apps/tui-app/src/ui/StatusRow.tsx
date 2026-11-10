@@ -29,7 +29,11 @@ export const StatusRow = memo(function StatusRow({
 	const tone = isOn ? colors.accent : colors.muted;
 
 	return (
-		<text flexShrink={0} attributes={selected ? TextAttributes.BOLD : TextAttributes.NONE}>
+		<text
+			flexShrink={0}
+			wrapMode="none"
+			attributes={selected ? TextAttributes.BOLD : TextAttributes.NONE}
+		>
 			<span fg={colors.accent}>{selected ? '›' : ' '}</span>
 			<span fg={colors.faint}> {number} </span>
 			<span fg={tone}>{isOn ? '●' : '○'} </span>

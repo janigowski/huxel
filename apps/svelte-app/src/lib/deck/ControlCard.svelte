@@ -18,6 +18,7 @@
 		oneditcolor: () => void;
 		presetName?: string;
 		oneditpresets?: () => void;
+		singleRow?: boolean;
 	}
 
 	let {
@@ -32,7 +33,8 @@
 		ondim,
 		oneditcolor,
 		presetName,
-		oneditpresets
+		oneditpresets,
+		singleRow = false
 	}: Props = $props();
 
 	const nameId = $props.id();
@@ -46,12 +48,12 @@
 	const glow = $derived(colors[0] ?? 'var(--foreground-emphasis-primary)');
 </script>
 
-<article class={['card', { lit: isOn }]} style:--glow={glow} aria-labelledby={nameId}>
+<article class={['card', { lit: isOn, line: singleRow }]} style:--glow={glow} aria-labelledby={nameId}>
 	{#if showGradient}
-		<GradientBar {colors} {opacity} />
+		<GradientBar {colors} {opacity} orientation={singleRow ? 'vertical' : 'horizontal'} />
 	{/if}
 
-	<div class="body">
+	<div class={['body', { line: singleRow }]}>
 		<div class="identity">
 			<p id={nameId} class="name" title={name}>{name}</p>
 			<button
@@ -67,7 +69,7 @@
 		</div>
 
 		{#if adjustable}
-			<div class="controls">
+			<div class={['controls', { line: singleRow }]}>
 				{#if brightness !== null}
 					<div class="dim">
 						<span class="meta">Brightness</span>
@@ -249,6 +251,93 @@
 	.choice:disabled {
 		color: var(--foreground-neutral-disabled);
 		cursor: not-allowed;
+	}
+
+	.card.line {
+		flex-direction: row;
+		align-items: stretch;
+	}
+
+	.body.line {
+		flex: 1;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: var(--space-3);
+		min-width: 0;
+	}
+
+	.body.line .identity {
+		flex: 0 1 auto;
+		min-width: 9rem;
+	}
+
+	.body.line .name {
+		flex: 1 1 auto;
+		width: auto;
+		min-width: 0;
+	}
+
+	.controls.line {
+		flex: 1;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: var(--space-2);
+		min-width: 0;
+	}
+
+	.controls.line .dim {
+		display: flex;
+		flex: 1 1 auto;
+		align-items: center;
+		gap: var(--space-2);
+		min-width: 0;
+	}
+
+	.controls.line .dim .meta {
+		display: none;
+	}
+
+	.controls.line .slider {
+		flex: 1 1 3rem;
+		min-width: 3rem;
+	}
+
+	.controls.line .slider :global(input) {
+		width: 100%;
+		min-width: 0;
+	}
+
+	.controls.line .choice {
+		flex: 0 1 auto;
+		width: auto;
+		min-width: 0;
+		max-width: 6.5rem;
+		min-height: var(--size-small);
+		padding: var(--space-1) var(--space-2);
+	}
+
+	.controls.line .choice-name {
+		max-width: 8rem;
+	}
+
+	@media (max-width: 40rem) {
+		.body.line .identity {
+			flex-basis: 6rem;
+		}
+
+		.controls.line .choice-name {
+			max-width: 3.5rem;
+		}
+	}
+
+	.controls.line .choice .meta {
+		display: none;
+	}
+
+	.controls.line .choice-copy {
+		flex-direction: row;
 	}
 
 	.choice-copy {

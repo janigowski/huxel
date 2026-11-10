@@ -1,11 +1,15 @@
-import type { BridgeLight, HueGateway, LightChangeObserver, XyColor } from '@huxel/app';
+import type { BridgeArea, BridgeLight, HueGateway, LightChangeObserver, XyColor } from '@huxel/app';
 
 export interface SimulatedGatewayOptions {
 	latencyMs?: number;
+	rooms?: readonly BridgeArea[];
+	zones?: readonly BridgeArea[];
 }
 
 export class SimulatedGateway implements HueGateway {
 	private readonly lights = new Map<string, BridgeLight>();
+	private readonly rooms: BridgeArea[];
+	private readonly zones: BridgeArea[];
 	private readonly observers = new Set<LightChangeObserver>();
 	private readonly latencyMs: number;
 
@@ -14,6 +18,8 @@ export class SimulatedGateway implements HueGateway {
 			this.lights.set(light.id, { ...light });
 		}
 
+		this.rooms = (options.rooms ?? []).map(copyArea);
+		this.zones = (options.zones ?? []).map(copyArea);
 		this.latencyMs = options.latencyMs ?? 0;
 	}
 
@@ -29,6 +35,35 @@ export class SimulatedGateway implements HueGateway {
 		await this.delay();
 
 		return this.snapshot;
+	}
+
+	async listAreas(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }> {
+		await this.delay();
+
+		return {
+			rooms: this.rooms.map(copyArea),
+			zones: this.zones.map(copyArea)
+		};
+	}
+
+	async setAreaPower(serviceId: string, isOn: boolean): Promise<void> {
+		await this.delay();
+		this.findArea(serviceId).isOn = isOn;
+	}
+
+	async setAreaBrightness(serviceId: string, brightness: number): Promise<void> {
+		await this.delay();
+		this.findArea(serviceId).brightness = brightness;
+	}
+
+	async setAreaColor(serviceId: string, color: XyColor): Promise<void> {
+		await this.delay();
+		this.findArea(serviceId).color = color;
+	}
+
+	async setAreaTemperature(serviceId: string, mirek: number): Promise<void> {
+		await this.delay();
+		this.findArea(serviceId).temperature = { mirek };
 	}
 
 	async setPower(lightId: string, isOn: boolean): Promise<void> {
@@ -90,6 +125,16 @@ export class SimulatedGateway implements HueGateway {
 		}
 	}
 
+	private findArea(serviceId: string): BridgeArea {
+		const area = [...this.rooms, ...this.zones].find((item) => item.serviceId === serviceId);
+
+		if (!area) {
+			throw new Error(`Area ${serviceId} not found`);
+		}
+
+		return area;
+	}
+
 	private delay(): Promise<void> {
 		if (this.latencyMs === 0) {
 			return Promise.resolve();
@@ -97,4 +142,13 @@ export class SimulatedGateway implements HueGateway {
 
 		return new Promise((resolve) => setTimeout(resolve, this.latencyMs));
 	}
+}
+
+function copyArea(area: BridgeArea): BridgeArea {
+	return {
+		...area,
+		temperature: area.temperature ? { ...area.temperature } : null,
+		color: area.color ? { ...area.color } : null,
+		children: [...area.children]
+	};
 }

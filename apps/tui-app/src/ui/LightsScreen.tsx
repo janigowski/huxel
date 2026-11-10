@@ -55,14 +55,10 @@ export function LightsScreen({ app, onError, onQuit }: LightsScreenProps) {
 	const selectedKeyRef = useRef<string | undefined>(undefined);
 	const modeRef = useRef<Mode>(BROWSE);
 
-	const lights = useMemo(
-		() => [...hue.lights].sort((left, right) => left.name.localeCompare(right.name)),
-		[hue.lights]
-	);
 	const loading = hue.status === 'idle' || hue.status === 'loading';
 	const entries = useMemo(
-		() => buildEntries({ loading, rooms: hue.rooms, zones: hue.zones, lights }),
-		[loading, hue.rooms, hue.zones, lights]
+		() => buildEntries({ loading, rooms: hue.rooms, zones: hue.zones }),
+		[loading, hue.rooms, hue.zones]
 	);
 	const error = commandError ?? (hue.status === 'error' ? describeError(hue.error) : null);
 	const editing =
@@ -112,11 +108,6 @@ export function LightsScreen({ app, onError, onQuit }: LightsScreenProps) {
 			return;
 		}
 
-		if (item.kind === 'light') {
-			run(hue.toggleLight(item.id));
-			return;
-		}
-
 		run(item.kind === 'room' ? hue.toggleRoom(item.id) : hue.toggleZone(item.id));
 	}
 
@@ -135,18 +126,16 @@ export function LightsScreen({ app, onError, onQuit }: LightsScreenProps) {
 
 		const brightness = Math.min(100, Math.max(0, Math.round(current.brightness) + offset));
 		const command =
-			item.kind === 'light'
-				? hue.dimLight(item.id, brightness)
-				: item.kind === 'room'
-					? hue.dimRoom(item.id, brightness)
-					: hue.dimZone(item.id, brightness);
+			item.kind === 'room'
+				? hue.dimRoom(item.id, brightness)
+				: hue.dimZone(item.id, brightness);
 		run(command);
 	}
 
 	function openChooser(kind: 'preset' | 'color') {
 		const item = selectedItem();
 
-		if (!item || item.kind === 'light') {
+		if (!item) {
 			return;
 		}
 
@@ -307,7 +296,7 @@ export function LightsScreen({ app, onError, onQuit }: LightsScreenProps) {
 				{error ? <Notice>{error}</Notice> : null}
 				{chooser ? (
 					<>
-						<text flexShrink={0}>
+						<text flexShrink={0} wrapMode="none">
 							<span fg={colors.text} attributes={TextAttributes.BOLD}>
 								{chooser.mode.kind === 'preset' ? 'Presets' : 'Color'}
 							</span>
@@ -324,6 +313,7 @@ export function LightsScreen({ app, onError, onQuit }: LightsScreenProps) {
 								<text
 									key={choice.id}
 									flexShrink={0}
+									wrapMode="none"
 									attributes={selected ? TextAttributes.BOLD : TextAttributes.NONE}
 								>
 									<span fg={colors.accent}>{selected ? '›' : ' '}</span>
@@ -347,7 +337,7 @@ export function LightsScreen({ app, onError, onQuit }: LightsScreenProps) {
 function renderEntry(entry: Entry, selected: boolean) {
 	if (entry.kind === 'title') {
 		return (
-			<text key={entry.key} flexShrink={0}>
+			<text key={entry.key} flexShrink={0} wrapMode="none">
 				<span fg={colors.text} attributes={TextAttributes.BOLD}>
 					{entry.title}
 				</span>
@@ -453,17 +443,6 @@ function liveArea(app: HueApp, kind: 'room' | 'zone', id: string) {
 }
 
 function liveLevel(app: HueApp, kind: ItemKind, id: string): { brightness: number } | undefined {
-	if (kind === 'light') {
-		const light = app.state.lights.get(id);
-		const brightness = light?.brightness.peek();
-
-		if (!light?.isOn.peek() || brightness == null) {
-			return undefined;
-		}
-
-		return { brightness };
-	}
-
 	const area = liveArea(app, kind, id);
 	const brightness = area?.brightness.peek();
 

@@ -8,15 +8,30 @@ Svelte 5 components and design tokens shared by [`svelte-app`](../../apps/svelte
 
 ```svelte
 <script lang="ts">
-	import { DashboardBar, Hero, LightsSection } from '@huxel/design-system';
+	import { AreaSection, DashboardBar, Hero } from '@huxel/design-system';
 	import type { SvelteHueApp } from '@huxel/app/svelte';
 
 	let { hue }: { hue: SvelteHueApp } = $props();
 </script>
 
 <DashboardBar label="Hue control dashboard" date={new Date()} connection={hue.connection} />
-<Hero title="Home Lights" subtitle="Bridge" />
-<LightsSection {hue} />
+<Hero title="Home" subtitle="Bridge" />
+<AreaSection
+	title="Rooms"
+	areas={hue.rooms.all}
+	loading={hue.status === 'loading'}
+	ontoggle={(id) => hue.toggleRoom(id)}
+	ondim={(id, brightness) => hue.dimRoom(id, brightness)}
+	onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
+/>
+<AreaSection
+	title="Zones"
+	areas={hue.zones.all}
+	loading={hue.status === 'loading'}
+	ontoggle={(id) => hue.toggleZone(id)}
+	ondim={(id, brightness) => hue.dimZone(id, brightness)}
+	onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
+/>
 ```
 
 Import the shared tokens once, then these component aliases. Load Instrument Sans. Do not load Inter.

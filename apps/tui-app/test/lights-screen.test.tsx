@@ -81,104 +81,6 @@ function row(frame: string, name: string) {
 	return frame.split('\n').find((line) => line.includes(name));
 }
 
-function lights(deskBrightness = 80) {
-	return new FakeGateway([
-		{ id: 'b', name: 'Kitchen', isOn: false, brightness: 40, color: null, temperature: null },
-		{
-			id: 'a',
-			name: 'Desk',
-			isOn: true,
-			brightness: deskBrightness,
-			color: null,
-			temperature: null
-		},
-		{ id: 'c', name: 'Plug', isOn: true, brightness: null, color: null, temperature: null }
-	]);
-}
-
-describe('LightsScreen', () => {
-	test('lists lights by name and toggles the selected one optimistically', async () => {
-		const gateway = lights();
-		const { captureCharFrame, waitForFrame } = await renderLights(gateway, 'Plug');
-
-		const rows = captureCharFrame().split('\n');
-		const desk = rows.findIndex((row) => row.includes('Desk'));
-		expect(rows.join('\n')).toContain('2/3 on');
-		expect(desk).toBeGreaterThan(-1);
-		expect(rows[desk]).toContain('›');
-		expect(rows[desk]).toContain('80% ████████░░');
-		expect(rows.findIndex((row) => row.includes('Kitchen'))).toBe(desk + 1);
-		expect(rows[desk + 2]).toContain('100%');
-
-		await press('j');
-		await press(' ');
-
-		const toggled = await waitForFrame((frame) => frame.includes('3/3 on'));
-		expect(row(toggled, 'Kitchen')).toContain('› 02 ●');
-		expect(gateway.powerCommands).toEqual([['b', true]]);
-	});
-
-	test('dims the selected light only while it is on', async () => {
-		const gateway = lights();
-		const { waitForFrame } = await renderLights(gateway, 'Plug');
-
-		await press('l');
-		expect(row(await waitForFrame((frame) => frame.includes('90%')), 'Desk')).toContain('90%');
-
-		await press('j');
-		await press('l');
-		await press('h');
-		expect(gateway.brightnessCommands).toEqual([['a', 90]]);
-	});
-
-	test('toggles the newly selected light when keys arrive together', async () => {
-		const gateway = lights();
-		const { waitForFrame } = await renderLights(gateway, 'Plug');
-
-		await press('j', ' ');
-
-		expect(row(await waitForFrame((frame) => frame.includes('3/3 on')), 'Kitchen')).toContain(
-			'› 02 ●'
-		);
-		expect(gateway.powerCommands).toEqual([['b', true]]);
-	});
-
-	test('accumulates dim steps that arrive together', async () => {
-		const gateway = lights(50);
-		const { waitForFrame } = await renderLights(gateway, 'Plug');
-
-		await press('l', 'l', 'l');
-
-		expect(row(await waitForFrame((frame) => frame.includes('80%')), 'Desk')).toContain('80%');
-		expect(gateway.brightnessCommands.at(-1)).toEqual(['a', 80]);
-		expect(gateway.brightnessCommands.map(([, brightness]) => brightness)).not.toContain(70);
-	});
-
-	test('keeps the selected row visible in a long list', async () => {
-		const gateway = new FakeGateway(
-			Array.from({ length: 30 }, (_, index) => ({
-				id: `light-${index}`,
-				name: `Light ${String(index + 1).padStart(2, '0')}`,
-				isOn: true,
-				brightness: 50,
-				color: null,
-				temperature: null
-			}))
-		);
-		const { captureCharFrame, waitForFrame } = await renderLights(gateway, 'Light 01', 80, 12);
-
-		await press(...Array.from({ length: 29 }, () => 'j'));
-
-		const frame = await waitForFrame((frame) => frame.includes('› 30'));
-		const rows = frame.split('\n').filter((line) => /Light \d\d/.test(line));
-		expect(row(frame, '› 30')).toContain('Light 30');
-		expect(rows.length).toBeGreaterThan(3);
-		expect(new Set(rows).size).toBe(rows.length);
-		expect(frame).toContain('q quit');
-		expect(captureCharFrame()).not.toContain('Light 01');
-	});
-});
-
 const attic: BridgeArea = {
 	id: 'attic',
 	name: 'Attic',
@@ -298,29 +200,29 @@ function preset(id: 'bright' | 'relax' | 'energize') {
 }
 
 describe('rooms and zones', () => {
-	test('lists rooms and zones by name ahead of the lights', async () => {
-		const { captureCharFrame } = await renderLights(home(), 'Desk', 80, 24);
+	test('lists rooms and then zones', async () => {
+		const { captureCharFrame } = await renderLights(home(), 'Attic', 80, 24);
 		const frame = captureCharFrame();
 		const rows = frame.split('\n');
 		const atticRow = rows.findIndex((line) => line.includes('Attic'));
 		const kitchenRow = rows.findIndex((line) => line.includes('Kitchen'));
 		const hallRow = rows.findIndex((line) => line.includes('Hall'));
-		const deskRow = rows.findIndex((line) => line.includes('Desk'));
 
 		expect(frame).toContain('Rooms');
 		expect(frame).toContain('1/2 on');
 		expect(frame).toContain('Zones');
+		expect(frame).not.toContain('All lights');
+		expect(frame).not.toContain('Desk');
 		expect(atticRow).toBeGreaterThan(-1);
 		expect(rows[atticRow]).toContain('›');
 		expect(kitchenRow).toBeGreaterThan(atticRow);
 		expect(hallRow).toBeGreaterThan(kitchenRow);
-		expect(deskRow).toBeGreaterThan(hallRow);
 		expect(rows[atticRow]).toContain('Custom');
 	});
 
 	test('toggles the selected room and the next key reaches that room', async () => {
 		const gateway = home();
-		const { waitForFrame } = await renderLights(gateway, 'Desk', 80, 24);
+		const { waitForFrame } = await renderLights(gateway, 'Attic', 80, 24);
 
 		await press('j', ' ');
 
@@ -331,7 +233,7 @@ describe('rooms and zones', () => {
 
 	test('dims a room only while it is on and can be dimmed', async () => {
 		const gateway = home(50);
-		const { waitForFrame } = await renderLights(gateway, 'Desk', 80, 24);
+		const { waitForFrame } = await renderLights(gateway, 'Attic', 80, 24);
 
 		await press('l', 'l', 'l');
 
@@ -341,10 +243,9 @@ describe('rooms and zones', () => {
 
 		await press('j', 'l');
 		await press('j', 'l');
-		await press('j', 'l');
 
 		expect(gateway.areaBrightness.map(([, brightness]) => brightness)).not.toContain(70);
-		expect(gateway.brightnessCommands).toEqual([['desk', 60]]);
+		expect(gateway.brightnessCommands).toEqual([]);
 	});
 
 	test('applies the selected preset and palette color', async () => {
@@ -356,7 +257,7 @@ describe('rooms and zones', () => {
 			throw new Error('Missing orange');
 		}
 
-		const { captureCharFrame, waitForFrame } = await renderLights(gateway, 'Desk', 80, 24);
+		const { captureCharFrame, waitForFrame } = await renderLights(gateway, 'Attic', 80, 24);
 
 		await press('p', ' ');
 
@@ -377,7 +278,7 @@ describe('rooms and zones', () => {
 	});
 
 	test('keeps presets and colors closed when the selection cannot use them', async () => {
-		const { captureCharFrame } = await renderLights(home(), 'Desk', 80, 24);
+		const { captureCharFrame } = await renderLights(home(), 'Attic', 80, 24);
 
 		await press('j', 'p', 'c');
 		expect(captureCharFrame()).not.toContain('Presets');
@@ -385,15 +286,12 @@ describe('rooms and zones', () => {
 
 		await press('j', 'c');
 		expect(captureCharFrame()).not.toContain('Color');
-
-		await press('j', 'p');
-		expect(captureCharFrame()).not.toContain('Presets');
 	});
 
 	test('applies a zone preset without dimming a zone that has no brightness', async () => {
 		const gateway = home();
 		const bright = preset('bright');
-		await renderLights(gateway, 'Desk', 80, 24);
+		await renderLights(gateway, 'Attic', 80, 24);
 
 		await press('j', 'j', 'p', ' ');
 
@@ -403,7 +301,7 @@ describe('rooms and zones', () => {
 
 	test('reports a rejected room command and restores the room', async () => {
 		const gateway = new AreaGateway([deskLight], { rooms: [attic], zones: [] }, 'bridge down');
-		const { waitForFrame } = await renderLights(gateway, 'Desk', 80, 24);
+		const { waitForFrame } = await renderLights(gateway, 'Attic', 80, 24);
 
 		await press(' ');
 		await act(async () => {
@@ -491,16 +389,16 @@ describe('rooms and zones', () => {
 
 		expect(loading).toContain('Loading rooms…');
 		expect(loading).toContain('Loading zones…');
-		expect(loading).toContain('Loading lights…');
+		expect(loading).not.toContain('Loading lights…');
 		expect(loading).not.toContain('No rooms');
 	});
 
 	test('shows an empty line for each section', async () => {
-		const { captureCharFrame } = await renderLights(new FakeGateway([]), 'No lights');
+		const { captureCharFrame } = await renderLights(new FakeGateway([]), 'No rooms');
 		const empty = captureCharFrame();
 
 		expect(empty).toContain('No rooms');
 		expect(empty).toContain('No zones');
-		expect(empty).toContain('No lights');
+		expect(empty).not.toContain('No lights');
 	});
 });
