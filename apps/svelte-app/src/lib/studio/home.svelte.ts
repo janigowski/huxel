@@ -12,7 +12,7 @@ import {
 	type MirekRange,
 	type XyColor
 } from '@huxel/app';
-import type { SvelteArea, SvelteHueApp, SvelteLight } from '@huxel/app/svelte';
+import type { SvelteArea, SvelteHueApp } from '@huxel/app/svelte';
 
 interface StudioLight {
 	id: string;
@@ -118,36 +118,39 @@ export class StudioHome implements SvelteHueApp {
 	readonly zones: SvelteHueApp['zones'];
 
 	constructor() {
-		const home = this;
+		const lightState = () => this.lightState;
+		const roomGroups = () => this.roomGroups;
+		const zoneGroups = () => this.zoneGroups;
+		const area = (group: StudioGroup) => this.area(group);
 
 		this.lights = {
 			get all() {
-				return home.lightState;
+				return lightState();
 			},
 			get(id) {
-				return home.lightState.find((light) => light.id === id);
+				return lightState().find((light) => light.id === id);
 			}
 		};
 
 		this.rooms = {
 			get all() {
-				return home.roomGroups.map((group) => home.area(group));
+				return roomGroups().map(area);
 			},
 			get(id) {
-				const group = home.roomGroups.find((entry) => entry.id === id);
+				const group = roomGroups().find((entry) => entry.id === id);
 
-				return group ? home.area(group) : undefined;
+				return group ? area(group) : undefined;
 			}
 		};
 
 		this.zones = {
 			get all() {
-				return home.zoneGroups.map((group) => home.area(group));
+				return zoneGroups().map(area);
 			},
 			get(id) {
-				const group = home.zoneGroups.find((entry) => entry.id === id);
+				const group = zoneGroups().find((entry) => entry.id === id);
 
-				return group ? home.area(group) : undefined;
+				return group ? area(group) : undefined;
 			}
 		};
 	}
@@ -298,7 +301,7 @@ export class StudioHome implements SvelteHueApp {
 			brightness: averageBrightness(members),
 			color: sharedColor(members),
 			temperature: sharedTemperature(members),
-			colors: [...new Set(members.flatMap((light) => light.colors))]
+			colors: uniqueColors(members.flatMap((light) => light.colors))
 		};
 	}
 
@@ -408,6 +411,18 @@ export class StudioHome implements SvelteHueApp {
 		this.paint(light, preset.color);
 		light.brightness = preset.brightness;
 	}
+}
+
+function uniqueColors(colors: readonly string[]): string[] {
+	const unique: string[] = [];
+
+	for (const color of colors) {
+		if (!unique.includes(color)) {
+			unique.push(color);
+		}
+	}
+
+	return unique;
 }
 
 function averageBrightness(lights: readonly StudioLight[]): number | null {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HueAppConnection } from '@huxel/app';
+	import { resolve } from '$app/paths';
 	import { bridgeTail } from './readout';
 
 	interface Props {
@@ -26,7 +27,7 @@
 		<p class="brand">huxel<span class="slash" aria-hidden="true">//</span>app</p>
 		<p class="bridge" title={bridgeId}>{preview ? 'sample home' : `bridge ${tail}`}</p>
 		{#if preview}
-			<a class="exit" href="/">Exit preview</a>
+			<a class="exit" href={resolve('/')}>Exit preview</a>
 		{/if}
 		<p class={['pill', tone]} role="status" aria-live="polite">
 			<span class="dot" aria-hidden="true"></span>

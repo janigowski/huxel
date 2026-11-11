@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import mark from '$lib/assets/favicon.svg';
 	import ActionButton from './ActionButton.svelte';
 	import Notice from './Notice.svelte';
@@ -24,7 +25,7 @@
 	{#if error}
 		<Notice>{error}</Notice>
 	{/if}
-	<a class="sample" href="/studio">Preview a sample home</a>
+	<a class="sample" href={resolve('/studio')}>Preview a sample home</a>
 </section>
 
 <style>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import type { SvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 	import GroupsSection from '$lib/hue/GroupsSection.svelte';
