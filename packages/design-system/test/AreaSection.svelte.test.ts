@@ -29,11 +29,11 @@ describe('AreaSection', () => {
 			onchangecolor: vi.fn()
 		});
 
-		const living = page.getByRole('button', { name: 'Living room, On' }).element().closest('article');
-		const kitchen = page
-			.getByRole('button', { name: 'Kitchen, Off' })
+		const living = page
+			.getByRole('button', { name: 'Living room, On' })
 			.element()
 			.closest('article');
+		const kitchen = page.getByRole('button', { name: 'Kitchen, Off' }).element().closest('article');
 
 		if (!living || !kitchen) {
 			throw new Error('Missing area row');
