@@ -70,6 +70,8 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 	const brightness = reader(light.brightness);
 	const color = reader(light.color);
 	const temperature = reader(light.temperature);
+	const gamut = reader(light.gamut);
+	const mirekRange = reader(light.mirekRange);
 	const colors = reader(light.colors);
 
 	return {
@@ -88,6 +90,12 @@ function createSvelteLight(light: ReadonlyLight): SvelteLight {
 		},
 		get temperature() {
 			return temperature();
+		},
+		get gamut() {
+			return gamut();
+		},
+		get mirekRange() {
+			return mirekRange();
 		},
 		get colors() {
 			return colors();

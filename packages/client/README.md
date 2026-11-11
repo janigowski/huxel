@@ -27,27 +27,27 @@ This package stores nothing on purpose. Pass the bridge address and the applicat
 
 The percent is resource types in the CLIP v2 notes stored in this repo. A type counts as supported when the client has typed methods for it.
 
-| Area | Progress | Share |
-| --- | --- | --- |
-| Lights and groups | 2 of 2 · `light`, `grouped_light` | 100% |
-| Rooms, zones, home | 3 of 3 · `room`, `zone`, `bridge_home` | 100% |
-| Scenes | 2 of 2 · `scene`, `smart_scene` | 100% |
-| Bridge and devices | 2 of 2 · `bridge`, `device` | 100% |
-| Resource catalog | 1 of 1 · `/resource` | 100% |
-| Sensors and input | 0 of 16 | 0% |
-| Connectivity and power | 0 of 6 | 0% |
-| Behavior | 0 of 3 | 0% |
-| Entertainment | 0 of 2 | 0% |
-| Matter and HomeKit | 0 of 3 | 0% |
-| Configuration and other | 0 of 6 | 0% |
-| **All resource types** | **10 of 46** | **22%** |
+| Area                    | Progress                               | Share   |
+| ----------------------- | -------------------------------------- | ------- |
+| Lights and groups       | 2 of 2 · `light`, `grouped_light`      | 100%    |
+| Rooms, zones, home      | 3 of 3 · `room`, `zone`, `bridge_home` | 100%    |
+| Scenes                  | 2 of 2 · `scene`, `smart_scene`        | 100%    |
+| Bridge and devices      | 2 of 2 · `bridge`, `device`            | 100%    |
+| Resource catalog        | 1 of 1 · `/resource`                   | 100%    |
+| Sensors and input       | 0 of 16                                | 0%      |
+| Connectivity and power  | 0 of 6                                 | 0%      |
+| Behavior                | 0 of 3                                 | 0%      |
+| Entertainment           | 0 of 2                                 | 0%      |
+| Matter and HomeKit      | 0 of 3                                 | 0%      |
+| Configuration and other | 0 of 6                                 | 0%      |
+| **All resource types**  | **10 of 46**                           | **22%** |
 
-| Also in the client | Status |
-| --- | --- |
-| Bridge discovery | Supported |
-| Link-button registration | Supported |
-| Event stream (SSE) | Supported |
-| Entertainment streaming | Not started |
+| Also in the client       | Status      |
+| ------------------------ | ----------- |
+| Bridge discovery         | Supported   |
+| Link-button registration | Supported   |
+| Event stream (SSE)       | Supported   |
+| Entertainment streaming  | Not started |
 
 ## Bridge address
 

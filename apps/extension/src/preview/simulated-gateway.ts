@@ -1,4 +1,12 @@
-import type { BridgeArea, BridgeLight, HueGateway, LightChangeObserver, XyColor } from '@huxel/app';
+import {
+	hexToXy,
+	mirekToHex,
+	type BridgeArea,
+	type BridgeLight,
+	type HueGateway,
+	type LightChangeObserver,
+	type XyColor
+} from '@huxel/app';
 
 export interface SimulatedGatewayOptions {
 	latencyMs?: number;
@@ -75,11 +83,17 @@ export class SimulatedGateway implements HueGateway {
 	}
 
 	async setColor(lightId: string, color: XyColor): Promise<void> {
-		await this.update(lightId, { color });
+		const light = this.lights.get(lightId);
+		const temperature = light?.temperature ? { mirek: null } : undefined;
+
+		await this.update(lightId, { color, ...(temperature ? { temperature } : {}) });
 	}
 
 	async setTemperature(lightId: string, mirek: number): Promise<void> {
-		await this.update(lightId, { temperature: { mirek } });
+		const light = this.lights.get(lightId);
+		const color = light?.color ? hexToXy(mirekToHex(mirek)) : undefined;
+
+		await this.update(lightId, { temperature: { mirek }, ...(color ? { color } : {}) });
 	}
 
 	watch(observer: LightChangeObserver): () => void {

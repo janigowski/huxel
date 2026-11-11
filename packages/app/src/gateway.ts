@@ -1,5 +1,5 @@
-import type { XyColor } from './color';
-import type { ColorTemperature } from './temperature';
+import type { GamutTriangle, XyColor } from './color';
+import type { ColorTemperature, MirekRange } from './temperature';
 
 /** Light state as reported by the bridge, in domain terms. */
 export interface BridgeLight {
@@ -11,6 +11,8 @@ export interface BridgeLight {
 	color: XyColor | null;
 	/** `null` when the light has no color temperature. */
 	temperature: ColorTemperature | null;
+	gamut?: GamutTriangle | null;
+	mirekRange?: MirekRange | null;
 }
 
 export type HueAppConnection = 'offline' | 'connecting' | 'live' | 'reconnecting';

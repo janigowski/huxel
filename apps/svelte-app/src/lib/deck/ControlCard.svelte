@@ -48,7 +48,11 @@
 	const glow = $derived(colors[0] ?? 'var(--foreground-emphasis-primary)');
 </script>
 
-<article class={['card', { lit: isOn, line: singleRow }]} style:--glow={glow} aria-labelledby={nameId}>
+<article
+	class={['card', { lit: isOn, line: singleRow }]}
+	style:--glow={glow}
+	aria-labelledby={nameId}
+>
 	{#if showGradient}
 		<GradientBar {colors} {opacity} orientation={singleRow ? 'vertical' : 'horizontal'} />
 	{/if}

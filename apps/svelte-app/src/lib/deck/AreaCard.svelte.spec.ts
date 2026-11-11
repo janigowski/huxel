@@ -35,23 +35,21 @@ async function renderCard(area: SvelteArea = living) {
 }
 
 describe('AreaCard', () => {
-	it('paints child colors as a 14px bar across the card', async () => {
+	it('paints child colors as a 14px bar along the card', async () => {
 		const { article, bar } = await renderCard();
 		const style = getComputedStyle(bar);
 
-		expect(bar.clientWidth).toBe(article.clientWidth);
-		expect(style.height).toBe('14px');
+		expect(style.width).toBe('14px');
+		expect(bar.clientHeight).toBe(article.clientHeight);
 		expect(bar.style.getPropertyValue('--stops')).toBe('#ff0000, #0000ff');
-		expect(style.backgroundImage).toContain('rgb(255, 0, 0)');
-		expect(style.backgroundImage).toContain('rgb(0, 0, 255)');
-		expect(style.backgroundImage).toMatch(/to right|90deg/);
+		expect(style.backgroundImage).toBe('linear-gradient(rgb(255, 0, 0), rgb(0, 0, 255))');
 		expect(bar.style.opacity).toBe(String(gradientOpacity(true, 80)));
 	});
 
 	it('keeps the same bar when the room is off', async () => {
 		const { bar } = await renderCard({ ...living, isOn: false, brightness: 10 });
 
-		expect(getComputedStyle(bar).height).toBe('14px');
+		expect(getComputedStyle(bar).width).toBe('14px');
 		expect(bar.style.opacity).toBe(String(gradientOpacity(false, 10)));
 	});
 
@@ -90,6 +88,6 @@ describe('AreaCard', () => {
 
 		expect(bar.className).toContain('empty');
 		expect(getComputedStyle(bar).backgroundImage).toContain('repeating-linear-gradient');
-		expect(getComputedStyle(bar).height).toBe('14px');
+		expect(getComputedStyle(bar).width).toBe('14px');
 	});
 });

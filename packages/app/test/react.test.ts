@@ -115,6 +115,8 @@ describe('useHueApp', () => {
 				brightness: 40,
 				color: { x: 0.3, y: 0.3 },
 				temperature: null,
+				gamut: null,
+				mirekRange: null,
 				colors: [xyToHex({ x: 0.3, y: 0.3 })]
 			},
 			{
@@ -124,6 +126,8 @@ describe('useHueApp', () => {
 				brightness: null,
 				color: null,
 				temperature: null,
+				gamut: null,
+				mirekRange: null,
 				colors: []
 			}
 		]);
