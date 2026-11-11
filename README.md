@@ -70,6 +70,6 @@ bun run lint
 bun run test
 ```
 
-Root scripts run in every workspace in dependency order, so `@huxel/client` builds before `@huxel/app`, `@huxel/app` before `@huxel/design-system`, and all of them before the apps. Apps consume the libraries' `dist/` builds, so build the libraries before running an app. Run a script in a single workspace with `bunx vp run --filter <name> <script>`.
+Root scripts run in every workspace in dependency order, so `@huxel/client` builds before `@huxel/app`, `@huxel/app` before `@huxel/design-system`, and all of them before the apps. Apps consume the libraries' `dist/` builds. `bun run dev` in `svelte-app` and `extension` builds those libraries first. Build `@huxel/client` and `@huxel/app` before starting `tui-app`. Run a script in a single workspace with `bunx vp run --filter <name> <script>`.
 
 Formatting settings are shared across the repository in the root `vite.config.ts`: `bun run format`.
