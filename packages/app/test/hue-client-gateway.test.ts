@@ -1,6 +1,7 @@
 import { createHueClient, HueApiError, HueNetworkError } from '@huxel/client';
 import type { HttpClient, HttpRequest, HttpResponse } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
+import { GAMUT_C } from '../src/color';
 import { HueClientGateway } from '../src/hue-client-gateway';
 
 interface Reply {
@@ -84,7 +85,8 @@ describe('HueClientGateway', () => {
 					isOn: true,
 					brightness: 54.7,
 					color: { x: 0.4573, y: 0.41 },
-					temperature: null
+					temperature: null,
+					gamut: GAMUT_C
 				},
 				{
 					id: 'b',
@@ -92,7 +94,8 @@ describe('HueClientGateway', () => {
 					isOn: false,
 					brightness: 80,
 					color: null,
-					temperature: { mirek: 447 }
+					temperature: { mirek: 447 },
+					mirekRange: { minimum: 153, maximum: 500 }
 				},
 				{ id: 'c', name: 'Plug', isOn: false, brightness: null, color: null, temperature: null }
 			]);
@@ -100,6 +103,47 @@ describe('HueClientGateway', () => {
 				method: 'GET',
 				url: 'https://bridge.local/clip/v2/resource/light'
 			});
+		});
+
+		it('prefers the reported gamut triangle over gamut type and keeps a narrow mirek schema', async () => {
+			const triangle = {
+				red: { x: 0.64, y: 0.33 },
+				green: { x: 0.3, y: 0.6 },
+				blue: { x: 0.15, y: 0.06 }
+			};
+			const { gateway } = setup({
+				body: {
+					errors: [],
+					data: [
+						{
+							...lightFixture('a', 'Strip', true, { brightness: 40 }, { x: 0.4, y: 0.4 }),
+							color: {
+								xy: { x: 0.4, y: 0.4 },
+								gamut_type: 'C',
+								gamut: triangle
+							},
+							color_temperature: {
+								mirek: null,
+								mirek_valid: false,
+								mirek_schema: { mirek_minimum: 200, mirek_maximum: 400 }
+							}
+						}
+					]
+				}
+			});
+
+			await expect(gateway.listLights()).resolves.toEqual([
+				{
+					id: 'a',
+					name: 'Strip',
+					isOn: true,
+					brightness: 40,
+					color: { x: 0.4, y: 0.4 },
+					temperature: { mirek: null },
+					gamut: triangle,
+					mirekRange: { minimum: 200, maximum: 400 }
+				}
+			]);
 		});
 
 		it('rejects on HTTP errors', async () => {

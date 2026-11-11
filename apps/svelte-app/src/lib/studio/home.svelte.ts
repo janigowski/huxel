@@ -8,6 +8,8 @@ import {
 	type HueAppConnection,
 	type HueAppStatus,
 	type PresetId,
+	type GamutTriangle,
+	type MirekRange,
 	type XyColor
 } from '@huxel/app';
 import type { SvelteArea, SvelteHueApp, SvelteLight } from '@huxel/app/svelte';
@@ -19,6 +21,8 @@ interface StudioLight {
 	brightness: number | null;
 	color: XyColor | null;
 	temperature: ColorTemperature | null;
+	gamut: GamutTriangle | null;
+	mirekRange: MirekRange | null;
 	colors: string[];
 }
 
@@ -48,6 +52,8 @@ function temperatureLight(
 		brightness,
 		color: null,
 		temperature: { mirek },
+		gamut: null,
+		mirekRange: null,
 		colors: [mirekToHex(mirek)]
 	};
 }
@@ -67,6 +73,8 @@ function colorLight(
 		brightness,
 		color: { x: color.x, y: color.y },
 		temperature: null,
+		gamut: null,
+		mirekRange: null,
 		colors: [hex]
 	};
 }
@@ -203,25 +211,37 @@ export class StudioHome implements SvelteHueApp {
 	}
 
 	dimRoom(roomId: string, brightness: number): Promise<void> {
-		this.dimGroup(this.roomGroups.find((group) => group.id === roomId), brightness);
+		this.dimGroup(
+			this.roomGroups.find((group) => group.id === roomId),
+			brightness
+		);
 
 		return Promise.resolve();
 	}
 
 	changeRoomColor(roomId: string, color: XyColor): Promise<void> {
-		this.paintGroup(this.roomGroups.find((group) => group.id === roomId), color);
+		this.paintGroup(
+			this.roomGroups.find((group) => group.id === roomId),
+			color
+		);
 
 		return Promise.resolve();
 	}
 
 	changeRoomTemperature(roomId: string, mirek: number): Promise<void> {
-		this.warmGroup(this.roomGroups.find((group) => group.id === roomId), mirek);
+		this.warmGroup(
+			this.roomGroups.find((group) => group.id === roomId),
+			mirek
+		);
 
 		return Promise.resolve();
 	}
 
 	applyRoomPreset(roomId: string, preset: PresetId): Promise<void> {
-		this.applyGroup(this.roomGroups.find((group) => group.id === roomId), preset);
+		this.applyGroup(
+			this.roomGroups.find((group) => group.id === roomId),
+			preset
+		);
 
 		return Promise.resolve();
 	}
@@ -233,25 +253,37 @@ export class StudioHome implements SvelteHueApp {
 	}
 
 	dimZone(zoneId: string, brightness: number): Promise<void> {
-		this.dimGroup(this.zoneGroups.find((group) => group.id === zoneId), brightness);
+		this.dimGroup(
+			this.zoneGroups.find((group) => group.id === zoneId),
+			brightness
+		);
 
 		return Promise.resolve();
 	}
 
 	changeZoneColor(zoneId: string, color: XyColor): Promise<void> {
-		this.paintGroup(this.zoneGroups.find((group) => group.id === zoneId), color);
+		this.paintGroup(
+			this.zoneGroups.find((group) => group.id === zoneId),
+			color
+		);
 
 		return Promise.resolve();
 	}
 
 	changeZoneTemperature(zoneId: string, mirek: number): Promise<void> {
-		this.warmGroup(this.zoneGroups.find((group) => group.id === zoneId), mirek);
+		this.warmGroup(
+			this.zoneGroups.find((group) => group.id === zoneId),
+			mirek
+		);
 
 		return Promise.resolve();
 	}
 
 	applyZonePreset(zoneId: string, preset: PresetId): Promise<void> {
-		this.applyGroup(this.zoneGroups.find((group) => group.id === zoneId), preset);
+		this.applyGroup(
+			this.zoneGroups.find((group) => group.id === zoneId),
+			preset
+		);
 
 		return Promise.resolve();
 	}

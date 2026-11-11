@@ -11,8 +11,14 @@ import type {
 import { AreaCatalog } from './area-catalog';
 import { AreaEventSession } from './area-event-session';
 import { ChildLights } from './child-lights';
-import { xyColorFrom, type XyColor } from './color';
-import { temperatureFrom, temperatureOf } from './temperature';
+import { gamutForType, xyColorFrom, type GamutTriangle, type XyColor } from './color';
+import {
+	DEFAULT_MIREK_RANGE,
+	isMirek,
+	temperatureFrom,
+	temperatureOf,
+	type MirekRange
+} from './temperature';
 import type {
 	AreaChange,
 	BridgeArea,
@@ -230,14 +236,16 @@ function fromEventResource(resource: LightEventResource): BridgeLight | undefine
 		return undefined;
 	}
 	const brightness = resource.dimming?.brightness;
-	return {
+	return lightRecord({
 		id: resource.id,
 		name,
 		isOn,
 		brightness: typeof brightness === 'number' ? brightness : null,
 		color: xyColorFrom(resource.color?.xy),
-		temperature: temperatureOf(resource.color_temperature)
-	};
+		temperature: temperatureOf(resource.color_temperature),
+		gamut: gamutOf(resource.color),
+		mirekRange: mirekRangeOf(resource.color_temperature)
+	});
 }
 
 function toLightUpdate(resource: LightEventResource): LightUpdate | undefined {
@@ -267,14 +275,72 @@ function toLightUpdate(resource: LightEventResource): LightUpdate | undefined {
 }
 
 function toBridgeLight(light: LightGet): BridgeLight {
-	return {
+	return lightRecord({
 		id: light.id,
 		name: light.metadata.name,
 		isOn: light.on.on,
 		brightness: light.dimming?.brightness ?? null,
 		color: xyColorFrom(light.color?.xy),
-		temperature: temperatureOf(light.color_temperature)
+		temperature: temperatureOf(light.color_temperature),
+		gamut: gamutOf(light.color),
+		mirekRange: mirekRangeOf(light.color_temperature)
+	});
+}
+
+function lightRecord(light: BridgeLight): BridgeLight {
+	return {
+		id: light.id,
+		name: light.name,
+		isOn: light.isOn,
+		brightness: light.brightness,
+		color: light.color,
+		temperature: light.temperature,
+		...(light.gamut ? { gamut: light.gamut } : {}),
+		...(light.mirekRange ? { mirekRange: light.mirekRange } : {})
 	};
+}
+
+function gamutOf(
+	color: { gamut?: GamutTriangle; gamut_type?: string } | undefined
+): GamutTriangle | null {
+	const reported = color?.gamut;
+
+	if (reported && isPoint(reported.red) && isPoint(reported.green) && isPoint(reported.blue)) {
+		return Object.freeze({
+			red: Object.freeze({ x: reported.red.x, y: reported.red.y }),
+			green: Object.freeze({ x: reported.green.x, y: reported.green.y }),
+			blue: Object.freeze({ x: reported.blue.x, y: reported.blue.y })
+		});
+	}
+
+	return gamutForType(color?.gamut_type);
+}
+
+function mirekRangeOf(
+	feature: { mirek_schema?: { mirek_minimum?: number; mirek_maximum?: number } } | undefined
+): MirekRange | null {
+	if (!feature) {
+		return null;
+	}
+
+	const minimum = feature.mirek_schema?.mirek_minimum;
+	const maximum = feature.mirek_schema?.mirek_maximum;
+
+	if (
+		typeof minimum === 'number' &&
+		typeof maximum === 'number' &&
+		minimum <= maximum &&
+		isMirek(minimum) &&
+		isMirek(maximum)
+	) {
+		return Object.freeze({ minimum, maximum });
+	}
+
+	return DEFAULT_MIREK_RANGE;
+}
+
+function isPoint(value: { x?: number; y?: number } | undefined): value is { x: number; y: number } {
+	return !!value && Number.isFinite(value.x) && Number.isFinite(value.y);
 }
 
 function assertApplied(target: string, response: ResourceIdentifierResponse): void {

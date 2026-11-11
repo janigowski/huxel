@@ -133,6 +133,7 @@ export class LiveSync {
 			const state = remote.get(id);
 			if (state) {
 				this.apply(light, withoutFields(state, resync.overrides.get(id)));
+				this.applyCapabilities(light, state);
 				next.set(id, light);
 			} else if (resync.existence.get(id) === 'added') {
 				next.set(id, light);
@@ -181,6 +182,7 @@ export class LiveSync {
 						const light = lights().get(id);
 						if (light) {
 							this.apply(light, fields);
+							this.applyCapabilities(light, change.light);
 						} else {
 							editable().set(id, new Light(change.light));
 						}
@@ -227,6 +229,16 @@ export class LiveSync {
 		}
 		if (fields.temperature !== undefined) {
 			this.target.lanes.get(light).temperature.reconcile(fields.temperature);
+		}
+	}
+
+	private applyCapabilities(light: Light, state: BridgeLight): void {
+		if (state.gamut !== undefined) {
+			light.setGamut(state.gamut);
+		}
+
+		if (state.mirekRange !== undefined) {
+			light.setMirekRange(state.mirekRange);
 		}
 	}
 }

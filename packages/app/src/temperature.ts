@@ -6,6 +6,13 @@ export interface ColorTemperature {
 const MIREK_MIN = 50;
 const MIREK_MAX = 1000;
 
+export interface MirekRange {
+	readonly minimum: number;
+	readonly maximum: number;
+}
+
+export const DEFAULT_MIREK_RANGE: MirekRange = Object.freeze({ minimum: 153, maximum: 500 });
+
 export function isMirek(value: unknown): value is number {
 	return (
 		typeof value === 'number' && Number.isInteger(value) && value >= MIREK_MIN && value <= MIREK_MAX
@@ -54,6 +61,50 @@ export function temperatureFrom(feature: unknown): ColorTemperature | undefined 
 	}
 
 	return undefined;
+}
+
+export function clampMirek(mirek: number, range: MirekRange = DEFAULT_MIREK_RANGE): number {
+	const rounded = Math.round(mirek);
+
+	if (!Number.isFinite(rounded)) {
+		return range.minimum;
+	}
+
+	return Math.min(range.maximum, Math.max(range.minimum, rounded));
+}
+
+export function kelvinFromMirek(mirek: number): number {
+	if (!isMirek(mirek)) {
+		throw new TypeError(
+			`Expected a mirek from ${MIREK_MIN} to ${MIREK_MAX}, received ${String(mirek)}`
+		);
+	}
+
+	return Math.round(1_000_000 / mirek);
+}
+
+export function mirekFromKelvin(kelvin: number, range: MirekRange = DEFAULT_MIREK_RANGE): number {
+	if (!Number.isFinite(kelvin) || kelvin <= 0) {
+		return range.minimum;
+	}
+
+	return clampMirek(Math.round(1_000_000 / kelvin), range);
+}
+
+export function sameMirekRange(a: MirekRange | null, b: MirekRange | null): boolean {
+	if (a === null || b === null) {
+		return a === b;
+	}
+
+	return a.minimum === b.minimum && a.maximum === b.maximum;
+}
+
+export function freezeMirekRange(range: MirekRange | null): MirekRange | null {
+	if (range === null) {
+		return null;
+	}
+
+	return Object.freeze({ minimum: range.minimum, maximum: range.maximum });
 }
 
 export function mirekToHex(mirek: number): string {

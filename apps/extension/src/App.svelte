@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { AreaSection, ConnectPanel, DashboardBar, Hero, Notice } from '@huxel/design-system';
+	import {
+		AreaSection,
+		ConnectPanel,
+		DashboardBar,
+		Hero,
+		LightSection,
+		Notice
+	} from '@huxel/design-system';
 	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 	import { bridgeOrigin, parseBridgeHost } from './bridge/bridge-host';
@@ -58,6 +65,15 @@
 		{:else}
 			{@const loading = hue.status === 'idle' || hue.status === 'loading'}
 
+			<LightSection
+				title="Lights"
+				lights={hue.lights.all}
+				{loading}
+				ontoggle={(id) => hue.toggleLight(id)}
+				ondim={(id, brightness) => hue.dimLight(id, brightness)}
+				onchangecolor={(id, color) => hue.changeColor(id, color)}
+				onchangetemperature={(id, mirek) => hue.changeTemperature(id, mirek)}
+			/>
 			<AreaSection
 				title="Rooms"
 				areas={hue.rooms.all}
