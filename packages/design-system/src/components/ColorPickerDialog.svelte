@@ -14,7 +14,7 @@
 	} from '@huxel/app';
 	import { onDestroy } from 'svelte';
 	import ColorWheel from './ColorWheel.svelte';
-	import TemperatureSlider from './TemperatureSlider.svelte';
+	import TemperatureWheel from './TemperatureWheel.svelte';
 	import { EmitGate } from '../emit-gate';
 
 	interface Props {
@@ -25,6 +25,8 @@
 		brightness: number | null;
 		gamut?: GamutTriangle | null;
 		mirekRange?: MirekRange | null;
+		supportsColor?: boolean;
+		supportsTemperature?: boolean;
 		oncolor: (color: XyColor) => void;
 		ontemperature: (mirek: number) => void;
 		onbrightness?: (brightness: number) => void;
@@ -38,6 +40,8 @@
 		brightness,
 		gamut = null,
 		mirekRange = null,
+		supportsColor,
+		supportsTemperature,
 		oncolor,
 		ontemperature,
 		onbrightness
@@ -47,8 +51,10 @@
 	const colorGate = new EmitGate();
 	const whiteGate = new EmitGate();
 	const levelGate = new EmitGate();
-	const activeGamut = $derived(color === null ? null : (gamut ?? GAMUT_C));
-	const activeRange = $derived(temperature === null ? null : (mirekRange ?? DEFAULT_MIREK_RANGE));
+	const colorEnabled = $derived(supportsColor ?? color !== null);
+	const temperatureEnabled = $derived(supportsTemperature ?? temperature !== null);
+	const activeGamut = $derived(colorEnabled ? (gamut ?? GAMUT_C) : null);
+	const activeRange = $derived(temperatureEnabled ? (mirekRange ?? DEFAULT_MIREK_RANGE) : null);
 	const both = $derived(activeGamut !== null && activeRange !== null);
 
 	interface Draft {
@@ -211,35 +217,31 @@
 
 	{#if both}
 		<div class="modes" role="radiogroup" aria-label="Color mode">
-			<label class="mode">
-				<input
-					class="visually-hidden"
-					type="radio"
-					name="{id}-mode"
-					value="color"
-					checked={view.mode === 'color'}
-					onchange={() => selectMode('color')}
-				/>
-				Color
-			</label>
-			<label class="mode">
-				<input
-					class="visually-hidden"
-					type="radio"
-					name="{id}-mode"
-					value="white"
-					checked={view.mode === 'white'}
-					onchange={() => selectMode('white')}
-				/>
-				White
-			</label>
+			<input
+				class="circle color"
+				type="radio"
+				name="{id}-mode"
+				value="color"
+				aria-label="Color"
+				checked={view.mode === 'color'}
+				onchange={() => selectMode('color')}
+			/>
+			<input
+				class="circle temperature"
+				type="radio"
+				name="{id}-mode"
+				value="white"
+				aria-label="Temperature"
+				checked={view.mode === 'white'}
+				onchange={() => selectMode('white')}
+			/>
 		</div>
 	{/if}
 
 	{#if view.mode === 'color' && activeGamut}
 		<ColorWheel hue={view.hue} saturation={view.saturation} color={preview} onchange={onWheel} />
 	{:else if view.mode === 'white' && activeRange}
-		<TemperatureSlider mirek={view.mirek} range={activeRange} onchange={onMirek} />
+		<TemperatureWheel mirek={view.mirek} range={activeRange} onchange={onMirek} />
 	{/if}
 
 	{#if brightness !== null}
@@ -311,34 +313,43 @@
 	}
 
 	.modes {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: var(--space-1);
+		display: flex;
+		justify-content: center;
+		gap: var(--space-4);
 		margin-block-end: var(--space-4);
-		padding: var(--space-1);
-		border-radius: var(--radius-control);
-		background: var(--background-neutral-strong);
 	}
 
-	.mode {
-		display: grid;
-		place-items: center;
-		min-height: var(--size-small);
-		border-radius: calc(var(--radius-control) - var(--space-1));
-		color: var(--foreground-neutral-secondary);
-		font-size: var(--font-size-body-2);
-		font-weight: var(--font-weight-medium);
+	.circle {
+		display: block;
+		width: 4.5rem;
+		height: 4.5rem;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		box-shadow: inset 0 0 0 var(--border-width) rgb(0 0 0 / 0.35);
+		appearance: none;
 		cursor: pointer;
 	}
 
-	.mode:has(:checked) {
-		background: var(--background-emphasis-strong);
-		color: var(--foreground-emphasis-on-fill);
+	.color {
+		background:
+			radial-gradient(circle, #fff 0%, transparent 68%),
+			conic-gradient(#f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
 	}
 
-	.mode:has(:focus-visible) {
+	.temperature {
+		background: linear-gradient(to right, #ffb25a, #fff1d6, #d6e8ff);
+	}
+
+	.circle:checked {
 		outline: var(--focus-width) solid var(--focus-border);
 		outline-offset: var(--space-1);
+	}
+
+	.circle:focus-visible {
+		outline: var(--focus-width) solid var(--focus-border);
+		outline-offset: var(--space-2);
 	}
 
 	.dim {
@@ -361,17 +372,5 @@
 		color: var(--foreground-neutral-primary);
 		font-variant-numeric: tabular-nums;
 		text-align: end;
-	}
-
-	.visually-hidden {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		margin: -1px;
-		padding: 0;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
-		border: 0;
 	}
 </style>

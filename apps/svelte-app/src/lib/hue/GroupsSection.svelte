@@ -2,7 +2,7 @@
 	import AreaList from '$lib/deck/AreaList.svelte';
 	import Notice from '$lib/deck/Notice.svelte';
 	import SectionBar from '$lib/deck/SectionBar.svelte';
-	import { describeError, type PresetId, type XyColor } from '@huxel/app';
+	import { describeError, type XyColor } from '@huxel/app';
 	import type { SvelteArea } from '@huxel/app/svelte';
 
 	interface Props {
@@ -12,10 +12,11 @@
 		ontoggle: (id: string) => Promise<void>;
 		ondim: (id: string, brightness: number) => Promise<void>;
 		onchangecolor: (id: string, color: XyColor) => Promise<void>;
-		onapplypreset: (id: string, preset: PresetId) => Promise<void>;
+		onchangetemperature: (id: string, mirek: number) => Promise<void>;
 	}
 
-	let { title, groups, loading, ontoggle, ondim, onchangecolor, onapplypreset }: Props = $props();
+	let { title, groups, loading, ontoggle, ondim, onchangecolor, onchangetemperature }: Props =
+		$props();
 
 	let commandError = $state<string | null>(null);
 
@@ -51,7 +52,7 @@
 			ontoggle={(id) => run(ontoggle(id))}
 			ondim={(id, brightness) => run(ondim(id, brightness))}
 			onchangecolor={(id, color) => run(onchangecolor(id, color))}
-			onapplypreset={(id, preset) => run(onapplypreset(id, preset))}
+			onchangetemperature={(id, mirek) => run(onchangetemperature(id, mirek))}
 		/>
 	{/if}
 </section>

@@ -70,7 +70,7 @@ describe('ColorPickerDialog', () => {
 	it('switches to the light mirek range and applies white live', async () => {
 		const { ontemperature } = await renderPicker();
 
-		await page.getByText('White', { exact: true }).click();
+		await page.getByRole('radio', { name: 'Temperature' }).click();
 
 		const slider = page.getByRole('slider', { name: 'Color temperature' });
 
@@ -115,7 +115,7 @@ describe('ColorPickerDialog', () => {
 		await renderPicker({ temperature: null, mirekRange: null });
 
 		await expect.element(page.getByRole('slider', { name: 'Hue and saturation' })).toBeVisible();
-		await expect.element(page.getByRole('radio', { name: 'White' })).not.toBeInTheDocument();
+		await expect.element(page.getByRole('radio', { name: 'Temperature' })).not.toBeInTheDocument();
 		await expect
 			.element(page.getByRole('slider', { name: 'Color temperature' }))
 			.not.toBeInTheDocument();

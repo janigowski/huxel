@@ -251,6 +251,36 @@ describe('rooms and zones', () => {
 		await second;
 	});
 
+	it('sets a room color when the grouped light has the color feature but no shared xy', async () => {
+		const room: BridgeArea = { ...living, color: null, supportsColor: true, isOn: true };
+		const { app, gateway } = await setup({ rooms: [room], zones: [] });
+		const command = app.changeRoomColor('living', { x: 0.3, y: 0.3 });
+
+		expect(app.state.rooms.get('living')?.color.value).toEqual({ x: 0.3, y: 0.3 });
+		expect(gateway.areaColor[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: { x: 0.3, y: 0.3 }
+		});
+		gateway.areaColor[0]?.result.resolve();
+		await command;
+	});
+
+	it('sets a room color when a child light supports color and the group has no xy', async () => {
+		const room: BridgeArea = {
+			...living,
+			color: null,
+			supportsColor: false,
+			isOn: true,
+			children: ['desk']
+		};
+		const { app, gateway } = await setup({ rooms: [room], zones: [] });
+		const command = app.changeRoomColor('living', { x: 0.4, y: 0.5 });
+
+		expect(gateway.areaColor[0]?.value).toEqual({ x: 0.4, y: 0.5 });
+		gateway.areaColor[0]?.result.resolve();
+		await command;
+	});
+
 	it('rejects invalid room commands', async () => {
 		const { app } = await setup();
 

@@ -16,7 +16,7 @@ export class ChangeAreaColor {
 			throw new InvalidColorError(color);
 		}
 
-		if (area.color.peek() === null) {
+		if (!area.supportsColor.peek()) {
 			throw new AreaNotColorCapableError(kind, area.id);
 		}
 

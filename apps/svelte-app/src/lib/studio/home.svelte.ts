@@ -300,6 +300,8 @@ export class StudioHome implements SvelteHueApp {
 			isOn: members.some((light) => light.isOn),
 			brightness: averageBrightness(members),
 			color: sharedColor(members),
+			supportsColor: members.some((light) => light.color !== null || light.gamut !== null),
+			supportsTemperature: members.some((light) => light.temperature !== null),
 			temperature: sharedTemperature(members),
 			colors: uniqueColors(members.flatMap((light) => light.colors))
 		};

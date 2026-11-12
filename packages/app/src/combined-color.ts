@@ -30,6 +30,34 @@ export class CombinedColor {
 		return found;
 	}
 
+	anyColorCapable(): boolean {
+		const lights = this.lights.value;
+
+		for (const id of this.childIds.value) {
+			const light = lights.get(id);
+
+			if (light && (light.color.value !== null || light.gamut.value !== null)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	anyTemperatureCapable(): boolean {
+		const lights = this.lights.value;
+
+		for (const id of this.childIds.value) {
+			const light = lights.get(id);
+
+			if (light && light.temperature.value !== null) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	setChildren(childIds: readonly string[]): void {
 		const current = this.childIds.peek();
 

@@ -108,6 +108,8 @@ function createSvelteArea(area: ReadonlyArea): SvelteArea {
 	const isOn = reader(area.isOn);
 	const brightness = reader(area.brightness);
 	const color = reader(area.color);
+	const supportsColor = reader(area.supportsColor);
+	const supportsTemperature = reader(area.supportsTemperature);
 	const temperature = reader(area.temperature);
 	const colors = reader(area.colors);
 
@@ -124,6 +126,12 @@ function createSvelteArea(area: ReadonlyArea): SvelteArea {
 		},
 		get color() {
 			return color();
+		},
+		get supportsColor() {
+			return supportsColor();
+		},
+		get supportsTemperature() {
+			return supportsTemperature();
 		},
 		get temperature() {
 			return temperature();

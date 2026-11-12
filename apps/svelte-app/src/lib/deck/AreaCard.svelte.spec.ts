@@ -24,8 +24,7 @@ async function renderCard(area: SvelteArea = living) {
 		area,
 		ontoggle: vi.fn(),
 		ondim: vi.fn(),
-		oneditcolor: vi.fn(),
-		oneditpresets: vi.fn()
+		oneditcolor: vi.fn()
 	});
 
 	const article = page.getByRole('article').element();
@@ -53,33 +52,34 @@ describe('AreaCard', () => {
 		expect(bar.style.opacity).toBe(String(gradientOpacity(false, 10)));
 	});
 
-	it('offers presets when the room can take color and brightness', async () => {
+	it('offers one color control and no preset control', async () => {
 		await renderCard();
 
-		await expect
-			.element(page.getByRole('button', { name: 'Living room presets, Custom' }))
-			.toBeVisible();
+		await expect.element(page.getByRole('button', { name: /Living room color/ })).toBeVisible();
+		await expect.element(page.getByRole('button', { name: /presets/ })).not.toBeInTheDocument();
 	});
 
-	it('names the active preset from mirek when the room has no xy color', async () => {
+	it('offers the same color control for a white room', async () => {
 		await renderCard({
 			...living,
 			color: null,
 			brightness: 57,
 			temperature: { mirek: 447 },
+			supportsTemperature: true,
 			colors: ['#ff942b']
 		});
 
 		await expect
-			.element(page.getByRole('button', { name: 'Living room presets, Relax' }))
+			.element(page.getByRole('button', { name: 'Living room color, White' }))
 			.toBeVisible();
+		await expect.element(page.getByRole('button', { name: /presets/ })).not.toBeInTheDocument();
 	});
 
-	it('offers presets when the room has no grouped color', async () => {
+	it('offers the color control when the room lights do not share one color', async () => {
 		await renderCard({ ...living, color: null, colors: ['#ffe94d'] });
 
 		await expect
-			.element(page.getByRole('button', { name: 'Living room presets, Custom' }))
+			.element(page.getByRole('button', { name: 'Living room color, Custom' }))
 			.toBeVisible();
 	});
 

@@ -41,6 +41,7 @@ export interface BridgeArea {
 	/** Normalized 0–100, or `null` when the group cannot be dimmed. */
 	brightness: number | null;
 	color: XyColor | null;
+	supportsColor?: boolean;
 	/** `null` when the grouped light has no color temperature. */
 	temperature: ColorTemperature | null;
 	/** Light ids that contribute to `colors`, in child order. */
