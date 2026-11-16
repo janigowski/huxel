@@ -6,9 +6,8 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"dev": "vp dev",
-		"watch": "vp build --watch",
-		"watch:shared": "vp build --watch --outDir \"$HOME/Documents/Extensions/hue-remote\" --emptyOutDir",
+		"dev": "vp run --filter 'extension^...' build && vp dev",
+		"watch": "vp run --filter 'extension^...' build && vp build --watch --outDir dist",
 		"build": "vp build",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"lint": "eslint .",

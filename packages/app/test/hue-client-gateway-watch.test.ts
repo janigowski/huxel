@@ -8,6 +8,7 @@ import type {
 	LightGet
 } from '@huxel/client';
 import { describe, expect, it, vi } from 'vite-plus/test';
+import { GAMUT_C } from '../src/color';
 import { HueClientGateway } from '../src/hue-client-gateway';
 import { createHueApp } from '../src/index';
 import type { HueAppConnection, LightChange, LightChangeObserver } from '../src/index';
@@ -188,7 +189,9 @@ describe('HueClientGateway.watch', () => {
 						isOn: true,
 						brightness: 50,
 						color: { x: 0.3, y: 0.6 },
-						temperature: null
+						supportsColor: true,
+						temperature: null,
+						gamut: GAMUT_C
 					}
 				},
 				{
@@ -226,6 +229,7 @@ describe('HueClientGateway.watch', () => {
 						isOn: true,
 						brightness: 70,
 						color: { x: 0.5, y: 0.4 },
+						supportsColor: true,
 						temperature: null
 					}
 				}

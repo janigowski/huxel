@@ -22,8 +22,7 @@ const meta = {
 	parameters: {
 		docs: {
 			description: {
-				component:
-					'Focus a column resizer and press Arrow Left or Arrow Right to change its width.'
+				component: 'Focus a column resizer and press Arrow Left or Arrow Right to change its width.'
 			}
 		}
 	}

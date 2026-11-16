@@ -67,6 +67,7 @@ export class AreaCatalog {
 			isOn: light.on?.on ?? false,
 			brightness: typeof light.dimming?.brightness === 'number' ? light.dimming.brightness : null,
 			color: xyColorFrom(light.color?.xy),
+			supportsColor: light.color !== undefined,
 			temperature: temperatureOf(light.color_temperature),
 			children
 		};

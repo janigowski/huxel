@@ -24,8 +24,7 @@ async function renderCard(area: SvelteArea = living) {
 		area,
 		ontoggle: vi.fn(),
 		ondim: vi.fn(),
-		oneditcolor: vi.fn(),
-		oneditpresets: vi.fn()
+		oneditcolor: vi.fn()
 	});
 
 	const article = page.getByRole('article').element();
@@ -35,53 +34,52 @@ async function renderCard(area: SvelteArea = living) {
 }
 
 describe('AreaCard', () => {
-	it('paints child colors as a 14px bar across the card', async () => {
+	it('paints child colors as a 14px bar along the card', async () => {
 		const { article, bar } = await renderCard();
 		const style = getComputedStyle(bar);
 
-		expect(bar.clientWidth).toBe(article.clientWidth);
-		expect(style.height).toBe('14px');
+		expect(style.width).toBe('14px');
+		expect(bar.clientHeight).toBe(article.clientHeight);
 		expect(bar.style.getPropertyValue('--stops')).toBe('#ff0000, #0000ff');
-		expect(style.backgroundImage).toContain('rgb(255, 0, 0)');
-		expect(style.backgroundImage).toContain('rgb(0, 0, 255)');
-		expect(style.backgroundImage).toMatch(/to right|90deg/);
+		expect(style.backgroundImage).toBe('linear-gradient(rgb(255, 0, 0), rgb(0, 0, 255))');
 		expect(bar.style.opacity).toBe(String(gradientOpacity(true, 80)));
 	});
 
 	it('keeps the same bar when the room is off', async () => {
 		const { bar } = await renderCard({ ...living, isOn: false, brightness: 10 });
 
-		expect(getComputedStyle(bar).height).toBe('14px');
+		expect(getComputedStyle(bar).width).toBe('14px');
 		expect(bar.style.opacity).toBe(String(gradientOpacity(false, 10)));
 	});
 
-	it('offers presets when the room can take color and brightness', async () => {
+	it('offers one color control and no preset control', async () => {
 		await renderCard();
 
-		await expect
-			.element(page.getByRole('button', { name: 'Living room presets, Custom' }))
-			.toBeVisible();
+		await expect.element(page.getByRole('button', { name: /Living room color/ })).toBeVisible();
+		await expect.element(page.getByRole('button', { name: /presets/ })).not.toBeInTheDocument();
 	});
 
-	it('names the active preset from mirek when the room has no xy color', async () => {
+	it('offers the same color control for a white room', async () => {
 		await renderCard({
 			...living,
 			color: null,
 			brightness: 57,
 			temperature: { mirek: 447 },
+			supportsTemperature: true,
 			colors: ['#ff942b']
 		});
 
 		await expect
-			.element(page.getByRole('button', { name: 'Living room presets, Relax' }))
+			.element(page.getByRole('button', { name: 'Living room color, White' }))
 			.toBeVisible();
+		await expect.element(page.getByRole('button', { name: /presets/ })).not.toBeInTheDocument();
 	});
 
-	it('offers presets when the room has no grouped color', async () => {
+	it('offers the color control when the room lights do not share one color', async () => {
 		await renderCard({ ...living, color: null, colors: ['#ffe94d'] });
 
 		await expect
-			.element(page.getByRole('button', { name: 'Living room presets, Custom' }))
+			.element(page.getByRole('button', { name: 'Living room color, Custom' }))
 			.toBeVisible();
 	});
 
@@ -90,6 +88,6 @@ describe('AreaCard', () => {
 
 		expect(bar.className).toContain('empty');
 		expect(getComputedStyle(bar).backgroundImage).toContain('repeating-linear-gradient');
-		expect(getComputedStyle(bar).height).toBe('14px');
+		expect(getComputedStyle(bar).width).toBe('14px');
 	});
 });

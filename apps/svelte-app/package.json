@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"dev": "vp dev",
+		"dev": "vp run --filter 'svelte-app^...' build && vp dev",
 		"build": "vp build",
 		"preview": "vp preview",
 		"prepare": "svelte-kit sync || echo ''",

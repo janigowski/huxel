@@ -59,6 +59,7 @@ describe('HueClientGateway areas', () => {
 					isOn: true,
 					brightness: 25,
 					color: { x: 0.5, y: 0.4 },
+					supportsColor: true,
 					temperature: null,
 					children: []
 				}
@@ -204,6 +205,7 @@ describe('HueClientGateway areas', () => {
 					isOn: true,
 					brightness: 80,
 					color: null,
+					supportsColor: false,
 					temperature: null,
 					children: []
 				}

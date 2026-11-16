@@ -10,9 +10,9 @@ html.preview {
 }
 
 html.preview body {
-	min-height: 37.5rem;
+	height: var(--popup-height);
 	margin: var(--space-8) auto;
-	overflow: hidden;
+	overflow: auto;
 	border: var(--border-width) solid var(--border-neutral);
 	border-radius: var(--radius-12);
 	background: var(--background-default);

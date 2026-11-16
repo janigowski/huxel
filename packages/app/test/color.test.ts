@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { hexToXy, xyToHex } from '../src/index';
+import {
+	GAMUT_C,
+	clampToGamut,
+	gamutForType,
+	hexToXy,
+	hsvToXy,
+	rgbToXy,
+	xyToHex,
+	xyToHsv
+} from '../src/index';
 
 function channels(hex: string): number[] {
 	return [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16));
@@ -86,3 +95,65 @@ describe('xyToHex', () => {
 		});
 	});
 });
+
+describe('rgb and hsv to xy', () => {
+	it.each([
+		['#ff0000', 0, 1],
+		['#00ff00', 120, 1],
+		['#0000ff', 240, 1],
+		['#ffffff', 0, 0]
+	])('matches hexToXy for %s', (hex, hue, saturation) => {
+		expect(rgbToXy(...bytes(hex))).toEqual(hexToXy(hex));
+		expect(hsvToXy({ h: hue, s: saturation })).toEqual(hexToXy(hex));
+	});
+
+	it('reads a wheel position back from xy', () => {
+		expect(xyToHsv(hexToXy('#ff0000'))).toEqual({ h: 0, s: 1 });
+		expect(xyToHsv(hexToXy('#00ff00')).h).toBeCloseTo(120, 5);
+		expect(xyToHsv(hexToXy('#0000ff')).h).toBeCloseTo(240, 5);
+		expect(xyToHsv(hexToXy('#ffffff')).s).toBe(0);
+	});
+
+	it('keeps gamut vertices and pulls outside colors onto the triangle', () => {
+		expect(clampToGamut(GAMUT_C.red, GAMUT_C)).toEqual(GAMUT_C.red);
+		expect(clampToGamut(GAMUT_C.green, GAMUT_C)).toEqual(GAMUT_C.green);
+		expect(clampToGamut(GAMUT_C.blue, GAMUT_C)).toEqual(GAMUT_C.blue);
+
+		const outside = { x: 0.01, y: 0.01 };
+		const clamped = clampToGamut(outside, GAMUT_C);
+
+		expect(clamped).not.toEqual(outside);
+		expect(clampToGamut(clamped, GAMUT_C)).toEqual(clamped);
+		expect(clamped.x).toBeGreaterThanOrEqual(0);
+		expect(clamped.y).toBeGreaterThanOrEqual(0);
+	});
+
+	it('clamps rgb that falls outside a narrow gamut', () => {
+		const narrow = {
+			red: { x: 0.5, y: 0.4 },
+			green: { x: 0.4, y: 0.5 },
+			blue: { x: 0.3, y: 0.3 }
+		};
+		const open = rgbToXy(255, 0, 0);
+		const closed = rgbToXy(255, 0, 0, narrow);
+
+		expect(closed).not.toEqual(open);
+		expect(clampToGamut(closed, narrow)).toEqual(closed);
+	});
+
+	it('maps Hue gamut letters and ignores unknown types', () => {
+		expect(gamutForType('A')?.red).toEqual({ x: 0.704, y: 0.296 });
+		expect(gamutForType('B')?.blue).toEqual({ x: 0.167, y: 0.04 });
+		expect(gamutForType('C')).toBe(GAMUT_C);
+		expect(gamutForType('other')).toBeNull();
+		expect(gamutForType(undefined)).toBeNull();
+	});
+});
+
+function bytes(hex: string): [number, number, number] {
+	return [
+		parseInt(hex.slice(1, 3), 16),
+		parseInt(hex.slice(3, 5), 16),
+		parseInt(hex.slice(5, 7), 16)
+	];
+}

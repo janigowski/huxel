@@ -53,6 +53,8 @@ class AreasGateway extends FakeGateway {
 	readonly areaBrightness: AreaCall<number>[] = [];
 	readonly areaColor: AreaCall<{ x: number; y: number }>[] = [];
 	readonly areaTemperature: AreaCall<number>[] = [];
+	readonly lightColor: AreaCall<{ x: number; y: number }>[] = [];
+	readonly lightTemperature: AreaCall<number>[] = [];
 
 	listAreas(): Promise<{ rooms: BridgeArea[]; zones: BridgeArea[] }> {
 		const result = deferred<{ rooms: BridgeArea[]; zones: BridgeArea[] }>();
@@ -74,6 +76,14 @@ class AreasGateway extends FakeGateway {
 
 	setAreaTemperature(serviceId: string, mirek: number): Promise<void> {
 		return this.areaCommand(this.areaTemperature, serviceId, mirek);
+	}
+
+	override setColor(lightId: string, color: { x: number; y: number }): Promise<void> {
+		return this.areaCommand(this.lightColor, lightId, color);
+	}
+
+	override setTemperature(lightId: string, mirek: number): Promise<void> {
+		return this.areaCommand(this.lightTemperature, lightId, mirek);
 	}
 
 	private areaCommand<T>(calls: AreaCall<T>[], serviceId: string, value: T): Promise<void> {
@@ -251,6 +261,63 @@ describe('rooms and zones', () => {
 		await second;
 	});
 
+	it('sets a room color when the grouped light has the color feature but no shared xy', async () => {
+		const room: BridgeArea = { ...living, color: null, supportsColor: true, isOn: true };
+		const { app, gateway } = await setup({ rooms: [room], zones: [] });
+		const command = app.changeRoomColor('living', { x: 0.3, y: 0.3 });
+
+		expect(app.state.rooms.get('living')?.color.value).toEqual({ x: 0.3, y: 0.3 });
+		expect(gateway.areaColor[0]).toMatchObject({
+			serviceId: 'living-light',
+			value: { x: 0.3, y: 0.3 }
+		});
+		gateway.areaColor[0]?.result.resolve();
+		await command;
+	});
+
+	it('sets a room color when a child light supports color and the group has no xy', async () => {
+		const room: BridgeArea = {
+			...living,
+			color: null,
+			supportsColor: false,
+			isOn: true,
+			children: ['desk']
+		};
+		const { app, gateway } = await setup({ rooms: [room], zones: [] });
+		const command = app.changeRoomColor('living', { x: 0.4, y: 0.5 });
+
+		expect(gateway.areaColor).toHaveLength(0);
+		expect(gateway.lightColor[0]).toMatchObject({
+			serviceId: 'desk',
+			value: { x: 0.4, y: 0.5 }
+		});
+		gateway.lightColor[0]?.result.resolve();
+		await command;
+	});
+
+	it('sets a strip temperature on the light when the room group does not report it', async () => {
+		const strip = bridgeLight({
+			id: 'strip',
+			name: 'Strip',
+			color: null,
+			temperature: { mirek: 250 }
+		});
+		const room: BridgeArea = {
+			...living,
+			color: null,
+			temperature: null,
+			isOn: true,
+			children: ['strip']
+		};
+		const { app, gateway } = await setup({ rooms: [room], zones: [] }, [strip]);
+		const command = app.changeRoomTemperature('living', 370);
+
+		expect(gateway.areaTemperature).toHaveLength(0);
+		expect(gateway.lightTemperature[0]).toMatchObject({ serviceId: 'strip', value: 370 });
+		gateway.lightTemperature[0]?.result.resolve();
+		await command;
+	});
+
 	it('rejects invalid room commands', async () => {
 		const { app } = await setup();
 
@@ -400,6 +467,13 @@ describe('rooms and zones', () => {
 		const rejection = expect(command).rejects.toBe(error);
 		gateway.areaTemperature[0]?.result.reject(error);
 		gateway.areaBrightness[0]?.result.reject(error);
+		await flushMicrotasks();
+
+		for (const call of gateway.lightTemperature) {
+			call.result.reject(error);
+		}
+
+		await flushMicrotasks();
 		await rejection;
 
 		expect(app.state.lights.get('warm')?.temperature.value).toEqual({ mirek: 250 });

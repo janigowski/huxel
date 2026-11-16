@@ -9,10 +9,28 @@ export type {
 	RoomZoneActions
 } from './hue-app';
 export { describeError } from './describe-error';
-export { hexToXy, xyToHex } from './color';
-export type { XyColor } from './color';
-export { mirekToHex } from './temperature';
-export type { ColorTemperature } from './temperature';
+export {
+	GAMUT_A,
+	GAMUT_B,
+	GAMUT_C,
+	clampToGamut,
+	gamutForType,
+	hexToXy,
+	hsvToXy,
+	rgbToXy,
+	xyToHex,
+	xyToHsv
+} from './color';
+export type { GamutTriangle, HsvColor, XyColor } from './color';
+export {
+	DEFAULT_MIREK_RANGE,
+	clampMirek,
+	isMirek,
+	kelvinFromMirek,
+	mirekFromKelvin,
+	mirekToHex
+} from './temperature';
+export type { ColorTemperature, MirekRange } from './temperature';
 export { areaPresets, findAreaPreset } from './preset';
 export type { AreaPreset, PresetId } from './preset';
 export type { AreaCollection } from './area-collection';

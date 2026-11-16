@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import type { SvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 	import GroupsSection from '$lib/hue/GroupsSection.svelte';
@@ -68,7 +67,7 @@
 				ontoggle={(id) => hue.toggleRoom(id)}
 				ondim={(id, brightness) => hue.dimRoom(id, brightness)}
 				onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
-				onapplypreset={(id, preset) => hue.applyRoomPreset(id, preset)}
+				onchangetemperature={(id, mirek) => hue.changeRoomTemperature(id, mirek)}
 			/>
 			<GroupsSection
 				title="Zones"
@@ -77,7 +76,7 @@
 				ontoggle={(id) => hue.toggleZone(id)}
 				ondim={(id, brightness) => hue.dimZone(id, brightness)}
 				onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
-				onapplypreset={(id, preset) => hue.applyZonePreset(id, preset)}
+				onchangetemperature={(id, mirek) => hue.changeZoneTemperature(id, mirek)}
 			/>
 		</div>
 	{:else}

@@ -126,9 +126,7 @@ export function LightsScreen({ app, onError, onQuit }: LightsScreenProps) {
 
 		const brightness = Math.min(100, Math.max(0, Math.round(current.brightness) + offset));
 		const command =
-			item.kind === 'room'
-				? hue.dimRoom(item.id, brightness)
-				: hue.dimZone(item.id, brightness);
+			item.kind === 'room' ? hue.dimRoom(item.id, brightness) : hue.dimZone(item.id, brightness);
 		run(command);
 	}
 

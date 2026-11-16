@@ -1,4 +1,4 @@
-import { createHueApp, hexToXy, type BridgeArea, type BridgeLight } from '@huxel/app';
+import { GAMUT_C, createHueApp, hexToXy, type BridgeArea, type BridgeLight } from '@huxel/app';
 import { HueLinkButtonNotPressedError, HueNetworkError } from '@huxel/client';
 import { MemoryHostAccess } from '../adapters/memory-host-access';
 import { MemoryStorage } from '../adapters/memory-storage';
@@ -17,7 +17,9 @@ export const PREVIEW_LIGHTS: readonly BridgeLight[] = [
 		isOn: true,
 		brightness: 80,
 		color: hexToXy('#ffbf00'),
-		temperature: null
+		temperature: { mirek: null },
+		gamut: GAMUT_C,
+		mirekRange: { minimum: 153, maximum: 500 }
 	},
 	{
 		id: 'sofa',
@@ -25,7 +27,8 @@ export const PREVIEW_LIGHTS: readonly BridgeLight[] = [
 		isOn: false,
 		brightness: 45,
 		color: hexToXy('#2f6bff'),
-		temperature: null
+		temperature: null,
+		gamut: GAMUT_C
 	},
 	{
 		id: 'hall',
@@ -33,7 +36,8 @@ export const PREVIEW_LIGHTS: readonly BridgeLight[] = [
 		isOn: true,
 		brightness: 30,
 		color: null,
-		temperature: { mirek: 370 }
+		temperature: { mirek: 370 },
+		mirekRange: { minimum: 153, maximum: 454 }
 	},
 	{ id: 'kitchen', name: 'Kitchen', isOn: false, brightness: null, color: null, temperature: null },
 	{
@@ -42,7 +46,8 @@ export const PREVIEW_LIGHTS: readonly BridgeLight[] = [
 		isOn: true,
 		brightness: 15,
 		color: hexToXy('#ff8a1f'),
-		temperature: null
+		temperature: null,
+		gamut: GAMUT_C
 	}
 ];
 

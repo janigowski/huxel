@@ -17,6 +17,8 @@ export class Area {
 	readonly isOn: ReadonlySignal<boolean>;
 	readonly brightness: ReadonlySignal<number | null>;
 	readonly color: ReadonlySignal<XyColor | null>;
+	readonly supportsColor: ReadonlySignal<boolean>;
+	readonly supportsTemperature: ReadonlySignal<boolean>;
 	readonly temperature: ReadonlySignal<ColorTemperature | null>;
 	/** `#rrggbb` colors of the child lights, in child order. */
 	readonly colors: ReadonlySignal<readonly string[]>;
@@ -25,6 +27,7 @@ export class Area {
 	private readonly isOnState: Signal<boolean>;
 	private readonly brightnessState: Signal<number | null>;
 	private readonly colorState: Signal<XyColor | null>;
+	private readonly colorCapableState: Signal<boolean>;
 	private readonly temperatureState: Signal<ColorTemperature | null>;
 	private readonly serviceIdState: Signal<string>;
 	private readonly combined: CombinedColor;
@@ -35,6 +38,7 @@ export class Area {
 		this.isOnState = signal(state.isOn);
 		this.brightnessState = signal(state.brightness);
 		this.colorState = signal(freezeColor(state.color));
+		this.colorCapableState = signal(state.supportsColor === true);
 		this.temperatureState = signal(freezeTemperature(state.temperature));
 		this.serviceIdState = signal(state.serviceId);
 		this.combined = new CombinedColor(state.children, lights);
@@ -42,6 +46,15 @@ export class Area {
 		this.isOn = computed(() => this.isOnState.value);
 		this.brightness = computed(() => this.brightnessState.value);
 		this.color = computed(() => this.colorState.value);
+		this.supportsColor = computed(
+			() =>
+				this.colorCapableState.value ||
+				this.colorState.value !== null ||
+				this.combined.anyColorCapable()
+		);
+		this.supportsTemperature = computed(
+			() => this.temperatureState.value !== null || this.combined.anyTemperatureCapable()
+		);
 		this.temperature = computed(() => this.temperatureState.value);
 		this.colors = computed(() => this.palette());
 		Object.freeze(this);
@@ -64,6 +77,10 @@ export class Area {
 	}
 
 	setColor(color: XyColor | null): void {
+		if (color !== null) {
+			this.colorCapableState.value = true;
+		}
+
 		if (sameColor(this.colorState.peek(), color)) {
 			return;
 		}
@@ -87,6 +104,39 @@ export class Area {
 
 	setChildren(children: readonly string[]): void {
 		this.combined.setChildren(children);
+	}
+
+	reportsGroupedColor(): boolean {
+		return this.colorCapableState.peek() || this.colorState.peek() !== null;
+	}
+
+	reportsGroupedTemperature(): boolean {
+		return this.temperatureState.peek() !== null;
+	}
+
+	colorCapableChildren(): Light[] {
+		return this.combined.colorCapable();
+	}
+
+	temperatureCapableChildren(): Light[] {
+		return this.combined.temperatureCapable();
+	}
+
+	previewChildColors(color: XyColor): () => void {
+		const previous = this.combined.colorCapable().map((light) => ({
+			light,
+			color: light.color.peek()
+		}));
+
+		for (const entry of previous) {
+			entry.light.setColor(color);
+		}
+
+		return () => {
+			for (const entry of previous) {
+				entry.light.setColor(entry.color);
+			}
+		};
 	}
 
 	previewChildTemperatures(mirek: number): () => void {
@@ -125,7 +175,15 @@ export class Area {
 
 export type ReadonlyArea = Pick<
 	Area,
-	'id' | 'name' | 'isOn' | 'brightness' | 'color' | 'temperature' | 'colors'
+	| 'id'
+	| 'name'
+	| 'isOn'
+	| 'brightness'
+	| 'color'
+	| 'supportsColor'
+	| 'supportsTemperature'
+	| 'temperature'
+	| 'colors'
 >;
 
 export interface AreaSnapshot {
@@ -134,6 +192,8 @@ export interface AreaSnapshot {
 	readonly isOn: boolean;
 	readonly brightness: number | null;
 	readonly color: XyColor | null;
+	readonly supportsColor?: boolean;
+	readonly supportsTemperature?: boolean;
 	readonly temperature: ColorTemperature | null;
 	readonly colors: readonly string[];
 }

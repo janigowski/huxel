@@ -16,10 +16,18 @@ export class ChangeAreaColor {
 			throw new InvalidColorError(color);
 		}
 
-		if (area.color.peek() === null) {
+		if (!area.supportsColor.peek()) {
 			throw new AreaNotColorCapableError(kind, area.id);
 		}
 
-		return this.lanes.get(area).color.submit(Object.freeze({ x: color.x, y: color.y }));
+		const next = Object.freeze({ x: color.x, y: color.y });
+		const restoreChildren = area.previewChildColors(next);
+
+		try {
+			await this.lanes.get(area).color.submit(next);
+		} catch (error) {
+			restoreChildren();
+			throw error;
+		}
 	}
 }

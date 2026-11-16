@@ -7,14 +7,21 @@
 
 :root {
 	--popup-width: 30rem;
+	--popup-height: 600px;
 	--page-width: var(--popup-width);
 	--page-gutter: var(--space-4);
 	--dialog-width: 24rem;
 }
 
+html,
+body {
+	height: var(--popup-height);
+}
+
 body {
 	width: var(--popup-width);
 	margin: 0;
+	overflow: auto;
 	background: var(--background-default);
 	color: var(--foreground-neutral-primary);
 	font-family: var(--font-sans);

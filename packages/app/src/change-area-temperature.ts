@@ -16,7 +16,7 @@ export class ChangeAreaTemperature {
 			throw new InvalidMirekError(mirek);
 		}
 
-		if (area.temperature.peek() === null) {
+		if (!area.supportsTemperature.peek()) {
 			throw new AreaNotTemperatureCapableError(kind, area.id);
 		}
 

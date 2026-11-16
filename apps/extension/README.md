@@ -6,11 +6,8 @@ Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge o
 
 ## Setup
 
-Workspace dependencies resolve to their `dist/` builds, so build them first from the repository root:
-
 ```bash
 bun install
-bun run --filter @huxel/client --filter @huxel/app --filter @huxel/design-system build
 ```
 
 ## Mock preview
@@ -18,6 +15,8 @@ bun run --filter @huxel/client --filter @huxel/app --filter @huxel/design-system
 ```bash
 bun run dev
 ```
+
+`dev` and `watch` build the workspace libraries first. Those libraries resolve to their `dist/` builds.
 
 This opens the popup in a normal browser tab, in a popup-sized frame with hot reload. It needs no extension and no bridge. Storage and host access are in memory (every request is granted), and the simulated bridge has a few lights. Click **Find** to discover `192.168.1.2`, then **Allow access**. The first **Connect bridge** shows the link button message and the second one links. Any other address simulates an unreachable bridge, so you can see the certificate hint.
 
@@ -29,9 +28,7 @@ bun run watch
 
 1. Open `arc://extensions` (`chrome://extensions` in Chrome) and turn on **Developer mode**.
 2. Click **Load unpacked** and select `apps/extension/dist`.
-3. Pin **Hue Remote**. `watch` rebuilds on every change, and you see the result when you reopen the popup. Click reload on the extensions page only after changing `public/manifest.json`.
-
-To develop from several git worktrees without reloading the extension from a different folder each time, run `bun run watch:shared` instead and load `~/Documents/Extensions/hue-remote` once. It builds into that fixed folder from whichever worktree runs it, so run it in only one worktree at a time.
+3. Pin **Hue Remote**. `watch` rebuilds into `dist` on every change, and you see the result when you reopen the popup. Click reload on the extensions page only after changing `public/manifest.json`.
 
 ## Linking a bridge
 

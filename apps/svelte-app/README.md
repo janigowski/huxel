@@ -6,11 +6,8 @@ Web dashboard for Philips Hue lights, rooms, and zones: link to a bridge, list t
 
 ## Setup
 
-`@huxel/app` and `@huxel/client` are workspace dependencies that resolve to their `dist/` builds, so build them first from the repository root:
-
 ```bash
 bun install
-bun run --filter @huxel/client --filter @huxel/app build
 ```
 
 ## Run
@@ -18,6 +15,8 @@ bun run --filter @huxel/client --filter @huxel/app build
 ```bash
 bun run dev
 ```
+
+`dev` builds the workspace libraries, then starts the app. Those libraries resolve to their `dist/` builds.
 
 In development, Vite proxies `/bridge` to the bridge at `https://192.168.1.10` (see `vite.config.ts`), and the bridge id is set in `src/lib/hue/bridge.ts`. Adjust both for your bridge.
 

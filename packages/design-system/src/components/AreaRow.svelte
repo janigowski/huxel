@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { mirekToHex, xyToHex } from '@huxel/app';
 	import type { SvelteArea } from '@huxel/app/svelte';
-	import { xyToHex } from '@huxel/app';
+	import { areaCanColor, areaCanTemperature } from '../area-capability';
 	import { findPaletteColor } from '../palette';
 	import ColorSwatch from './ColorSwatch.svelte';
 	import Label from './Label.svelte';
@@ -16,9 +17,24 @@
 	let { area, ontoggle, ondim, oneditcolor }: Props = $props();
 
 	const level = $derived(area.isOn ? Math.round(area.brightness ?? 0) : 0);
+	const canPick = $derived(areaCanColor(area) || areaCanTemperature(area));
 	const paletteColor = $derived(findPaletteColor(area.color));
-	const colorName = $derived(paletteColor?.name ?? 'Custom');
-	const swatch = $derived(area.color === null ? null : (paletteColor?.hex ?? xyToHex(area.color)));
+	const colorName = $derived(
+		area.color
+			? (paletteColor?.name ?? 'Custom')
+			: area.temperature?.mirek != null
+				? 'White'
+				: 'Custom'
+	);
+	const swatch = $derived(
+		!canPick
+			? null
+			: area.color
+				? (paletteColor?.hex ?? xyToHex(area.color))
+				: area.temperature?.mirek != null
+					? mirekToHex(area.temperature.mirek)
+					: (area.colors[0] ?? '#fff4e0')
+	);
 	const stateLabel = $derived(area.isOn ? 'On' : 'Off');
 </script>
 

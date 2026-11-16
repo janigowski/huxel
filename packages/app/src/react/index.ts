@@ -43,6 +43,8 @@ function lightSnapshot(light: ReadonlyLight): ReactLight {
 				brightness: light.brightness.value,
 				color: light.color.value,
 				temperature: light.temperature.value,
+				gamut: light.gamut.value,
+				mirekRange: light.mirekRange.value,
 				colors: light.colors.value
 			})
 		);
