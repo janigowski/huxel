@@ -65,15 +65,6 @@
 		{:else}
 			{@const loading = hue.status === 'idle' || hue.status === 'loading'}
 
-			<LightSection
-				title="Lights"
-				lights={hue.lights.all}
-				{loading}
-				ontoggle={(id) => hue.toggleLight(id)}
-				ondim={(id, brightness) => hue.dimLight(id, brightness)}
-				onchangecolor={(id, color) => hue.changeColor(id, color)}
-				onchangetemperature={(id, mirek) => hue.changeTemperature(id, mirek)}
-			/>
 			<AreaSection
 				title="Rooms"
 				areas={hue.rooms.all}
@@ -81,6 +72,7 @@
 				ontoggle={(id) => hue.toggleRoom(id)}
 				ondim={(id, brightness) => hue.dimRoom(id, brightness)}
 				onchangecolor={(id, color) => hue.changeRoomColor(id, color)}
+				onchangetemperature={(id, mirek) => hue.changeRoomTemperature(id, mirek)}
 			/>
 			<AreaSection
 				title="Zones"
@@ -89,6 +81,16 @@
 				ontoggle={(id) => hue.toggleZone(id)}
 				ondim={(id, brightness) => hue.dimZone(id, brightness)}
 				onchangecolor={(id, color) => hue.changeZoneColor(id, color)}
+				onchangetemperature={(id, mirek) => hue.changeZoneTemperature(id, mirek)}
+			/>
+			<LightSection
+				title="Lights"
+				lights={hue.lights.all}
+				{loading}
+				ontoggle={(id) => hue.toggleLight(id)}
+				ondim={(id, brightness) => hue.dimLight(id, brightness)}
+				onchangecolor={(id, color) => hue.changeColor(id, color)}
+				onchangetemperature={(id, mirek) => hue.changeTemperature(id, mirek)}
 			/>
 		{/if}
 

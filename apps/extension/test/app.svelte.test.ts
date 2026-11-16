@@ -1,8 +1,10 @@
+import type { BridgeLight } from '@huxel/app';
 import { HueRateLimitError } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import { page } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
 import App from '../src/App.svelte';
+import { SimulatedGateway } from '../src/preview/simulated-gateway';
 import { BridgeSession } from '../src/session/bridge-session.svelte';
 import {
 	BRIDGE_HOST,
@@ -254,6 +256,51 @@ describe('App', () => {
 		await expect.element(roomsHeading()).toBeVisible();
 		await expect.element(page.getByRole('button', { name: 'Retry' })).not.toBeInTheDocument();
 		await expect.element(page.getByText(/Could not reach the bridge/)).not.toBeInTheDocument();
+	});
+
+	it('opens one color and temperature picker for a room', async () => {
+		const desk: BridgeLight = {
+			id: 'desk',
+			name: 'Desk',
+			isOn: true,
+			brightness: 40,
+			color: { x: 0.4, y: 0.5 },
+			temperature: { mirek: 370 },
+			supportsColor: true
+		};
+		const gateway = new SimulatedGateway([desk], {
+			rooms: [
+				{
+					id: 'living',
+					name: 'Living room',
+					serviceId: 'living-service',
+					isOn: true,
+					brightness: 40,
+					color: null,
+					temperature: { mirek: 370 },
+					children: ['desk']
+				}
+			]
+		});
+		const bridge = new FakeBridge({
+			storage: linkedBridgeStorage(),
+			granted: [BRIDGE_ORIGIN],
+			gateways: [gateway]
+		});
+
+		await renderApp(bridge);
+
+		const button = page.getByRole('button', { name: 'Living room color, White' });
+
+		await expect.element(button).toBeVisible();
+		await button.click();
+		await expect.element(page.getByRole('radio', { name: 'Color' })).toBeVisible();
+		await expect.element(page.getByRole('radio', { name: 'Temperature' })).toBeVisible();
+		await expect.element(page.getByRole('slider', { name: 'Color temperature' })).toBeVisible();
+
+		await page.getByRole('radio', { name: 'Color' }).click();
+
+		await expect.element(page.getByRole('slider', { name: 'Hue and saturation' })).toBeVisible();
 	});
 
 	it('asks to allow access again when site access was revoked', async () => {
