@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { kelvinFromMirek, mirekFromKelvin, mirekToHex, type MirekRange } from '@huxel/app';
+	import { onDestroy } from 'svelte';
+	import { PointerDrag } from '../pointer-drag';
 
 	interface Props {
 		mirek: number;
 		range: MirekRange;
-		onchange: (mirek: number, immediate: boolean) => void;
+		onchange: (mirek: number, immediate?: boolean) => void;
 	}
 
 	let { mirek, range, onchange }: Props = $props();
@@ -16,10 +18,13 @@
 	const x = $derived(place * 100);
 	let offsetY = $state(50);
 	const gradient = $derived(temperatureGradient(range));
-	let dragging = false;
+	const drag = new PointerDrag((event) => {
+		const element = drag.element();
 
-	function point(event: PointerEvent, immediate: boolean) {
-		const element = event.currentTarget as HTMLElement;
+		if (!element) {
+			return;
+		}
+
 		const rect = element.getBoundingClientRect();
 		const radius = rect.width / 2;
 		let dx = event.clientX - (rect.left + radius);
@@ -35,32 +40,12 @@
 		offsetY = radius === 0 ? 50 : 50 + (dy / radius) * 50;
 		const across = radius === 0 ? 0 : (dx / radius + 1) / 2;
 
-		onchange(mirekFromKelvin(warm + across * (cool - warm), range), immediate);
-	}
+		onchange(mirekFromKelvin(warm + across * (cool - warm), range));
+	});
 
-	function start(event: PointerEvent) {
-		const element = event.currentTarget as HTMLElement;
-		element.setPointerCapture(event.pointerId);
-		dragging = true;
-		point(event, false);
-	}
-
-	function drag(event: PointerEvent) {
-		if (!dragging) {
-			return;
-		}
-
-		point(event, false);
-	}
-
-	function stop(event: PointerEvent) {
-		if (!dragging) {
-			return;
-		}
-
-		dragging = false;
-		point(event, true);
-	}
+	onDestroy(() => {
+		drag.dispose();
+	});
 
 	function key(event: KeyboardEvent) {
 		const step = Math.max(50, Math.round((cool - warm) / 20));
@@ -106,17 +91,10 @@
 	aria-valuenow={kelvin}
 	aria-valuetext="{kelvin} kelvin"
 	tabindex="0"
-	onpointerdown={start}
-	onpointermove={drag}
-	onpointerup={stop}
-	onpointercancel={stop}
+	onpointerdown={(event) => drag.start(event)}
 	onkeydown={key}
 >
-	<span
-		class="handle"
-		style:left="{x}%"
-		style:top="{offsetY}%"
-		style:background={mirekToHex(mirek)}
+	<span class="handle" style:left="{x}%" style:top="{offsetY}%" style:background={mirekToHex(mirek)}
 	></span>
 </div>
 
@@ -129,6 +107,7 @@
 		border-radius: 50%;
 		box-shadow: inset 0 0 0 var(--border-width) rgb(0 0 0 / 0.35);
 		touch-action: none;
+		user-select: none;
 		cursor: crosshair;
 	}
 

@@ -48,9 +48,9 @@
 	}: Props = $props();
 
 	const id = $props.id();
+	const levelGate = new EmitGate();
 	const colorGate = new EmitGate();
 	const whiteGate = new EmitGate();
-	const levelGate = new EmitGate();
 	const colorEnabled = $derived(supportsColor ?? color !== null);
 	const temperatureEnabled = $derived(supportsTemperature ?? temperature !== null);
 	const activeGamut = $derived(colorEnabled ? (gamut ?? GAMUT_C) : null);
@@ -93,9 +93,9 @@
 	);
 
 	onDestroy(() => {
+		levelGate.flush();
 		colorGate.flush();
 		whiteGate.flush();
-		levelGate.flush();
 	});
 
 	function edit(patch: Partial<Draft>): void {
@@ -103,9 +103,9 @@
 	}
 
 	function release() {
+		levelGate.flush();
 		colorGate.flush();
 		whiteGate.flush();
-		levelGate.flush();
 		draft = null;
 		open = false;
 	}
@@ -121,7 +121,7 @@
 		}
 	}
 
-	function emitColor(immediate: boolean) {
+	function emitColor(immediate = false) {
 		const send = () => {
 			const current = draft ?? fromLight;
 
@@ -141,7 +141,7 @@
 		colorGate.push(send);
 	}
 
-	function emitTemperature(immediate: boolean) {
+	function emitTemperature(immediate = false) {
 		const send = () => {
 			const current = draft ?? fromLight;
 
@@ -188,12 +188,12 @@
 		emitTemperature(true);
 	}
 
-	function onWheel(nextHue: number, nextSaturation: number, immediate: boolean) {
+	function onWheel(nextHue: number, nextSaturation: number, immediate = false) {
 		edit({ hue: nextHue, saturation: nextSaturation });
 		emitColor(immediate);
 	}
 
-	function onMirek(next: number, immediate: boolean) {
+	function onMirek(next: number, immediate = false) {
 		edit({ mirek: next });
 		emitTemperature(immediate);
 	}

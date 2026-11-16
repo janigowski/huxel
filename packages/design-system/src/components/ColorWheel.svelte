@@ -1,19 +1,25 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
+	import { PointerDrag } from '../pointer-drag';
+
 	interface Props {
 		hue: number;
 		saturation: number;
 		color: string;
-		onchange: (hue: number, saturation: number, immediate: boolean) => void;
+		onchange: (hue: number, saturation: number, immediate?: boolean) => void;
 	}
 
 	let { hue, saturation, color, onchange }: Props = $props();
 
 	const x = $derived(50 + Math.sin((hue * Math.PI) / 180) * saturation * 50);
 	const y = $derived(50 - Math.cos((hue * Math.PI) / 180) * saturation * 50);
-	let dragging = false;
+	const drag = new PointerDrag((event) => {
+		const element = drag.element();
 
-	function point(event: PointerEvent, immediate: boolean) {
-		const element = event.currentTarget as HTMLElement;
+		if (!element) {
+			return;
+		}
+
 		const rect = element.getBoundingClientRect();
 		const radius = rect.width / 2;
 		const dx = event.clientX - (rect.left + radius);
@@ -25,32 +31,12 @@
 			nextHue += 360;
 		}
 
-		onchange(nextHue, radius === 0 ? 0 : distance / radius, immediate);
-	}
+		onchange(nextHue, radius === 0 ? 0 : distance / radius);
+	});
 
-	function start(event: PointerEvent) {
-		const element = event.currentTarget as HTMLElement;
-		element.setPointerCapture(event.pointerId);
-		dragging = true;
-		point(event, false);
-	}
-
-	function drag(event: PointerEvent) {
-		if (!dragging) {
-			return;
-		}
-
-		point(event, false);
-	}
-
-	function stop(event: PointerEvent) {
-		if (!dragging) {
-			return;
-		}
-
-		dragging = false;
-		point(event, true);
-	}
+	onDestroy(() => {
+		drag.dispose();
+	});
 
 	function key(event: KeyboardEvent) {
 		const step = event.shiftKey ? 15 : 8;
@@ -83,10 +69,7 @@
 	aria-valuenow={Math.round(hue)}
 	aria-valuetext="{Math.round(hue)} degrees, {Math.round(saturation * 100)} percent saturation"
 	tabindex="0"
-	onpointerdown={start}
-	onpointermove={drag}
-	onpointerup={stop}
-	onpointercancel={stop}
+	onpointerdown={(event) => drag.start(event)}
 	onkeydown={key}
 >
 	<span class="handle" style:left="{x}%" style:top="{y}%" style:background={color}></span>
@@ -104,6 +87,7 @@
 			conic-gradient(#f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
 		box-shadow: inset 0 0 0 var(--border-width) rgb(0 0 0 / 0.35);
 		touch-action: none;
+		user-select: none;
 		cursor: crosshair;
 	}
 
