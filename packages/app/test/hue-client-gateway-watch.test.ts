@@ -189,6 +189,7 @@ describe('HueClientGateway.watch', () => {
 						isOn: true,
 						brightness: 50,
 						color: { x: 0.3, y: 0.6 },
+						supportsColor: true,
 						temperature: null,
 						gamut: GAMUT_C
 					}
@@ -228,6 +229,7 @@ describe('HueClientGateway.watch', () => {
 						isOn: true,
 						brightness: 70,
 						color: { x: 0.5, y: 0.4 },
+						supportsColor: true,
 						temperature: null
 					}
 				}

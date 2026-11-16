@@ -106,6 +106,39 @@ export class Area {
 		this.combined.setChildren(children);
 	}
 
+	reportsGroupedColor(): boolean {
+		return this.colorCapableState.peek() || this.colorState.peek() !== null;
+	}
+
+	reportsGroupedTemperature(): boolean {
+		return this.temperatureState.peek() !== null;
+	}
+
+	colorCapableChildren(): Light[] {
+		return this.combined.colorCapable();
+	}
+
+	temperatureCapableChildren(): Light[] {
+		return this.combined.temperatureCapable();
+	}
+
+	previewChildColors(color: XyColor): () => void {
+		const previous = this.combined.colorCapable().map((light) => ({
+			light,
+			color: light.color.peek()
+		}));
+
+		for (const entry of previous) {
+			entry.light.setColor(color);
+		}
+
+		return () => {
+			for (const entry of previous) {
+				entry.light.setColor(entry.color);
+			}
+		};
+	}
+
 	previewChildTemperatures(mirek: number): () => void {
 		const previous = this.combined.temperatureOnly().map((light) => ({
 			light,

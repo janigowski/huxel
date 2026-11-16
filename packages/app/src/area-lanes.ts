@@ -1,6 +1,6 @@
 import type { XyColor } from './color';
 import { CommandLane } from './command-lane';
-import type { AreaGateway } from './gateway';
+import type { HueGateway } from './gateway';
 import type { Area } from './area';
 import type { ColorTemperature } from './temperature';
 
@@ -12,12 +12,12 @@ export interface AreaLanes {
 }
 
 export class AreaLaneRegistry {
-	private readonly gateway: AreaGateway;
+	private readonly gateway: HueGateway;
 	private readonly settleMs: number;
 	private readonly lanes = new Map<Area, AreaLanes>();
 	private disposed = false;
 
-	constructor(gateway: AreaGateway, settleMs: number) {
+	constructor(gateway: HueGateway, settleMs: number) {
 		this.gateway = gateway;
 		this.settleMs = settleMs;
 	}
@@ -66,7 +66,7 @@ export class AreaLaneRegistry {
 			color: new CommandLane<XyColor | null>(
 				() => area.color.peek(),
 				(color) => area.setColor(color),
-				(color) => (color ? this.gateway.setAreaColor(area.serviceId, color) : Promise.resolve()),
+				(color) => (color ? sendColor(this.gateway, area, color) : Promise.resolve()),
 				this.settleMs
 			),
 			temperature: new CommandLane<ColorTemperature | null>(
@@ -74,12 +74,60 @@ export class AreaLaneRegistry {
 				(temperature) => area.setTemperature(temperature),
 				(temperature) =>
 					typeof temperature?.mirek === 'number'
-						? this.gateway.setAreaTemperature(area.serviceId, temperature.mirek)
+						? sendTemperature(this.gateway, area, temperature.mirek)
 						: Promise.resolve(),
 				this.settleMs
 			)
 		};
 	}
+}
+
+async function sendColor(gateway: HueGateway, area: Area, color: XyColor): Promise<void> {
+	const lights = () => area.colorCapableChildren();
+
+	if (area.reportsGroupedColor()) {
+		try {
+			await gateway.setAreaColor?.(area.serviceId, color);
+			return;
+		} catch (error) {
+			if (lights().length === 0) {
+				throw error;
+			}
+		}
+	}
+
+	const targets = lights();
+
+	if (targets.length === 0) {
+		await gateway.setAreaColor?.(area.serviceId, color);
+		return;
+	}
+
+	await Promise.all(targets.map((light) => gateway.setColor(light.id, color)));
+}
+
+async function sendTemperature(gateway: HueGateway, area: Area, mirek: number): Promise<void> {
+	const lights = () => area.temperatureCapableChildren();
+
+	if (area.reportsGroupedTemperature()) {
+		try {
+			await gateway.setAreaTemperature?.(area.serviceId, mirek);
+			return;
+		} catch (error) {
+			if (lights().length === 0) {
+				throw error;
+			}
+		}
+	}
+
+	const targets = lights();
+
+	if (targets.length === 0) {
+		await gateway.setAreaTemperature?.(area.serviceId, mirek);
+		return;
+	}
+
+	await Promise.all(targets.map((light) => gateway.setTemperature(light.id, mirek)));
 }
 
 function disposeLanes(lanes: AreaLanes): void {

@@ -242,6 +242,7 @@ function fromEventResource(resource: LightEventResource): BridgeLight | undefine
 		isOn,
 		brightness: typeof brightness === 'number' ? brightness : null,
 		color: xyColorFrom(resource.color?.xy),
+		supportsColor: resource.color !== undefined,
 		temperature: temperatureOf(resource.color_temperature),
 		gamut: gamutOf(resource.color),
 		mirekRange: mirekRangeOf(resource.color_temperature)
@@ -281,6 +282,7 @@ function toBridgeLight(light: LightGet): BridgeLight {
 		isOn: light.on.on,
 		brightness: light.dimming?.brightness ?? null,
 		color: xyColorFrom(light.color?.xy),
+		supportsColor: light.color !== undefined,
 		temperature: temperatureOf(light.color_temperature),
 		gamut: gamutOf(light.color),
 		mirekRange: mirekRangeOf(light.color_temperature)
@@ -295,6 +297,7 @@ function lightRecord(light: BridgeLight): BridgeLight {
 		brightness: light.brightness,
 		color: light.color,
 		temperature: light.temperature,
+		...(light.supportsColor ? { supportsColor: true } : {}),
 		...(light.gamut ? { gamut: light.gamut } : {}),
 		...(light.mirekRange ? { mirekRange: light.mirekRange } : {})
 	};

@@ -9,6 +9,7 @@ export interface BridgeLight {
 	/** Normalized 0–100, or `null` when the light cannot be dimmed. */
 	brightness: number | null;
 	color: XyColor | null;
+	supportsColor?: boolean;
 	/** `null` when the light has no color temperature. */
 	temperature: ColorTemperature | null;
 	gamut?: GamutTriangle | null;

@@ -36,7 +36,7 @@ export class CombinedColor {
 		for (const id of this.childIds.value) {
 			const light = lights.get(id);
 
-			if (light && (light.color.value !== null || light.gamut.value !== null)) {
+			if (light?.canColor()) {
 				return true;
 			}
 		}
@@ -58,6 +58,14 @@ export class CombinedColor {
 		return false;
 	}
 
+	colorCapable(): Light[] {
+		return this.lightsWith((light) => light.canColor());
+	}
+
+	temperatureCapable(): Light[] {
+		return this.lightsWith((light) => light.temperature.value !== null);
+	}
+
 	setChildren(childIds: readonly string[]): void {
 		const current = this.childIds.peek();
 
@@ -69,6 +77,21 @@ export class CombinedColor {
 		}
 
 		this.childIds.value = Object.freeze([...childIds]);
+	}
+
+	private lightsWith(include: (light: Light) => boolean): Light[] {
+		const lights = this.lights.value;
+		const found: Light[] = [];
+
+		for (const id of this.childIds.value) {
+			const light = lights.get(id);
+
+			if (light && include(light)) {
+				found.push(light);
+			}
+		}
+
+		return found;
 	}
 
 	private hexes(): readonly string[] {

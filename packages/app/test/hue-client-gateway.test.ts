@@ -85,6 +85,7 @@ describe('HueClientGateway', () => {
 					isOn: true,
 					brightness: 54.7,
 					color: { x: 0.4573, y: 0.41 },
+					supportsColor: true,
 					temperature: null,
 					gamut: GAMUT_C
 				},
@@ -139,6 +140,7 @@ describe('HueClientGateway', () => {
 					isOn: true,
 					brightness: 40,
 					color: { x: 0.4, y: 0.4 },
+					supportsColor: true,
 					temperature: { mirek: null },
 					gamut: triangle,
 					mirekRange: { minimum: 200, maximum: 400 }

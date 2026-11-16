@@ -36,6 +36,7 @@ export class Light {
 	private readonly isOnState: Signal<boolean>;
 	private readonly brightnessState: Signal<number | null>;
 	private readonly colorState: Signal<XyColor | null>;
+	private readonly colorFeature: boolean;
 	private readonly temperatureState: Signal<ColorTemperature | null>;
 	private readonly gamutState: Signal<GamutTriangle | null>;
 	private readonly mirekRangeState: Signal<MirekRange | null>;
@@ -46,6 +47,7 @@ export class Light {
 		this.isOnState = signal(state.isOn);
 		this.brightnessState = signal(state.brightness);
 		this.colorState = signal(freezeColor(state.color ?? null));
+		this.colorFeature = state.supportsColor === true;
 		this.temperatureState = signal(freezeTemperature(state.temperature));
 		this.gamutState = signal(freezeGamut(state.gamut ?? null));
 		this.mirekRangeState = signal(freezeMirekRange(state.mirekRange ?? null));
@@ -70,6 +72,10 @@ export class Light {
 
 	setBrightness(brightness: number | null): void {
 		this.brightnessState.value = brightness;
+	}
+
+	canColor(): boolean {
+		return this.colorFeature || this.colorState.value !== null || this.gamutState.value !== null;
 	}
 
 	setColor(color: XyColor | null): void {

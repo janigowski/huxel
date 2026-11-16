@@ -111,9 +111,7 @@ export class HueApp implements HueAppActions, RoomZoneActions {
 		this.gateway = gateway;
 		this.areaGateway = asAreaGateway(gateway);
 		this.lanes = new LightLaneRegistry(gateway, settleMs);
-		this.areaLanes = this.areaGateway
-			? new AreaLaneRegistry(this.areaGateway, settleMs)
-			: undefined;
+		this.areaLanes = this.areaGateway ? new AreaLaneRegistry(gateway, settleMs) : undefined;
 		this.toggleLightState = new ToggleLight(this.lanes);
 		this.dimLightState = new DimLight(this.lanes);
 		this.changeColorState = new ChangeColor(this.lanes);
