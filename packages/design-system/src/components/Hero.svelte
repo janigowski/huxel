@@ -13,7 +13,9 @@
 <section class="hero">
 	<div>
 		<h1>{title}</h1>
-		<p class="subtitle">{subtitle}</p>
+		{#if subtitle}
+			<p class="subtitle">{subtitle}</p>
+		{/if}
 	</div>
 	<BrandMark {product} />
 </section>

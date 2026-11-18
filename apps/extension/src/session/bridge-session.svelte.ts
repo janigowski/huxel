@@ -50,7 +50,7 @@ export class BridgeSession {
 	);
 
 	readonly subtitle = $derived(
-		this.bridge ? `Bridge ${this.bridge.id ?? this.bridge.host}` : 'No bridge linked'
+		this.bridge?.id ? `Bridge ${this.bridge.id}` : this.bridge ? '' : 'No bridge linked'
 	);
 
 	readonly showAddressField = $derived(this.addressStatus === 'needed' || this.editingAddress);

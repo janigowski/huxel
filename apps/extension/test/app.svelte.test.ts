@@ -162,7 +162,8 @@ describe('App', () => {
 
 		await expect.element(roomsHeading()).toBeVisible();
 		await expect.element(page.getByText('Obtaining the bridge address')).not.toBeInTheDocument();
-		await expect.element(page.getByText(`Linked to ${BRIDGE_HOST}`)).toBeVisible();
+		await expect.element(page.getByText(BRIDGE_HOST)).not.toBeInTheDocument();
+		await expect.element(page.getByRole('button', { name: 'Forget bridge' })).toBeVisible();
 		expect(bridge.hostAccess.requests).toEqual([BRIDGE_ORIGIN]);
 		expect(bridge.registrationOrigins).toEqual([BRIDGE_ORIGIN, BRIDGE_ORIGIN]);
 		expect(bridge.stored).toEqual({

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AreaSection, DashboardBar, Hero, LightSection, Notice } from '@huxel/design-system';
+	import { AreaSection, Hero, LightSection, Notice } from '@huxel/design-system';
 	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
 	import { bridgeOrigin } from './bridge/bridge-host';
@@ -34,7 +34,6 @@
 </script>
 
 <main class="page">
-	<DashboardBar label="Hue control dashboard" date={new Date()} connection={hue?.connection} />
 	<Hero title="Home" subtitle={session.subtitle} product="extension" />
 
 	{#if session.status === 'restoring'}
@@ -90,7 +89,7 @@
 			<Notice>{errorMessage}</Notice>
 		{/if}
 
-		<LinkedBridgeBar {host} onforget={() => session.forget()} />
+		<LinkedBridgeBar onforget={() => session.forget()} />
 	{:else}
 		<SetupChecklist {session} />
 	{/if}

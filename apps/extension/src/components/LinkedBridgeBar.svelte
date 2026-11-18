@@ -2,15 +2,13 @@
 	import { Label } from '@huxel/design-system';
 
 	interface Props {
-		host: string;
 		onforget: () => void;
 	}
 
-	let { host, onforget }: Props = $props();
+	let { onforget }: Props = $props();
 </script>
 
 <footer class="bar">
-	<Label>Linked to {host}</Label>
 	<button type="button" onclick={onforget}><Label>Forget bridge</Label></button>
 </footer>
 
@@ -18,7 +16,7 @@
 	.bar {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: flex-end;
 		gap: var(--space-3);
 		margin-block-start: var(--space-4);
 		padding-block-start: var(--space-3);
