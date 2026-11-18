@@ -1,21 +1,13 @@
 <script lang="ts">
-	import {
-		AreaSection,
-		ConnectPanel,
-		DashboardBar,
-		Hero,
-		LightSection,
-		Notice
-	} from '@huxel/design-system';
+	import { AreaSection, DashboardBar, Hero, LightSection, Notice } from '@huxel/design-system';
 	import { createSvelteHueApp } from '@huxel/app/svelte';
 	import { untrack } from 'svelte';
-	import { bridgeOrigin, parseBridgeHost } from './bridge/bridge-host';
+	import { bridgeOrigin } from './bridge/bridge-host';
 	import { isUnreachable, unreachableMessage } from './bridge/session-error';
 	import AccessPanel from './components/AccessPanel.svelte';
-	import BridgeHostField from './components/BridgeHostField.svelte';
 	import CertificateHint from './components/CertificateHint.svelte';
 	import LinkedBridgeBar from './components/LinkedBridgeBar.svelte';
-	import SelectedHost from './components/SelectedHost.svelte';
+	import SetupChecklist from './components/SetupChecklist.svelte';
 	import type { BridgeSession } from './session/bridge-session.svelte';
 
 	interface Props {
@@ -99,47 +91,8 @@
 		{/if}
 
 		<LinkedBridgeBar {host} onforget={() => session.forget()} />
-	{:else if session.linkHost}
-		<ConnectPanel
-			connecting={session.connecting}
-			error={errorMessage}
-			onconnect={() => session.connect()}
-			disabled={session.busy}
-		>
-			<SelectedHost
-				host={session.linkHost}
-				disabled={session.busy}
-				onchange={() => session.changeHost()}
-			/>
-			<p>
-				The application key from the bridge is saved in this browser and sent only to that bridge.
-			</p>
-		</ConnectPanel>
-
-		{#if session.error?.certificateUrl}
-			<CertificateHint url={session.error.certificateUrl} />
-		{/if}
 	{:else}
-		<AccessPanel
-			host={parseBridgeHost(session.hostInput)}
-			requesting={session.requestingAccess}
-			error={errorMessage}
-			onallow={() => session.allowAccess()}
-			disabled={session.busy}
-		>
-			<p>
-				Find your bridge or enter its address, then allow the extension to reach it on your local
-				network. The address is saved in this browser. Find sends one request to
-				discovery.meethue.com.
-			</p>
-			<BridgeHostField
-				bind:value={session.hostInput}
-				discovering={session.discovering}
-				disabled={session.busy}
-				ondiscover={() => session.discover()}
-				onsubmit={() => session.allowAccess()}
-			/>
-		</AccessPanel>
+		<SetupChecklist {session} />
 	{/if}
 </main>
 

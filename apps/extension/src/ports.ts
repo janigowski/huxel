@@ -21,6 +21,7 @@ export interface Dependencies {
 	storage: KeyValueStorage;
 	hostAccess: HostAccess;
 	discoverBridges(): Promise<DiscoveredBridge[]>;
+	reachBridge(origin: string): Promise<void>;
 	registerApplication(origin: string): Promise<string>;
 	openHueApp(credentials: BridgeCredentials): HueApp;
 }

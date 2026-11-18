@@ -113,6 +113,13 @@ export function createPreviewDependencies(): Dependencies {
 
 			return [PREVIEW_BRIDGE];
 		},
+		async reachBridge(origin) {
+			await wait(LATENCY_MS);
+
+			if (origin !== previewOrigin) {
+				throw new HueNetworkError(`Network request failed: GET ${origin}/`);
+			}
+		},
 		async registerApplication(origin) {
 			await wait(LATENCY_MS);
 

@@ -1,5 +1,5 @@
 import type { BridgeLight } from '@huxel/app';
-import { HueRateLimitError } from '@huxel/client';
+import { HueNetworkError, HueRateLimitError, type DiscoveredBridge } from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import { page } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
@@ -10,6 +10,8 @@ import {
 	BRIDGE_HOST,
 	BRIDGE_ID,
 	BRIDGE_ORIGIN,
+	deferred,
+	discoveredBridge,
 	FailingStorage,
 	FakeBridge,
 	linkButtonNotPressed,
@@ -33,6 +35,21 @@ const hostInput = () => page.getByLabelText('Bridge address');
 const roomsHeading = () => page.getByRole('heading', { name: 'Rooms' });
 
 describe('App', () => {
+	it('looks up a bridge on its own when nothing is saved', async () => {
+		let calls = 0;
+		const bridge = new FakeBridge({
+			discovery: async () => {
+				calls += 1;
+				return [];
+			}
+		});
+
+		await renderApp(bridge);
+
+		await expect.element(page.getByRole('button', { name: 'Find' })).not.toBeInTheDocument();
+		expect(calls).toBe(1);
+	});
+
 	it('shows a loading state until the session is restored', async () => {
 		const session = new BridgeSession(new FakeBridge().dependencies);
 
@@ -43,11 +60,19 @@ describe('App', () => {
 		await session.restore();
 
 		await expect.element(page.getByText('Loading…')).not.toBeInTheDocument();
-		await expect.element(hostInput()).toBeVisible();
+		await expect.element(page.getByText('Obtaining the bridge address')).toBeVisible();
 	});
 
 	it('restores a linked bridge and shows its lights', async () => {
-		const bridge = new FakeBridge({ storage: linkedBridgeStorage(), granted: [BRIDGE_ORIGIN] });
+		let calls = 0;
+		const bridge = new FakeBridge({
+			storage: linkedBridgeStorage(),
+			granted: [BRIDGE_ORIGIN],
+			discovery: async () => {
+				calls += 1;
+				return [];
+			}
+		});
 
 		await renderApp(bridge);
 
@@ -57,10 +82,40 @@ describe('App', () => {
 		await expect.element(page.getByRole('heading', { name: 'Zones' })).toBeVisible();
 		await expect.element(page.getByText('All lights')).not.toBeInTheDocument();
 		expect(bridge.openedWith).toEqual([{ origin: BRIDGE_ORIGIN, appKey: 'stored-key' }]);
+		expect(calls).toBe(0);
+	});
+
+	it('shows obtaining the bridge address in progress, then done from discovery', async () => {
+		const discovery = deferred<DiscoveredBridge[]>();
+		const bridge = new FakeBridge({ discovery: () => discovery.promise });
+		const session = new BridgeSession(bridge.dependencies);
+
+		await render(App, { session });
+		await session.restore();
+
+		await expect.element(page.getByText('In progress')).toBeVisible();
+		await expect.element(hostInput()).not.toBeInTheDocument();
+		await expect
+			.poll(() => {
+				const status = document.querySelector('.status');
+
+				return status ? getComputedStyle(status).animationName : 'none';
+			})
+			.not.toBe('none');
+
+		discovery.resolve([discoveredBridge()]);
+
+		await expect.element(page.getByText('Done')).toBeVisible();
+		await expect.element(page.getByText('The address came from discovery.')).toBeVisible();
+		await expect.element(hostInput()).not.toBeInTheDocument();
+		await expect.element(page.getByText(`Bridge ${BRIDGE_HOST}`)).toBeVisible();
 	});
 
 	it('allows host access first, then links after the link button is pressed', async () => {
-		const bridge = new FakeBridge({ registrations: [linkButtonNotPressed(), 'new-key'] });
+		const bridge = new FakeBridge({
+			discovery: async () => [],
+			registrations: [linkButtonNotPressed(), 'new-key']
+		});
 
 		await renderApp(bridge);
 
@@ -70,7 +125,13 @@ describe('App', () => {
 		await hostInput().fill('https://192.168.1.10/');
 		await allowButton().click();
 
+		await expect.element(page.getByText('Authorizing the bridge')).toBeVisible();
 		await expect.element(page.getByText(`Bridge ${BRIDGE_HOST}`)).toBeVisible();
+		await expect
+			.element(
+				page.getByText('Press the link button on your Hue bridge, then connect within 30 seconds.')
+			)
+			.toBeVisible();
 		await expect
 			.element(page.getByText(/application key from the bridge is saved in this browser/))
 			.toBeVisible();
@@ -82,10 +143,12 @@ describe('App', () => {
 		await expect
 			.element(page.getByText('Press the link button on the bridge, then connect again.'))
 			.toBeVisible();
+		await expect.element(connectButton()).toBeVisible();
 
 		await connectButton().click();
 
 		await expect.element(roomsHeading()).toBeVisible();
+		await expect.element(page.getByText('Obtaining the bridge address')).not.toBeInTheDocument();
 		await expect.element(page.getByText(`Linked to ${BRIDGE_HOST}`)).toBeVisible();
 		expect(bridge.hostAccess.requests).toEqual([BRIDGE_ORIGIN]);
 		expect(bridge.registrationOrigins).toEqual([BRIDGE_ORIGIN, BRIDGE_ORIGIN]);
@@ -124,7 +187,6 @@ describe('App', () => {
 		const bridge = new FakeBridge({ grantOnRequest: false });
 
 		await renderApp(bridge);
-		await hostInput().fill(BRIDGE_HOST);
 		await allowButton().click();
 
 		await expect.element(page.getByText(/Access to 192.168.1.10 was not allowed/)).toBeVisible();
@@ -132,14 +194,10 @@ describe('App', () => {
 		expect(bridge.registrationOrigins).toEqual([]);
 	});
 
-	it('fills the host from discovery and keeps the discovered bridge id', async () => {
+	it('keeps the discovered bridge id when one bridge is found', async () => {
 		const bridge = new FakeBridge();
 
 		await renderApp(bridge);
-		await page.getByRole('button', { name: 'Find' }).click();
-
-		await expect.element(hostInput()).toHaveValue(BRIDGE_HOST);
-
 		await allowButton().click();
 		await connectButton().click();
 
@@ -151,53 +209,120 @@ describe('App', () => {
 		});
 	});
 
-	it('skips the access step for a discovered bridge that already has access', async () => {
+	it('marks allow access done when the browser already granted it', async () => {
 		const bridge = new FakeBridge({ granted: [BRIDGE_ORIGIN] });
 
 		await renderApp(bridge);
-		await page.getByRole('button', { name: 'Find' }).click();
 
 		await expect.element(connectButton()).toBeEnabled();
 	});
 
-	it('suggests manual entry when no bridge is discovered', async () => {
+	it('asks for an address when no bridge is discovered', async () => {
 		const bridge = new FakeBridge({ discovery: async () => [] });
 
 		await renderApp(bridge);
-		await page.getByRole('button', { name: 'Find' }).click();
 
 		await expect.element(page.getByText(/No bridge found on this network/)).toBeVisible();
+		await expect.element(page.getByText('Needs you').first()).toBeVisible();
 		await expect.element(hostInput()).toHaveValue('');
 	});
 
-	it('suggests manual entry when discovery is rate limited', async () => {
+	it('asks for an address when discovery is rate limited', async () => {
 		const bridge = new FakeBridge({
 			discovery: () => Promise.reject(new HueRateLimitError('Too many requests', 429, []))
 		});
 
 		await renderApp(bridge);
-		await page.getByRole('button', { name: 'Find' }).click();
 
 		await expect.element(page.getByText(/Enter the bridge address instead/)).toBeVisible();
 		await expect.element(hostInput()).toBeEnabled();
 	});
 
-	it('explains how to trust the certificate when the bridge is unreachable', async () => {
-		const bridge = new FakeBridge({ registrations: [networkError()] });
+	it('asks for an address when the discovery service cannot be reached', async () => {
+		const bridge = new FakeBridge({
+			discovery: () => Promise.reject(new HueNetworkError('offline'))
+		});
 
 		await renderApp(bridge);
-		await hostInput().fill(BRIDGE_HOST);
+
+		await expect.element(page.getByText(/Could not reach the Hue discovery service/)).toBeVisible();
+		await expect.element(hostInput()).toBeVisible();
+	});
+
+	it('lists every bridge and waits for an address when several are found', async () => {
+		const bridge = new FakeBridge({
+			discovery: async () => [
+				discoveredBridge(),
+				{ id: '001788fffe000002', internalipaddress: '192.168.1.20' }
+			]
+		});
+
+		await renderApp(bridge);
+
+		await expect.element(hostInput()).toBeVisible();
+		await expect.element(page.getByText(BRIDGE_HOST)).toBeVisible();
+		await expect.element(page.getByText('192.168.1.20')).toBeVisible();
+		await expect.element(connectButton()).not.toBeInTheDocument();
+		await expect
+			.element(page.getByText('The address came from discovery.'))
+			.not.toBeInTheDocument();
+
+		await hostInput().fill('192.168.1.20');
 		await allowButton().click();
 		await connectButton().click();
 
-		await expect.element(page.getByText(/accept its certificate/)).toBeVisible();
+		expect(bridge.stored.linkedBridge).toEqual({
+			host: '192.168.1.20',
+			id: '001788fffe000002',
+			appKey: 'app-key'
+		});
+	});
+
+	it('keeps a saved draft address and does not look up another bridge', async () => {
+		let calls = 0;
+		const bridge = new FakeBridge({
+			storage: { draftHost: BRIDGE_HOST },
+			discovery: async () => {
+				calls += 1;
+				return [];
+			}
+		});
+
+		await renderApp(bridge);
+
+		await expect.element(page.getByText(`Bridge ${BRIDGE_HOST}`)).toBeVisible();
+		await expect.element(hostInput()).not.toBeInTheDocument();
+		expect(calls).toBe(0);
+	});
+
+	it('explains how to trust the bridge and opens its address', async () => {
+		const bridge = new FakeBridge();
+
+		await renderApp(bridge);
+
+		await expect.element(page.getByText(/connection is not private/)).toBeVisible();
+		await expect.element(page.getByText(/choose Advanced, then Proceed/)).toBeVisible();
 		await expect
 			.element(page.getByRole('link', { name: `Open ${BRIDGE_HOST}` }))
 			.toHaveAttribute('href', `${BRIDGE_ORIGIN}/`);
+		await expect.element(connectButton()).not.toBeInTheDocument();
+	});
+
+	it('leaves trust open and hides the link button when the bridge does not answer', async () => {
+		const bridge = new FakeBridge({
+			granted: [BRIDGE_ORIGIN],
+			reach: () => Promise.reject(networkError())
+		});
+
+		await renderApp(bridge);
+
+		await expect.element(page.getByText('Trust the bridge')).toBeVisible();
+		await expect.element(page.getByText(/connection is not private/)).toBeVisible();
+		await expect.element(connectButton()).not.toBeInTheDocument();
 	});
 
 	it('rejects invalid and IPv6 addresses without requesting access', async () => {
-		const bridge = new FakeBridge();
+		const bridge = new FakeBridge({ discovery: async () => [] });
 
 		await renderApp(bridge);
 		await hostInput().fill('192.168.1.10/api');
@@ -308,7 +433,14 @@ describe('App', () => {
 	});
 
 	it('asks to allow access again when site access was revoked', async () => {
-		const bridge = new FakeBridge({ storage: linkedBridgeStorage() });
+		let calls = 0;
+		const bridge = new FakeBridge({
+			storage: linkedBridgeStorage(),
+			discovery: async () => {
+				calls += 1;
+				return [];
+			}
+		});
 
 		await renderApp(bridge);
 
@@ -320,5 +452,6 @@ describe('App', () => {
 
 		await expect.element(roomsHeading()).toBeVisible();
 		expect(bridge.hostAccess.requests).toEqual([BRIDGE_ORIGIN]);
+		expect(calls).toBe(0);
 	});
 });

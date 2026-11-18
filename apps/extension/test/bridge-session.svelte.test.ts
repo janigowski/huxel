@@ -73,18 +73,16 @@ describe('BridgeSession', () => {
 		expect(session.status).toBe('linked');
 	});
 
-	it('keeps an address typed while discovery was running', async () => {
+	it('keeps an address typed while discovery is running', async () => {
 		const discovery = deferred<DiscoveredBridge[]>();
 		const bridge = new FakeBridge({ discovery: () => discovery.promise });
 		const session = new BridgeSession(bridge.dependencies);
 
 		await session.restore();
 
-		const discovering = session.discover();
-
 		session.hostInput = '10.0.0.7';
 		discovery.resolve([discoveredBridge()]);
-		await discovering;
+		await expect.poll(() => session.discovering).toBe(false);
 
 		expect(session.hostInput).toBe('10.0.0.7');
 	});
@@ -102,6 +100,7 @@ describe('BridgeSession', () => {
 		});
 
 		await session.restore();
+		await expect.poll(() => session.discovering).toBe(false);
 		session.hostInput = BRIDGE_HOST;
 		await session.allowAccess();
 

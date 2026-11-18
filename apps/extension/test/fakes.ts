@@ -94,6 +94,7 @@ export interface FakeBridgeOptions {
 	granted?: readonly string[];
 	grantOnRequest?: boolean;
 	discovery?: () => Promise<DiscoveredBridge[]>;
+	reach?: (origin: string) => Promise<void>;
 	registrations?: Array<string | Error | Promise<string>>;
 	gateways?: HueGateway[];
 }
@@ -106,6 +107,7 @@ export class FakeBridge {
 	readonly openedWith: BridgeCredentials[] = [];
 
 	private readonly discovery: () => Promise<DiscoveredBridge[]>;
+	private readonly reach: (origin: string) => Promise<void>;
 	private readonly registrations: Array<string | Error | Promise<string>>;
 	private readonly gateways: HueGateway[];
 
@@ -118,6 +120,7 @@ export class FakeBridge {
 			grantOnRequest: options.grantOnRequest
 		});
 		this.discovery = options.discovery ?? (async () => [discoveredBridge()]);
+		this.reach = options.reach ?? (async () => {});
 		this.registrations = [...(options.registrations ?? ['app-key'])];
 		this.gateways = [...(options.gateways ?? [])];
 	}
@@ -127,6 +130,7 @@ export class FakeBridge {
 			storage: this.storage,
 			hostAccess: this.hostAccess,
 			discoverBridges: () => this.discovery(),
+			reachBridge: (origin) => this.reach(origin),
 			registerApplication: async (origin) => {
 				this.registrationOrigins.push(origin);
 
