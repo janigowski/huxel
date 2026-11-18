@@ -13,10 +13,13 @@ export interface BridgeStore {
 	forgetLinkedBridge(): Promise<void>;
 	loadDraftHost(): Promise<string | null>;
 	saveDraftHost(host: string): Promise<void>;
+	loadDraftId(): Promise<string | null>;
+	saveDraftId(id: string | null): Promise<void>;
 }
 
 export const LINKED_BRIDGE_KEY = 'linkedBridge';
 export const DRAFT_HOST_KEY = 'draftHost';
+export const DRAFT_ID_KEY = 'draftBridgeId';
 
 export function createBridgeStore(storage: KeyValueStorage): BridgeStore {
 	return {
@@ -36,6 +39,14 @@ export function createBridgeStore(storage: KeyValueStorage): BridgeStore {
 		},
 		saveDraftHost(host) {
 			return storage.set(DRAFT_HOST_KEY, host);
+		},
+		async loadDraftId() {
+			const value = await storage.get(DRAFT_ID_KEY);
+
+			return typeof value === 'string' && value !== '' ? value : null;
+		},
+		saveDraftId(id) {
+			return id === null ? storage.remove(DRAFT_ID_KEY) : storage.set(DRAFT_ID_KEY, id);
 		}
 	};
 }

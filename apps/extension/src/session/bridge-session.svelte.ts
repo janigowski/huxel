@@ -71,7 +71,7 @@ export class BridgeSession {
 		this.reaching ? 'in-progress' : this.trustPhase === 'done' ? 'done' : 'needs-you'
 	);
 
-	readonly accessVisible = $derived(this.showAddressField || this.trustVisible);
+	readonly accessVisible = $derived(this.trustVisible);
 
 	readonly accessStepStatus = $derived<StepStatus>(
 		this.requestingAccess ? 'in-progress' : this.linkHost ? 'done' : 'needs-you'
@@ -167,7 +167,7 @@ export class BridgeSession {
 		}
 	}
 
-	async allowAccess(): Promise<void> {
+	async commitAddress(): Promise<void> {
 		if (this.busy) {
 			return;
 		}
@@ -190,15 +190,46 @@ export class BridgeSession {
 			this.addressHint = null;
 		}
 
+		try {
+			await this.rememberDraft(host);
+		} catch (error) {
+			this.error = { message: describeError(error) };
+			return;
+		}
+
 		this.addressStatus = 'ready';
 		this.editingAddress = false;
 		this.addressMessage = null;
 		this.trustPhase = 'open';
+		this.linkHost = (await this.hasAccess(host)) ? host : null;
+
+		if (this.linkHost) {
+			await this.reach();
+		}
+	}
+
+	async allowAccess(): Promise<void> {
+		if (this.busy || this.addressStatus !== 'ready' || this.editingAddress) {
+			return;
+		}
+
+		this.error = null;
+
+		const parsed = parseBridgeHostInput(this.hostInput);
+
+		if (!parsed.ok) {
+			this.error = describeInvalidHost(parsed.reason);
+			return;
+		}
+
+		const { host } = parsed;
+
+		this.hostInput = host;
 		this.requestingAccess = true;
 
 		try {
 			const request = this.dependencies.hostAccess.request(bridgeOrigin(host));
-			const [granted] = await Promise.all([request, this.store.saveDraftHost(host)]);
+			const [granted] = await Promise.all([request, this.rememberDraft(host)]);
 
 			if (!granted) {
 				this.linkHost = null;
@@ -323,6 +354,12 @@ export class BridgeSession {
 	}
 
 	private async useSavedHost(host: string): Promise<void> {
+		const id = await this.store.loadDraftId();
+
+		if (id) {
+			this.discoveredByHost.set(host, id);
+		}
+
 		this.hostInput = host;
 		this.addressStatus = 'ready';
 		this.addressHint = null;
@@ -337,6 +374,13 @@ export class BridgeSession {
 
 	private async useDiscoveredHost(host: string): Promise<void> {
 		this.hostInput = host;
+
+		try {
+			await this.rememberDraft(host);
+		} catch (error) {
+			this.error = { message: describeError(error) };
+		}
+
 		this.candidateHosts = [];
 		this.addressMessage = null;
 		this.addressHint = DISCOVERY_HINT;
@@ -348,6 +392,12 @@ export class BridgeSession {
 		if (this.linkHost) {
 			await this.reach();
 		}
+	}
+
+	private async rememberDraft(host: string): Promise<void> {
+		const id = this.discoveredByHost.get(host) ?? null;
+
+		await Promise.all([this.store.saveDraftHost(host), this.store.saveDraftId(id)]);
 	}
 
 	private async reach(): Promise<void> {

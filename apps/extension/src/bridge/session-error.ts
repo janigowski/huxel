@@ -51,7 +51,7 @@ export function describeDiscoveryError(error: unknown): SessionError {
 		};
 	}
 
-	return { message: describeError(error) };
+	return { message: `${describeError(error)} Enter the bridge address instead.` };
 }
 
 export function isUnreachable(error: unknown): boolean {

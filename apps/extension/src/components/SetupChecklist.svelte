@@ -52,7 +52,7 @@
 				<p>{session.addressMessage}</p>
 			{/if}
 
-			{#if session.candidateHosts.length > 1}
+			{#if session.showAddressField && session.candidateHosts.length > 1}
 				<ul aria-label="Discovered bridges">
 					{#each session.candidateHosts as candidate (candidate)}
 						<li>{candidate}</li>
@@ -64,8 +64,11 @@
 				<BridgeHostField
 					bind:value={session.hostInput}
 					disabled={session.busy}
-					onsubmit={() => session.allowAccess()}
+					onsubmit={() => session.commitAddress()}
 				/>
+				<ActionButton onclick={() => session.commitAddress()} disabled={session.busy}>
+					Use this address
+				</ActionButton>
 			{:else if session.addressStatus === 'ready' && host}
 				<SelectedHost {host} disabled={session.busy} onchange={() => session.changeHost()} />
 			{/if}
@@ -76,7 +79,7 @@
 				{@render step('Trust the bridge', session.trustStepStatus)}
 				<p>
 					Chrome says the connection is not private because it does not trust the bridge's
-					certificate. Open the bridge, choose Advanced, then Proceed, and come back.
+					certificate. Open the bridge, choose Advanced, then Proceed, close the tab, and come back.
 				</p>
 				<a href="{`https://${host}`}/" target="_blank" rel="noreferrer"
 					><Label>Open {host}</Label></a

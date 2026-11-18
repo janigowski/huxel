@@ -1,4 +1,9 @@
-import { HueLinkButtonNotPressedError, HueNetworkError, HueRateLimitError } from '@huxel/client';
+import {
+	HueApiError,
+	HueLinkButtonNotPressedError,
+	HueNetworkError,
+	HueRateLimitError
+} from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import {
 	describeConnectError,
@@ -39,6 +44,16 @@ describe('describeDiscoveryError', () => {
 		);
 		expect(describeDiscoveryError(new HueNetworkError('offline')).message).toContain(
 			'Enter the bridge address'
+		);
+	});
+
+	it('asks for an address when discovery fails for another reason', () => {
+		expect(
+			describeDiscoveryError(
+				new HueApiError('Hue API request GET discovery failed with status 500', 500, [])
+			).message
+		).toBe(
+			'Hue API request GET discovery failed with status 500 Enter the bridge address instead.'
 		);
 	});
 });

@@ -1,5 +1,10 @@
 import type { BridgeLight } from '@huxel/app';
-import { HueNetworkError, HueRateLimitError, type DiscoveredBridge } from '@huxel/client';
+import {
+	HueApiError,
+	HueNetworkError,
+	HueRateLimitError,
+	type DiscoveredBridge
+} from '@huxel/client';
 import { describe, expect, it } from 'vite-plus/test';
 import { page } from 'vite-plus/test/browser';
 import { render } from 'vitest-browser-svelte';
@@ -123,6 +128,14 @@ describe('App', () => {
 		await expect.element(connectButton()).not.toBeInTheDocument();
 
 		await hostInput().fill('https://192.168.1.10/');
+		await expect.element(allowButton()).not.toBeInTheDocument();
+
+		await page.getByRole('button', { name: 'Use this address' }).click();
+
+		await expect.element(page.getByText(/connection is not private/)).toBeVisible();
+		await expect.element(page.getByText(/close the tab/)).toBeVisible();
+		expect(bridge.hostAccess.requests).toEqual([]);
+
 		await allowButton().click();
 
 		await expect.element(page.getByText('Authorizing the bridge')).toBeVisible();
@@ -194,6 +207,39 @@ describe('App', () => {
 		expect(bridge.registrationOrigins).toEqual([]);
 	});
 
+	it('keeps the discovered bridge id when the popup closes before linking', async () => {
+		let calls = 0;
+		const bridge = new FakeBridge({
+			discovery: async () => {
+				calls += 1;
+
+				return [discoveredBridge()];
+			}
+		});
+
+		await renderApp(bridge);
+
+		await expect.element(page.getByText('The address came from discovery.')).toBeVisible();
+		expect(bridge.stored.draftHost).toBe(BRIDGE_HOST);
+		expect(bridge.stored.draftBridgeId).toBe(BRIDGE_ID);
+		expect(calls).toBe(1);
+
+		const resumed = new BridgeSession(bridge.dependencies);
+
+		await resumed.restore();
+
+		expect(calls).toBe(1);
+
+		await resumed.allowAccess();
+		await resumed.connect();
+
+		expect(bridge.stored.linkedBridge).toEqual({
+			host: BRIDGE_HOST,
+			id: BRIDGE_ID,
+			appKey: 'app-key'
+		});
+	});
+
 	it('keeps the discovered bridge id when one bridge is found', async () => {
 		const bridge = new FakeBridge();
 
@@ -238,6 +284,20 @@ describe('App', () => {
 		await expect.element(hostInput()).toBeEnabled();
 	});
 
+	it('asks for an address when discovery fails', async () => {
+		const bridge = new FakeBridge({
+			discovery: () =>
+				Promise.reject(
+					new HueApiError('Hue API request GET discovery failed with status 500', 500, [])
+				)
+		});
+
+		await renderApp(bridge);
+
+		await expect.element(page.getByText(/Enter the bridge address instead/)).toBeVisible();
+		await expect.element(hostInput()).toBeVisible();
+	});
+
 	it('asks for an address when the discovery service cannot be reached', async () => {
 		const bridge = new FakeBridge({
 			discovery: () => Promise.reject(new HueNetworkError('offline'))
@@ -268,6 +328,7 @@ describe('App', () => {
 			.not.toBeInTheDocument();
 
 		await hostInput().fill('192.168.1.20');
+		await page.getByRole('button', { name: 'Use this address' }).click();
 		await allowButton().click();
 		await connectButton().click();
 
@@ -301,7 +362,9 @@ describe('App', () => {
 		await renderApp(bridge);
 
 		await expect.element(page.getByText(/connection is not private/)).toBeVisible();
-		await expect.element(page.getByText(/choose Advanced, then Proceed/)).toBeVisible();
+		await expect
+			.element(page.getByText(/choose Advanced, then Proceed, close the tab/))
+			.toBeVisible();
 		await expect
 			.element(page.getByRole('link', { name: `Open ${BRIDGE_HOST}` }))
 			.toHaveAttribute('href', `${BRIDGE_ORIGIN}/`);
@@ -326,12 +389,12 @@ describe('App', () => {
 
 		await renderApp(bridge);
 		await hostInput().fill('192.168.1.10/api');
-		await allowButton().click();
+		await page.getByRole('button', { name: 'Use this address' }).click();
 
 		await expect.element(page.getByText(/Enter the bridge address, for example/)).toBeVisible();
 
 		await hostInput().fill('fe80::1');
-		await allowButton().click();
+		await page.getByRole('button', { name: 'Use this address' }).click();
 
 		await expect.element(page.getByText(/IPv6 addresses are not supported/)).toBeVisible();
 		expect(bridge.hostAccess.requests).toEqual([]);

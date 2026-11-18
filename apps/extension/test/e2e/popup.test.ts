@@ -43,6 +43,12 @@ async function showAddressField(popup: Page): Promise<void> {
 	await field.waitFor();
 }
 
+async function commitAddress(popup: Page, host: string): Promise<void> {
+	await showAddressField(popup);
+	await popup.getByLabel('Bridge address').fill(host);
+	await popup.getByRole('button', { name: 'Use this address' }).click();
+}
+
 describe('extension popup', () => {
 	it('renders the setup checklist', async () => {
 		const popup = collectErrors(await extension.openPopup());
@@ -59,8 +65,7 @@ describe('extension popup', () => {
 		const popup = collectErrors(await extension.openPopup());
 
 		await finishDiscovery(popup);
-		await showAddressField(popup);
-		await popup.getByLabel('Bridge address').fill(UNREACHABLE_HOST);
+		await commitAddress(popup, UNREACHABLE_HOST);
 		await popup.getByRole('button', { name: `Allow access to ${UNREACHABLE_HOST}` }).click();
 		await popup.getByRole('button', { name: 'Waiting for access…' }).waitFor();
 		await popup.reload();
@@ -75,10 +80,9 @@ describe('extension popup', () => {
 		const popup = collectErrors(await extension.openPopup());
 
 		await finishDiscovery(popup);
-		await showAddressField(popup);
-		await popup.getByLabel('Bridge address').fill(UNREACHABLE_HOST);
-		await popup.getByRole('button', { name: `Allow access to ${UNREACHABLE_HOST}` }).click();
+		await commitAddress(popup, UNREACHABLE_HOST);
 		await popup.getByText(/connection is not private/).waitFor();
+		await popup.getByText(/close the tab/).waitFor();
 
 		expect(
 			await popup.getByRole('link', { name: `Open ${UNREACHABLE_HOST}` }).getAttribute('href')
@@ -104,9 +108,13 @@ describe('extension popup', () => {
 		await finishDiscovery(popup);
 
 		if ((await connect.count()) === 0) {
-			await showAddressField(popup);
-			await popup.getByLabel('Bridge address').fill(host);
-			await popup.getByRole('button', { name: /Allow access/ }).click();
+			await commitAddress(popup, host);
+
+			const allow = popup.getByRole('button', { name: /Allow access/ });
+
+			if ((await allow.count()) > 0) {
+				await allow.click();
+			}
 		}
 
 		await connect.click();

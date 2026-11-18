@@ -3,6 +3,7 @@ import { MemoryStorage } from '../src/adapters/memory-storage';
 import {
 	createBridgeStore,
 	DRAFT_HOST_KEY,
+	DRAFT_ID_KEY,
 	LINKED_BRIDGE_KEY,
 	parseLinkedBridge
 } from '../src/bridge/bridge-store';
@@ -76,5 +77,24 @@ describe('createBridgeStore', () => {
 		await storage.set(DRAFT_HOST_KEY, 12);
 
 		expect(await store.loadDraftHost()).toBeNull();
+	});
+
+	it('round trips the draft bridge id and drops invalid values', async () => {
+		const storage = new MemoryStorage();
+		const store = createBridgeStore(storage);
+
+		await store.saveDraftId('001788fffe7d45eb');
+
+		expect(await store.loadDraftId()).toBe('001788fffe7d45eb');
+		expect(storage.snapshot()).toEqual({ [DRAFT_ID_KEY]: '001788fffe7d45eb' });
+
+		await store.saveDraftId(null);
+
+		expect(await store.loadDraftId()).toBeNull();
+		expect(storage.snapshot()).toEqual({});
+
+		await storage.set(DRAFT_ID_KEY, 12);
+
+		expect(await store.loadDraftId()).toBeNull();
 	});
 });
