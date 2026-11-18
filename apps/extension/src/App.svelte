@@ -111,6 +111,9 @@
 				disabled={session.busy}
 				onchange={() => session.changeHost()}
 			/>
+			<p>
+				The application key from the bridge is saved in this browser and sent only to that bridge.
+			</p>
 		</ConnectPanel>
 
 		{#if session.error?.certificateUrl}
@@ -126,7 +129,8 @@
 		>
 			<p>
 				Find your bridge or enter its address, then allow the extension to reach it on your local
-				network.
+				network. The address is saved in this browser. Find sends one request to
+				discovery.meethue.com.
 			</p>
 			<BridgeHostField
 				bind:value={session.hostInput}

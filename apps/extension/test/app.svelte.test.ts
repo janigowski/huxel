@@ -64,12 +64,16 @@ describe('App', () => {
 
 		await renderApp(bridge);
 
+		await expect.element(page.getByText(/saved in this browser/)).toBeVisible();
 		await expect.element(connectButton()).not.toBeInTheDocument();
 
 		await hostInput().fill('https://192.168.1.10/');
 		await allowButton().click();
 
 		await expect.element(page.getByText(`Bridge ${BRIDGE_HOST}`)).toBeVisible();
+		await expect
+			.element(page.getByText(/application key from the bridge is saved in this browser/))
+			.toBeVisible();
 		expect(bridge.hostAccess.requests).toEqual([BRIDGE_ORIGIN]);
 		expect(bridge.registrationOrigins).toEqual([]);
 

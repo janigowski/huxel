@@ -2,7 +2,7 @@
 
 ![huxel//extension, light control from your browser](./banner.svg)
 
-Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge on the local network, then toggle, dim and recolor lights from the toolbar popup. It is a Svelte 5 + Vite app built from the shared [`@huxel/design-system`](../../packages/design-system) components on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). The extension is not published to a store. You load it unpacked.
+Chromium browser extension (Arc, Chrome) for Philips Hue lights: link a bridge on the local network, then toggle, dim and recolor lights from the toolbar popup. It is a Svelte 5 + Vite app built from the shared [`@huxel/design-system`](../../packages/design-system) components on top of [`@huxel/app`](../../packages/app) and [`@huxel/client`](../../packages/client). Load a local build unpacked while developing. `bun run pack` writes the Chrome Web Store zip.
 
 ## Setup
 
@@ -42,12 +42,15 @@ The application key is stored in `chrome.storage.local`. **Forget bridge** remov
 
 ```bash
 bun run build
+bun run pack
 bun run check
 bun run lint
 bun run test
 bun run test:e2e
 HUE_BRIDGE_HOST=192.168.1.10 bun run test:e2e
 ```
+
+`pack` builds the workspace libraries and the extension, then zips the contents of `dist` into `release/huxel-<version>.zip`. `manifest.json` is at the root of that zip. The dashboard fields to paste are in [`store.md`](./store.md). The privacy policy is [`PRIVACY.md`](../../PRIVACY.md).
 
 ## Testing
 

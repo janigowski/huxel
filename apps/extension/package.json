@@ -9,6 +9,7 @@
 		"dev": "vp run --filter 'extension^...' build && vp dev",
 		"watch": "vp run --filter 'extension^...' build && vp build --watch --outDir dist",
 		"build": "vp build",
+		"pack": "vp run --filter 'extension^...' build && vp build && bun scripts/pack.ts",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"lint": "eslint .",
 		"test": "vp test run",

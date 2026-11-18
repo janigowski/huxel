@@ -52,7 +52,7 @@ Web dashboard. List lights, rooms, and zones, then toggle, dim, and set color wi
 
 ### [extension](./apps/extension)
 
-Chromium toolbar popup for Arc and Chrome. Control the lights on the local network from the browser. You load it unpacked from a local build.
+Chromium toolbar popup for Arc and Chrome. Control the lights on the local network from the browser. Load a local build unpacked, or pack a Chrome Web Store zip with `bun run pack` in this app.
 
 ### [tui-app](./apps/tui-app)
 

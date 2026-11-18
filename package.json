@@ -15,6 +15,7 @@
 	],
 	"scripts": {
 		"build": "vp run -r build",
+		"pack:extension": "vp run --filter extension pack",
 		"check": "vp run -r check && tsc --noEmit -p scripts/codemods && bun run codemod:check",
 		"test": "bun test scripts/codemods && vp run -r test",
 		"lint": "vp fmt --check . && vp run --filter './apps/*' --filter './packages/*' lint",
